@@ -278,7 +278,7 @@ internal sealed class ChatTranscript
                 return;
             }
 
-            SyncFollow(model.ThreadId);
+            SyncFollow(model.ThreadId, model.Loading);
             MaybeLoadOlder(model);
             ImGui.Dummy(new Vector2(0f, 8f * scale));
             var messages = model.Messages;
@@ -435,26 +435,29 @@ internal sealed class ChatTranscript
         }
     }
 
-    private void SyncFollow(string threadId)
+    private void SyncFollow(string threadId, bool loading)
+{
+    var scale = UiScale.Current;
+    if (followThreadId == threadId)
     {
-        var scale = UiScale.Current;
-        if (followThreadId == threadId)
+        if (!loading)
         {
             followBottom = ImGui.GetScrollY() >= ImGui.GetScrollMaxY() - 4f * scale;
         }
-        else
-        {
-            followThreadId = threadId;
-            followBottom = true;
-            olderAnchorFromBottom = -1f;
-        }
-
-        if (snapToBottom)
-        {
-            followBottom = true;
-            snapToBottom = false;
-        }
     }
+    else
+    {
+        followThreadId = threadId;
+        followBottom = true;
+        olderAnchorFromBottom = -1f;
+    }
+
+    if (snapToBottom)
+    {
+        followBottom = true;
+        snapToBottom = false;
+    }
+}
 
     private static void DrawSenderLabel(TranscriptMessage message, PhoneTheme theme)
     {
