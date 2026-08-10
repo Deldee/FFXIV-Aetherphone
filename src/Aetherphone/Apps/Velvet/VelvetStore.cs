@@ -92,21 +92,22 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     private volatile UserDto[] blocked = Array.Empty<UserDto>();
     private volatile bool loadingBlocked;
     private volatile bool blockedLoaded;
-    private readonly VelvetDiscoverHiddenArchive hiddenArchive;
-    private volatile bool hiddenLoaded;
-    private volatile bool hiddenLoading;
+    private volatile UserDto[] notInterested = Array.Empty<UserDto>();
+    private readonly VelvetDiscovernotInterestedArchive notInterestedArchive;
+    private volatile bool notInterestedLoaded;
+    private volatile bool notInterestedLoading;
 
     public VelvetStore(AethernetSession session, VelvetClient client, AccountClient account, SafetyClient safety,
         MediaClient media, NotificationService notifications, Configuration configuration, KeyVault vault,
         ConversationKeyStore keys, PhoneVisibility visibility, RealtimeSignalBus signals, AppInstaller installer,
-        VelvetDiscoverHiddenArchive hiddenArchive)
+        VelvetDiscovernotInterestedArchive notInterestedArchive)
         : base("Velvet", session, safety, media, notifications, vault, keys, visibility, installer.Gate("velvet"))
     {
         this.client = client;
         this.account = account;
         this.configuration = configuration;
         this.signals = signals;
-        this.hiddenArchive = hiddenArchive;
+        this.notInterestedArchive = notInterestedArchive;
         signals.VelvetPinged += OnVelvetPinged;
         signals.SocialPinged += OnSocialPinged;
         signals.ConnectedChanged += OnRealtimeConnected;
@@ -240,7 +241,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         meGate.Reset();
         discoverResults = Array.Empty<VelvetProfileDto>();
         hiddenFromDiscover = Array.Empty<string>();
-        hiddenLoaded = false;
+        notInterestedLoaded = false;
         discoverCursor = null;
         discoverLoaded = false;
         discoverFilter = VelvetDiscoverFilter.Empty;
@@ -1156,7 +1157,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
             var accountId = MyUserId;
             work.Run("discover hidden save",
-                async token => await Task.Run(() => hiddenArchive.Save(accountId, hiddenFromDiscover), token)
+                async token => await Task.Run(() => notInterestedArchive.Save(accountId, hiddenFromDiscover), token)
                     .ConfigureAwait(false));
         }
 
@@ -1631,7 +1632,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
     private void EnsureHiddenLoaded()
     {
-        if (hiddenLoaded || hiddenLoading)
+        if (notInterestedLoaded || notInterestedLoading)
         {
             return;
         }
@@ -1642,11 +1643,11 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
             return;
         }
 
-        hiddenLoading = true;
+        notInterestedLoading = true;
         var epoch = accountEpoch;
         work.Run("discover hidden load", async token =>
         {
-            var ids = await Task.Run(() => hiddenArchive.Load(accountId), token).ConfigureAwait(false);
+            var ids = await Task.Run(() => notInterestedArchive.Load(accountId), token).ConfigureAwait(false);
             if (epoch != accountEpoch || ids.Length == 0)
             {
                 return;
@@ -1658,10 +1659,10 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         {
             if (epoch == accountEpoch)
             {
-                hiddenLoaded = true;
+                notInterestedLoaded = true;
             }
 
-            hiddenLoading = false;
+            notInterestedLoading = false;
         });
     }
 

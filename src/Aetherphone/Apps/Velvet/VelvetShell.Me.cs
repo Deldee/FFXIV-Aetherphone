@@ -189,6 +189,13 @@ internal sealed partial class VelvetShell
         var body = new Rect(new Vector2(area.Min.X, area.Min.Y + VHeader.Height * scale), area.Max);
         using (AppSurface.Begin(body))
         {
+            notInterested = store.N
+            if (blocked.Length == 0)
+            {
+                Typography.DrawCentered(new Vector2(body.Center.X, body.Min.Y + 80f * scale), Loc.T(L.Velvet.BlockedNone),
+                    VelvetTheme.MutedInk, TextStyles.Callout);
+                return;
+            }
             // Implementation for drawing not interested section
         }
     }
