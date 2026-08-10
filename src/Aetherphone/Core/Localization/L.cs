@@ -3035,6 +3035,8 @@ internal static class L
         public static readonly LocString WhoHelp =
             new("velvet.whoHelp", "Choose who can send you a one line intro. Friends means friends of friends.");
         public static readonly LocString BlockedNone = new("velvet.blockedNone", "No one blocked.");
+        public static readonly LocString NotInterestedNone = new("velvet.notInterestedNone", "No one marked as not interested.");
+        public static readonly LocString NotInterestedRemove = new("velvet.notInterestedRemove", "Remove");
         public static readonly LocString ChatsTab = new("velvet.chatsTab", "Chats");
         public static readonly LocString RequestsCount = new("velvet.requestsCount", "Requests ({0})");
         public static readonly LocString MessagesEmptyHint =

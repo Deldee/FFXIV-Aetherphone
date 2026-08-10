@@ -112,8 +112,8 @@ internal sealed partial class VelvetShell
                 router.Push(VelvetView.Blocked);
             }
 
-            
-           
+
+
         }
     }
 
@@ -185,18 +185,54 @@ internal sealed partial class VelvetShell
             router.Pop();
             return;
         }
-
+        if (!store.NotInterestedLoaded && !store.LoadingNotInterested)
+        {
+            store.RefreshNotInterested();
+        }
+        
         var body = new Rect(new Vector2(area.Min.X, area.Min.Y + VHeader.Height * scale), area.Max);
         using (AppSurface.Begin(body))
         {
-            notInterested = store.N
-            if (blocked.Length == 0)
+            var notInterested = store.NotInterested;
+            if (notInterested.Length == 0)
             {
-                Typography.DrawCentered(new Vector2(body.Center.X, body.Min.Y + 80f * scale), Loc.T(L.Velvet.BlockedNone),
+                Typography.DrawCentered(new Vector2(body.Center.X, body.Min.Y + 80f * scale), Loc.T(L.Velvet.NotInterestedNone),
                     VelvetTheme.MutedInk, TextStyles.Callout);
                 return;
             }
-            // Implementation for drawing not interested section
+            Gap(8f);
+            for (var index = 0; index < notInterested.Length; index++)
+            {
+                var user = notInterested[index];
+                var model = new VRowModel
+                {
+                    Title = DisplayNameOf(user.DisplayName, user.Handle),
+                    Subtitle = SocialIdentity.ProfileMeta(user.Handle, RegionCodeOf(user)),
+                    Height = 60f,
+                    Leading = VRowLeading.Avatar,
+                    AvatarRadius = 20f,
+                    Name = DisplayNameOf(user.DisplayName, user.Handle),
+                    World = string.Empty,
+                    AvatarUrl = user.AvatarUrl,
+                    RoleBadges = user.Badges,
+                    UserId = user.UserId,
+                    Pill = Loc.T(L.Velvet.NotInterestedRemove),
+                    PillFilled = false,
+                    PillEnabled = true,
+                };
+                var hit = VRow.Draw(in model, ui, theme, images, lodestone);
+                if (hit == VRowHit.Pill)
+                {
+                    //store.Unblock(user.UserId);
+                }
+                else if (hit == VRowHit.Body)
+                {
+                    OpenProfile(user.UserId);
+                }
+            }
+
+            Gap(40f);
         }
     }
 }
+

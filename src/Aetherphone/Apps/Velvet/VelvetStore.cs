@@ -92,10 +92,10 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     private volatile UserDto[] blocked = Array.Empty<UserDto>();
     private volatile bool loadingBlocked;
     private volatile bool blockedLoaded;
-    private volatile UserDto[] notInterested = Array.Empty<UserDto>();
+    private volatile VelvetProfileDto[] notInterested = Array.Empty<VelvetProfileDto>();
     private readonly VelvetDiscovernotInterestedArchive notInterestedArchive;
     private volatile bool notInterestedLoaded;
-    private volatile bool notInterestedLoading;
+    private volatile bool loadingNotInterested;
 
     public VelvetStore(AethernetSession session, VelvetClient client, AccountClient account, SafetyClient safety,
         MediaClient media, NotificationService notifications, Configuration configuration, KeyVault vault,
@@ -209,6 +209,11 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     public UserDto[] Blocked => blocked;
     public bool LoadingBlocked => loadingBlocked;
     public bool BlockedLoaded => blockedLoaded;
+
+    public VelvetProfileDto[] NotInterested => notInterested;
+    public bool NotInterestedLoaded => notInterestedLoaded;
+    public bool LoadingNotInterested => loadingNotInterested;
+
     public int UnreadCount => ComputeUnread();
 
     public void RefreshThreads() => RefreshThreadListCore();
@@ -1211,6 +1216,33 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         });
     }
 
+    public void RefreshNotInterested()
+    {
+        if (!session.IsSignedIn)
+        {
+            return;
+        }
+
+        loadingNotInterested= true;
+        
+
+            work.Run("notInterested", async token =>
+        {
+            for (var index = 0; index < hiddenFromDiscover.Length; index++)
+            {
+                var user = await client.UserAsync(hiddenFromDiscover[index], token).ConfigureAwait(false);
+                if(user is not null)
+                {
+                    notInterested.Append(user);
+                }
+            }
+        }, () =>
+        {
+            loadingNotInterested = false;
+            notInterestedLoaded = true;
+        });
+    }
+
     // aspects holds one choice per photo, framed exactly as AethergramStore.CreateGram does.
     public void CreatePost(string[] sourcePaths, WallpaperCrop[] crops, PostAspect[] aspects, string caption,
         string[] tags, int audience, Action<bool> onComplete)
@@ -1632,7 +1664,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
     private void EnsureHiddenLoaded()
     {
-        if (notInterestedLoaded || notInterestedLoading)
+        if (notInterestedLoaded || loadingNotInterested)
         {
             return;
         }
@@ -1643,7 +1675,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
             return;
         }
 
-        notInterestedLoading = true;
+        loadingNotInterested = true;
         var epoch = accountEpoch;
         work.Run("discover hidden load", async token =>
         {
@@ -1662,7 +1694,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
                 notInterestedLoaded = true;
             }
 
-            notInterestedLoading = false;
+            loadingNotInterested = false;
         });
     }
 
@@ -1677,6 +1709,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
         return added ? set.ToArray() : existing;
     }
+
 
     protected override void DisposeCore()
     {
