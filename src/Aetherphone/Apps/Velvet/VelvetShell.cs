@@ -347,6 +347,9 @@ internal sealed partial class VelvetShell : IPhoneApp
             case VelvetScreenId.Blocked:
                 DrawBlocked(area);
                 break;
+            case VelvetScreenId.NotInterested:
+                DrawNotInterested(area);
+                break;
             case VelvetScreenId.ChatImage:
                 threadView.DrawImagePicker(area, view.Arg ?? string.Empty);
                 break;

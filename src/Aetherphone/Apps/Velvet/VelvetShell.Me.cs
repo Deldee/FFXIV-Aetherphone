@@ -84,6 +84,20 @@ internal sealed partial class VelvetShell
 
             Gap(18f);
             VSectionHeader.Overline(Loc.T(L.Velvet.SafetyHeader));
+            var NotInterestedRow = new VRowModel
+            {
+                Title = Loc.T(L.Velvet.NotInterested),
+                Leading = VRowLeading.IconTile,
+                TileIcon = FontAwesomeIcon.EyeSlash,
+                TileTint = VelvetTheme.Gold,
+                Chevron = true,
+                Height = 52f,
+            };
+            if (VRow.Draw(in NotInterestedRow, ui, theme, images, lodestone) == VRowHit.Body)
+            {
+                router.Push(VelvetView.NotInterested);
+            }
+
             var blockedRow = new VRowModel
             {
                 Title = Loc.T(L.Velvet.Blocked),
@@ -98,7 +112,8 @@ internal sealed partial class VelvetShell
                 router.Push(VelvetView.Blocked);
             }
 
-            Gap(40f);
+            
+           
         }
     }
 
@@ -160,6 +175,21 @@ internal sealed partial class VelvetShell
             }
 
             Gap(40f);
+        }
+    }
+    private void DrawNotInterested(Rect area)
+    {
+        var scale = UiScale.Current;
+        if (VHeader.Push(area, Loc.T(L.Velvet.NotInterested), theme))
+        {
+            router.Pop();
+            return;
+        }
+
+        var body = new Rect(new Vector2(area.Min.X, area.Min.Y + VHeader.Height * scale), area.Max);
+        using (AppSurface.Begin(body))
+        {
+            // Implementation for drawing not interested section
         }
     }
 }
