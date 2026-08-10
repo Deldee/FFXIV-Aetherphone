@@ -189,7 +189,7 @@ internal sealed partial class VelvetShell
         {
             store.RefreshNotInterested();
         }
-        
+
         var body = new Rect(new Vector2(area.Min.X, area.Min.Y + VHeader.Height * scale), area.Max);
         using (AppSurface.Begin(body))
         {
@@ -223,7 +223,7 @@ internal sealed partial class VelvetShell
                 var hit = VRow.Draw(in model, ui, theme, images, lodestone);
                 if (hit == VRowHit.Pill)
                 {
-                    //store.Unblock(user.UserId);
+                    store.RemoveFromNotInterested(user.UserId);
                 }
                 else if (hit == VRowHit.Body)
                 {

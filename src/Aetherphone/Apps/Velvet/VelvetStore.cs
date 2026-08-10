@@ -94,6 +94,8 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     private volatile bool blockedLoaded;
     private volatile VelvetProfileDto[] notInterested = Array.Empty<VelvetProfileDto>();
     private readonly VelvetDiscovernotInterestedArchive notInterestedArchive;
+    private volatile bool hiddenIdsLoaded;
+    private volatile bool loadingHiddenIds;
     private volatile bool notInterestedLoaded;
     private volatile bool loadingNotInterested;
 
@@ -245,8 +247,10 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         accessBlocked = false;
         meGate.Reset();
         discoverResults = Array.Empty<VelvetProfileDto>();
+
         hiddenFromDiscover = Array.Empty<string>();
         notInterestedLoaded = false;
+        hiddenIdsLoaded = false;
         discoverCursor = null;
         discoverLoaded = false;
         discoverFilter = VelvetDiscoverFilter.Empty;
@@ -626,7 +630,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
             return;
         }
 
-        
+
         var epoch = ++discoverEpoch;
         discoverFilter = filter;
         discoverTags = tags;
@@ -1153,6 +1157,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     public void HideFromDiscover(string userId)
     {
         var hidden = hiddenFromDiscover;
+        notInterestedLoaded = false;
         if (Array.IndexOf(hidden, userId) < 0)
         {
             var grown = new string[hidden.Length + 1];
@@ -1167,6 +1172,32 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         }
 
         discoverResults = RemoveDiscover(discoverResults, userId);
+    }
+
+    public void RemoveFromNotInterested(string userId)
+    {
+        var hidden = hiddenFromDiscover;
+        var index = Array.IndexOf(hidden, userId);
+        if (index < 0)
+        {
+            return;
+        }
+
+        var trimmed = new string[hidden.Length - 1];
+        Array.Copy(hidden, trimmed, index);
+        Array.Copy(hidden, index + 1, trimmed, index, hidden.Length - index - 1);
+        hiddenFromDiscover = trimmed;
+
+        notInterested = RemoveProfile(notInterested, userId);
+
+        // Discover's cached results were filtered against the old hidden set;
+        // force a refresh so this user can resurface there.
+        discoverLoaded = false;
+
+        var accountId = MyUserId;
+        work.Run("discover hidden remove",
+            async token => await Task.Run(() => notInterestedArchive.Save(accountId, hiddenFromDiscover), token)
+                .ConfigureAwait(false));
     }
 
     private static VelvetProfileDto[] RemoveDiscover(VelvetProfileDto[] source, string userId)
@@ -1218,28 +1249,51 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
     public void RefreshNotInterested()
     {
-        if (!session.IsSignedIn)
+        if (!session.IsSignedIn || loadingNotInterested)
         {
             return;
         }
 
-        loadingNotInterested= true;
-        
-
-            work.Run("notInterested", async token =>
+        var accountId = MyUserId;
+        loadingNotInterested = true;
+        var epoch = accountEpoch;
+        work.Run("notInterested", async token =>
         {
-            for (var index = 0; index < hiddenFromDiscover.Length; index++)
+            if (!hiddenIdsLoaded)
             {
-                var user = await client.UserAsync(hiddenFromDiscover[index], token).ConfigureAwait(false);
-                if(user is not null)
+                var stored = await Task.Run(() => notInterestedArchive.Load(accountId), token).ConfigureAwait(false);
+                if (epoch != accountEpoch)
                 {
-                    notInterested.Append(user);
+                    return;
                 }
+
+                hiddenFromDiscover = MergeHidden(hiddenFromDiscover, stored);
+                discoverResults = WithoutHidden(discoverResults);
+                hiddenIdsLoaded = true;
+            }
+
+            var ids = hiddenFromDiscover;
+            var list = new List<VelvetProfileDto>(ids.Length);
+            for (var index = 0; index < ids.Length; index++)
+            {
+                var user = await client.UserAsync(ids[index], token).ConfigureAwait(false);
+                if (user is not null && epoch == accountEpoch)
+                {
+                    list.Add(user);
+                }
+            }
+
+            if (epoch == accountEpoch)
+            {
+                notInterested = list.ToArray();
             }
         }, () =>
         {
+            if (epoch == accountEpoch)
+            {
+                notInterestedLoaded = true;
+            }
             loadingNotInterested = false;
-            notInterestedLoaded = true;
         });
     }
 
@@ -1664,7 +1718,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
     private void EnsureHiddenLoaded()
     {
-        if (notInterestedLoaded || loadingNotInterested)
+        if (hiddenIdsLoaded || loadingHiddenIds)
         {
             return;
         }
@@ -1675,7 +1729,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
             return;
         }
 
-        loadingNotInterested = true;
+        loadingHiddenIds = true;
         var epoch = accountEpoch;
         work.Run("discover hidden load", async token =>
         {
@@ -1691,10 +1745,9 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         {
             if (epoch == accountEpoch)
             {
-                notInterestedLoaded = true;
+                hiddenIdsLoaded = true;
             }
-
-            loadingNotInterested = false;
+            loadingHiddenIds = false;
         });
     }
 
@@ -1710,6 +1763,23 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         return added ? set.ToArray() : existing;
     }
 
+    private static VelvetProfileDto[] RemoveProfile(VelvetProfileDto[] source, string userId)
+    {
+        for (var index = 0; index < source.Length; index++)
+        {
+            if (source[index].UserId != userId)
+            {
+                continue;
+            }
+
+            var trimmed = new VelvetProfileDto[source.Length - 1];
+            Array.Copy(source, trimmed, index);
+            Array.Copy(source, index + 1, trimmed, index, source.Length - index - 1);
+            return trimmed;
+        }
+
+        return source;
+    }
 
     protected override void DisposeCore()
     {
