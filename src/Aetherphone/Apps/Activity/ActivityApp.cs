@@ -31,7 +31,7 @@ internal sealed partial class ActivityApp : IPhoneApp
     public string Id => "character";
     public string DisplayName => Loc.T(L.Character.Activity);
     public string Glyph => "Ac";
-    public int BadgeCount => configuration.NotifyRetainerVentures ? tracker.VenturesReady : 0;
+    public int BadgeCount => configuration.ShowActivityBadge? tracker.VenturesReady : 0;
 
     private readonly GameData gameData;
     private readonly ActivityTracker tracker;
@@ -66,7 +66,7 @@ internal sealed partial class ActivityApp : IPhoneApp
 
         if (DrawNotificationToggle(content, scale))
         {
-            configuration.ShowActivitiesBadge = !configuration.ShowActivitiesBadge;
+            configuration.ShowActivityBadge = !configuration.ShowActivityBadge;
             configuration.Save();
         }
 
@@ -101,8 +101,8 @@ internal sealed partial class ActivityApp : IPhoneApp
     private bool DrawNotificationToggle(Rect content, float scale)
     {
         return NotificationToggleButton.Draw(content, scale, "character.badge.toggle",
-            !configuration.ShowActivitiesBadge, AppPalettes.Activity.Accent, AppPalettes.Activity.TitleInk,
-            AppPalettes.Activity.MutedInk, Loc.T(L.Activities.ShowBadge), Loc.T(L.Activities.HideBadge),
+            !configuration.ShowActivityBadge, AppPalettes.Activity.Accent, AppPalettes.Activity.TitleInk,
+            AppPalettes.Activity.MutedInk, Loc.T(L.Activity.ShowBadge), Loc.T(L.Activity.HideBadge),
             FontAwesomeIcon.Users, FontAwesomeIcon.UsersSlash);
     }
 
