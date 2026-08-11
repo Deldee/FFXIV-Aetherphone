@@ -14,7 +14,7 @@ internal static class BingoRules
 
     public const int NumbersPerColumn = 15;
 
-    public const long CardPrice = 20;
+    public const long CardPrice = 2000;
 
     public const int MaxCards = 4;
 
@@ -28,15 +28,15 @@ internal static class BingoRules
 
     public const int StageCount = 3;
 
-    public const int BallIntervalSeconds = 3;
+    public const int BallIntervalSeconds = 2;
 
-    public const long MaxSingleWin = 1000;
+    public const long MaxSingleWin = 500_000;
 
     public const int FreeMask = 1 << FreeCell;
 
     public const int FullMask = (1 << Cells) - 1;
 
-    public static readonly int[] StageRateTenths = { 28, 37, 80 };
+    public static readonly int[] StageRateTenths = { 2847, 3780, 8149 };
 
     public static readonly int[] CardCells =
     {
