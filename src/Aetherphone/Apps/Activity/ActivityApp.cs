@@ -31,7 +31,7 @@ internal sealed partial class ActivityApp : IPhoneApp
     public string Id => "character";
     public string DisplayName => Loc.T(L.Character.Activity);
     public string Glyph => "Ac";
-    public int BadgeCount => tracker.VenturesReady;
+    public int BadgeCount => configuration.NotifyRetainerVentures ? tracker.VenturesReady : 0;
 
     private readonly GameData gameData;
     private readonly ActivityTracker tracker;
