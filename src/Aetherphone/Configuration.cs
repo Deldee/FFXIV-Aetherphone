@@ -218,6 +218,7 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     
     public bool MarketContextMenu { get; set; } = true;
 
+    public bool NotifyWalletCapped { get; set; } = true;
     public bool HasUnseenChangelog => LastSeenChangelogVersion != ChangelogData.LatestVersion;
 
     public void MarkChangelogSeen()
