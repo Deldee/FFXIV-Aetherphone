@@ -95,12 +95,10 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     private volatile VelvetProfileDto[] notInterested = Array.Empty<VelvetProfileDto>();
     private readonly VelvetNotInterestedArchive notInterestedArchive;
     private volatile bool notInterestedIdsLoaded;
-    private volatile bool loadingNotInterestedIds;
     private volatile bool notInterestedLoaded;
     private volatile bool loadingNotInterested;
     private Task? notInterestedIdsLoadTask;
     private readonly object notInterestedIdsSync = new();
-
 
     public VelvetStore(AethernetSession session, VelvetClient client, AccountClient account, SafetyClient safety,
         MediaClient media, NotificationService notifications, Configuration configuration, KeyVault vault,
@@ -633,7 +631,6 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         {
             return;
         }
-
 
         var epoch = ++discoverEpoch;
         discoverFilter = filter;
@@ -1769,16 +1766,16 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
     private async Task LoadNotInterestedIdsAsync(CancellationToken token)
     {
-        var accountId = MyUserId;
-        if (accountId.Length == 0)
-        {
-            return;
-        }
-
-        loadingNotInterestedIds = true;
         var epoch = accountEpoch;
+        var loaded = false;
         try
         {
+            var accountId = MyUserId;
+            if (accountId.Length == 0)
+            {
+                return;
+            }
+
             var ids = await Task.Run(() => notInterestedArchive.Load(accountId), token).ConfigureAwait(false);
             if (epoch != accountEpoch)
             {
@@ -1787,11 +1784,11 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
             notInterestedFromDiscover = MergeNotInterested(notInterestedFromDiscover, ids);
             discoverResults = WithoutNotInterested(discoverResults);
+            loaded = true;
         }
         finally
         {
-            loadingNotInterestedIds = false;
-            if (epoch == accountEpoch)
+            if (loaded && epoch == accountEpoch)
             {
                 notInterestedIdsLoaded = true;
             }
