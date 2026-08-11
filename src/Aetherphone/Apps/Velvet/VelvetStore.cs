@@ -188,7 +188,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     public bool UserPostsLoaded => userPostsLoaded;
     public bool UserPostsFailed => userPostsFailed;
     public bool UserPostsLoadingMore => userPostsLoadingMore;
-    public bool HasMoreUserPosts => userPostsCursor is not null;
+    public bool HasMoreUserPosts => userPostsCursor is not null; 
     public VelvetThreadDto[] Threads => ThreadListItems;
     public bool LoadingThreads => LoadingThreadList;
     public bool ThreadsLoaded => ThreadListLoaded;
@@ -251,6 +251,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         notInterestedFromDiscover = Array.Empty<string>();
         notInterestedLoaded = false;
         notInterestedIdsLoaded = false;
+        notInterested = Array.Empty<VelvetProfileDto>();
         discoverCursor = null;
         discoverLoaded = false;
         discoverFilter = VelvetDiscoverFilter.Empty;
