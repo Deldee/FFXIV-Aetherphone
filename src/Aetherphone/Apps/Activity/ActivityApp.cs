@@ -102,7 +102,7 @@ internal sealed partial class ActivityApp : IPhoneApp
     {
         return NotificationToggleButton.Draw(content, scale, "character.badge.toggle",
             !configuration.ShowActivityBadge, AppPalettes.Activity.Accent, AppPalettes.Activity.TitleInk,
-            AppPalettes.Activity.MutedInk, Loc.T(L.Activity.ShowBadge), Loc.T(L.Activity.HideBadge),
+            AppPalettes.Activity.MutedInk, Loc.T(L.Character.ShowBadge), Loc.T(L.Character.HideBadge),
             FontAwesomeIcon.Users, FontAwesomeIcon.UsersSlash);
     }
 

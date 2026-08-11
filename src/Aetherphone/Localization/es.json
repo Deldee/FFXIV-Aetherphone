@@ -1710,6 +1710,8 @@
   "character.ringClosedBody": "Has alcanzado el objetivo de hoy.",
   "character.allRingsTitle": "Todos los anillos cerrados",
   "character.allRingsBody": "Has cumplido los tres objetivos hoy. ¡Un día perfecto!",
+  "character.showMissions": "Mostrar el globo de expediciones de tus retainers",
+  "character.hideMissions": "Ocultar el globo de expediciones de tus retainers",
   "camera.modeSquare": "CUADRADO",
   "camera.modePhoto": "FOTO",
   "contacts.empty": "Abre tu lista de amigos del juego una vez",
