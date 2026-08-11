@@ -84,7 +84,7 @@ internal sealed partial class VelvetShell
 
             Gap(18f);
             VSectionHeader.Overline(Loc.T(L.Velvet.SafetyHeader));
-            var NotInterestedRow = new VRowModel
+            var notInterestedRow = new VRowModel
             {
                 Title = Loc.T(L.Velvet.NotInterested),
                 Leading = VRowLeading.IconTile,
@@ -93,7 +93,7 @@ internal sealed partial class VelvetShell
                 Chevron = true,
                 Height = 52f,
             };
-            if (VRow.Draw(in NotInterestedRow, ui, theme, images, lodestone) == VRowHit.Body)
+            if (VRow.Draw(in notInterestedRow, ui, theme, images, lodestone) == VRowHit.Body)
             {
                 router.Push(VelvetView.NotInterested);
             }
@@ -112,8 +112,7 @@ internal sealed partial class VelvetShell
                 router.Push(VelvetView.Blocked);
             }
 
-
-
+            Gap(40f);
         }
     }
 
@@ -177,6 +176,7 @@ internal sealed partial class VelvetShell
             Gap(40f);
         }
     }
+
     private void DrawNotInterested(Rect area)
     {
         var scale = UiScale.Current;
@@ -185,6 +185,7 @@ internal sealed partial class VelvetShell
             router.Pop();
             return;
         }
+
         if (!store.NotInterestedLoaded && !store.LoadingNotInterested)
         {
             store.RefreshNotInterested();
@@ -200,6 +201,7 @@ internal sealed partial class VelvetShell
                     VelvetTheme.MutedInk, TextStyles.Callout);
                 return;
             }
+
             Gap(8f);
             for (var index = 0; index < notInterested.Length; index++)
             {
@@ -235,4 +237,3 @@ internal sealed partial class VelvetShell
         }
     }
 }
-

@@ -93,7 +93,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     private volatile bool loadingBlocked;
     private volatile bool blockedLoaded;
     private volatile VelvetProfileDto[] notInterested = Array.Empty<VelvetProfileDto>();
-    private readonly VelvetDiscoverNotInterestedArchive notInterestedArchive;
+    private readonly VelvetNotInterestedArchive notInterestedArchive;
     private volatile bool notInterestedIdsLoaded;
     private volatile bool loadingNotInterestedIds;
     private volatile bool notInterestedLoaded;
@@ -102,7 +102,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     public VelvetStore(AethernetSession session, VelvetClient client, AccountClient account, SafetyClient safety,
         MediaClient media, NotificationService notifications, Configuration configuration, KeyVault vault,
         ConversationKeyStore keys, PhoneVisibility visibility, RealtimeSignalBus signals, AppInstaller installer,
-        VelvetDiscoverNotInterestedArchive notInterestedArchive)
+        VelvetNotInterestedArchive notInterestedArchive)
         : base("Velvet", session, safety, media, notifications, vault, keys, visibility, installer.Gate("velvet"))
     {
         this.client = client;
@@ -1729,7 +1729,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
         loadingNotInterestedIds = true;
         var epoch = accountEpoch;
-        work.Run("discover hidden load", async token =>
+        work.Run("discover not interested load", async token =>
         {
             var ids = await Task.Run(() => notInterestedArchive.Load(accountId), token).ConfigureAwait(false);
             if (epoch != accountEpoch || ids.Length == 0)

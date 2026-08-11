@@ -10,12 +10,12 @@ internal sealed class StoredHiddenList
     [JsonProperty("ids")] public List<string> UserIds { get; set; } = new();
 }
 
-internal sealed class VelvetDiscoverNotInterestedArchive
+internal sealed class VelvetNotInterestedArchive
 {
     private readonly object sync = new();
     private readonly DirectoryInfo baseDir;
 
-    public VelvetDiscoverNotInterestedArchive(DirectoryInfo baseDir)
+    public VelvetNotInterestedArchive(DirectoryInfo baseDir)
     {
         this.baseDir = baseDir;
         if (!baseDir.Exists)
@@ -44,7 +44,7 @@ internal sealed class VelvetDiscoverNotInterestedArchive
         }
         catch (Exception exception)
         {
-            AepLog.Warning(exception, $"DiscoverHiddenArchive load failed for {accountId}");
+            AepLog.Warning(exception, $"VelvetNotInterestedArchive load failed for {accountId}");
             return Array.Empty<string>();
         }
     }
@@ -69,7 +69,7 @@ internal sealed class VelvetDiscoverNotInterestedArchive
         }
         catch (Exception exception)
         {
-            AepLog.Warning(exception, $"DiscoverHiddenArchive write failed for {accountId}");
+            AepLog.Warning(exception, $"VelvetNotInterestedArchive write failed for {accountId}");
         }
     }
 

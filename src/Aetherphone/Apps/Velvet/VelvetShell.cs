@@ -73,8 +73,6 @@ internal sealed partial class VelvetShell : IPhoneApp
     private float sinceHeartbeat = HeartbeatSeconds;
     private bool cachedLalafell;
 
-
-
     public VelvetShell(AethernetSession session, AethernetApi net, LodestoneService lodestone,
         Configuration configuration, PhotoLibrary library, HttpService http, RemoteImageCache images,
         NotificationService notifications, VelvetLauncher launcher, SocialLauncher socialLauncher, GameData gameData,
@@ -83,7 +81,7 @@ internal sealed partial class VelvetShell : IPhoneApp
         ConfirmService confirm, ReportService report, ConductGateService conduct, AppInstaller installer)
     {
         var velvetArchiveDir = new DirectoryInfo(Path.Combine(Plugin.PluginInterface.ConfigDirectory.FullName, "Velvet"));
-        var discoverHiddenArchive = new VelvetDiscoverNotInterestedArchive(velvetArchiveDir);
+        var discoverHiddenArchive = new VelvetNotInterestedArchive(velvetArchiveDir);
         store = new VelvetStore(session, net.Velvet, net.Account, net.Safety, net.Media, notifications, configuration,
             keyVault, conversationKeys, visibility, realtimeSignals, installer, discoverHiddenArchive);
         commentMentions = new MentionAutocomplete(store.NewMentionSuggestions());
