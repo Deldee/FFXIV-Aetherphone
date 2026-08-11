@@ -63,6 +63,13 @@ internal sealed partial class ActivityApp : IPhoneApp
         var screen = SceneChrome.ScreenFrom(content, theme, scale);
         ui.Backdrop(screen);
         DrawHeader(content, scale);
+
+        if (DrawNotificationToggle(content, scale))
+        {
+            configuration.ShowActivitiesBadge = !configuration.ShowActivitiesBadge;
+            configuration.Save();
+        }
+
         var body = new Rect(new Vector2(content.Min.X, content.Min.Y + AppHeader.Height * scale), content.Max);
         if (!tracker.IsTracking)
         {
@@ -89,6 +96,14 @@ internal sealed partial class ActivityApp : IPhoneApp
 
             ImGui.Dummy(new Vector2(0f, 12f * scale));
         }
+    }
+
+    private bool DrawNotificationToggle(Rect content, float scale)
+    {
+        return NotificationToggleButton.Draw(content, scale, "character.badge.toggle",
+            !configuration.ShowActivitiesBadge, AppPalettes.Activity.Accent, AppPalettes.Activity.TitleInk,
+            AppPalettes.Activity.MutedInk, Loc.T(L.Activities.ShowBadge), Loc.T(L.Activities.HideBadge),
+            FontAwesomeIcon.Users, FontAwesomeIcon.UsersSlash);
     }
 
     private void DrawScreenTabs(float scale)
