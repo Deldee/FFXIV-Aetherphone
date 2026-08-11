@@ -37,7 +37,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     private volatile AvatarUploadOutcome avatarFailure = AvatarUploadOutcome.Unreachable;
     private volatile bool introBusy;
     private volatile VelvetProfileDto[] discoverResults = Array.Empty<VelvetProfileDto>();
-    private volatile string[] hiddenFromDiscover = Array.Empty<string>();
+    private volatile string[] notInterestedFromDiscover = Array.Empty<string>();
     private volatile bool loadingDiscover;
     private volatile bool discoverLoaded;
     private volatile string? discoverCursor;
@@ -93,16 +93,16 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     private volatile bool loadingBlocked;
     private volatile bool blockedLoaded;
     private volatile VelvetProfileDto[] notInterested = Array.Empty<VelvetProfileDto>();
-    private readonly VelvetDiscovernotInterestedArchive notInterestedArchive;
-    private volatile bool hiddenIdsLoaded;
-    private volatile bool loadingHiddenIds;
+    private readonly VelvetDiscoverNotInterestedArchive notInterestedArchive;
+    private volatile bool notInterestedIdsLoaded;
+    private volatile bool loadingNotInterestedIds;
     private volatile bool notInterestedLoaded;
     private volatile bool loadingNotInterested;
 
     public VelvetStore(AethernetSession session, VelvetClient client, AccountClient account, SafetyClient safety,
         MediaClient media, NotificationService notifications, Configuration configuration, KeyVault vault,
         ConversationKeyStore keys, PhoneVisibility visibility, RealtimeSignalBus signals, AppInstaller installer,
-        VelvetDiscovernotInterestedArchive notInterestedArchive)
+        VelvetDiscoverNotInterestedArchive notInterestedArchive)
         : base("Velvet", session, safety, media, notifications, vault, keys, visibility, installer.Gate("velvet"))
     {
         this.client = client;
@@ -248,9 +248,9 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         meGate.Reset();
         discoverResults = Array.Empty<VelvetProfileDto>();
 
-        hiddenFromDiscover = Array.Empty<string>();
+        notInterestedFromDiscover = Array.Empty<string>();
         notInterestedLoaded = false;
-        hiddenIdsLoaded = false;
+        notInterestedIdsLoaded = false;
         discoverCursor = null;
         discoverLoaded = false;
         discoverFilter = VelvetDiscoverFilter.Empty;
@@ -637,13 +637,13 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         discoverRegion = region;
         discoverCursor = null;
         loadingDiscover = true;
-        EnsureHiddenLoaded();
+        EnsureNotInterestedLoaded();
         work.Run("discover", async token =>
         {
             var page = await client.DiscoverAsync(filter, tags, region, null, token).ConfigureAwait(false);
             if (page is not null && epoch == discoverEpoch)
             {
-                discoverResults = WithoutHidden(page.Users);
+                discoverResults = WithoutNotInterested(page.Users);
                 discoverCursor = page.NextCursor;
             }
         }, () =>
@@ -674,16 +674,16 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
                 .ConfigureAwait(false);
             if (page is not null && epoch == discoverEpoch)
             {
-                discoverResults = AppendUniqueDiscover(discoverResults, WithoutHidden(page.Users));
+                discoverResults = AppendUniqueDiscover(discoverResults, WithoutNotInterested(page.Users));
                 discoverCursor = page.NextCursor;
             }
         }, () => loadingMoreDiscover = false);
     }
 
-    private VelvetProfileDto[] WithoutHidden(VelvetProfileDto[] incoming)
+    private VelvetProfileDto[] WithoutNotInterested(VelvetProfileDto[] incoming)
     {
-        var hidden = hiddenFromDiscover;
-        if (hidden.Length == 0)
+        var notInterested = notInterestedFromDiscover;
+        if (notInterested.Length == 0)
         {
             return incoming;
         }
@@ -692,7 +692,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         var count = 0;
         for (var index = 0; index < incoming.Length; index++)
         {
-            if (Array.IndexOf(hidden, incoming[index].UserId) < 0)
+            if (Array.IndexOf(notInterested, incoming[index].UserId) < 0)
             {
                 kept[count] = incoming[index];
                 count++;
@@ -1156,18 +1156,18 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
     public void HideFromDiscover(string userId)
     {
-        var hidden = hiddenFromDiscover;
+        var notInterested = notInterestedFromDiscover;
         notInterestedLoaded = false;
-        if (Array.IndexOf(hidden, userId) < 0)
+        if (Array.IndexOf(notInterested, userId) < 0)
         {
-            var grown = new string[hidden.Length + 1];
-            Array.Copy(hidden, grown, hidden.Length);
-            grown[hidden.Length] = userId;
-            hiddenFromDiscover = grown;
+            var grown = new string[notInterested.Length + 1];
+            Array.Copy(notInterested, grown, notInterested.Length);
+            grown[notInterested.Length] = userId;
+            notInterestedFromDiscover = grown;
 
             var accountId = MyUserId;
-            work.Run("discover hidden save",
-                async token => await Task.Run(() => notInterestedArchive.Save(accountId, hiddenFromDiscover), token)
+            work.Run("discover not interested save",
+                async token => await Task.Run(() => notInterestedArchive.Save(accountId, notInterestedFromDiscover), token)
                     .ConfigureAwait(false));
         }
 
@@ -1176,27 +1176,25 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
     public void RemoveFromNotInterested(string userId)
     {
-        var hidden = hiddenFromDiscover;
-        var index = Array.IndexOf(hidden, userId);
+        var notInterested = notInterestedFromDiscover;
+        var index = Array.IndexOf(notInterested, userId);
         if (index < 0)
         {
             return;
         }
 
-        var trimmed = new string[hidden.Length - 1];
-        Array.Copy(hidden, trimmed, index);
-        Array.Copy(hidden, index + 1, trimmed, index, hidden.Length - index - 1);
-        hiddenFromDiscover = trimmed;
+        var trimmed = new string[notInterested.Length - 1];
+        Array.Copy(notInterested, trimmed, index);
+        Array.Copy(notInterested, index + 1, trimmed, index, notInterested.Length - index - 1);
+        notInterestedFromDiscover = trimmed;
 
-        notInterested = RemoveProfile(notInterested, userId);
+        this.notInterested = RemoveProfile(this.notInterested, userId);
 
-        // Discover's cached results were filtered against the old hidden set;
-        // force a refresh so this user can resurface there.
         discoverLoaded = false;
 
         var accountId = MyUserId;
-        work.Run("discover hidden remove",
-            async token => await Task.Run(() => notInterestedArchive.Save(accountId, hiddenFromDiscover), token)
+        work.Run("discover not interested remove",
+            async token => await Task.Run(() => notInterestedArchive.Save(accountId, notInterestedFromDiscover), token)
                 .ConfigureAwait(false));
     }
 
@@ -1259,7 +1257,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         var epoch = accountEpoch;
         work.Run("notInterested", async token =>
         {
-            if (!hiddenIdsLoaded)
+            if (!notInterestedIdsLoaded)
             {
                 var stored = await Task.Run(() => notInterestedArchive.Load(accountId), token).ConfigureAwait(false);
                 if (epoch != accountEpoch)
@@ -1267,12 +1265,12 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
                     return;
                 }
 
-                hiddenFromDiscover = MergeHidden(hiddenFromDiscover, stored);
-                discoverResults = WithoutHidden(discoverResults);
-                hiddenIdsLoaded = true;
+                notInterestedFromDiscover = MergeNotInterested(notInterestedFromDiscover, stored);
+                discoverResults = WithoutNotInterested(discoverResults);
+                notInterestedIdsLoaded = true;
             }
 
-            var ids = hiddenFromDiscover;
+            var ids = notInterestedFromDiscover;
             var list = new List<VelvetProfileDto>(ids.Length);
             for (var index = 0; index < ids.Length; index++)
             {
@@ -1716,9 +1714,9 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
         }
     }
 
-    private void EnsureHiddenLoaded()
+    private void EnsureNotInterestedLoaded()
     {
-        if (hiddenIdsLoaded || loadingHiddenIds)
+        if (notInterestedIdsLoaded || loadingNotInterestedIds)
         {
             return;
         }
@@ -1729,7 +1727,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
             return;
         }
 
-        loadingHiddenIds = true;
+        loadingNotInterestedIds = true;
         var epoch = accountEpoch;
         work.Run("discover hidden load", async token =>
         {
@@ -1739,19 +1737,19 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
                 return;
             }
 
-            hiddenFromDiscover = MergeHidden(hiddenFromDiscover, ids);
-            discoverResults = WithoutHidden(discoverResults);
+            notInterestedFromDiscover = MergeNotInterested(notInterestedFromDiscover, ids);
+            discoverResults = WithoutNotInterested(discoverResults);
         }, () =>
         {
             if (epoch == accountEpoch)
             {
-                hiddenIdsLoaded = true;
+                notInterestedIdsLoaded = true;
             }
-            loadingHiddenIds = false;
+            loadingNotInterestedIds = false;
         });
     }
 
-    private static string[] MergeHidden(string[] existing, string[] incoming)
+    private static string[] MergeNotInterested(string[] existing, string[] incoming)
     {
         var set = new HashSet<string>(existing, StringComparer.Ordinal);
         var added = false;

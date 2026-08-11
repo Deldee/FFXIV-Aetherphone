@@ -83,7 +83,7 @@ internal sealed partial class VelvetShell : IPhoneApp
         ConfirmService confirm, ReportService report, ConductGateService conduct, AppInstaller installer)
     {
         var velvetArchiveDir = new DirectoryInfo(Path.Combine(Plugin.PluginInterface.ConfigDirectory.FullName, "Velvet"));
-        var discoverHiddenArchive = new VelvetDiscovernotInterestedArchive(velvetArchiveDir);
+        var discoverHiddenArchive = new VelvetDiscoverNotInterestedArchive(velvetArchiveDir);
         store = new VelvetStore(session, net.Velvet, net.Account, net.Safety, net.Media, notifications, configuration,
             keyVault, conversationKeys, visibility, realtimeSignals, installer, discoverHiddenArchive);
         commentMentions = new MentionAutocomplete(store.NewMentionSuggestions());

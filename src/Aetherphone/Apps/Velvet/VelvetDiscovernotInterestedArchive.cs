@@ -10,12 +10,12 @@ internal sealed class StoredHiddenList
     [JsonProperty("ids")] public List<string> UserIds { get; set; } = new();
 }
 
-internal sealed class VelvetDiscovernotInterestedArchive
+internal sealed class VelvetDiscoverNotInterestedArchive
 {
     private readonly object sync = new();
     private readonly DirectoryInfo baseDir;
 
-    public VelvetDiscovernotInterestedArchive(DirectoryInfo baseDir)
+    public VelvetDiscoverNotInterestedArchive(DirectoryInfo baseDir)
     {
         this.baseDir = baseDir;
         if (!baseDir.Exists)
