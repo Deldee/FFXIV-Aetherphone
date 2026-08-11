@@ -98,9 +98,6 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     private volatile bool loadingNotInterestedIds;
     private volatile bool notInterestedLoaded;
     private volatile bool loadingNotInterested;
-    private Task? notInterestedIdsLoadTask;
-    private readonly object notInterestedIdsSync = new();
-
 
     public VelvetStore(AethernetSession session, VelvetClient client, AccountClient account, SafetyClient safety,
         MediaClient media, NotificationService notifications, Configuration configuration, KeyVault vault,
@@ -191,7 +188,7 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
     public bool UserPostsLoaded => userPostsLoaded;
     public bool UserPostsFailed => userPostsFailed;
     public bool UserPostsLoadingMore => userPostsLoadingMore;
-    public bool HasMoreUserPosts => userPostsCursor is not null;
+    public bool HasMoreUserPosts => userPostsCursor is not null; 
     public VelvetThreadDto[] Threads => ThreadListItems;
     public bool LoadingThreads => LoadingThreadList;
     public bool ThreadsLoaded => ThreadListLoaded;
@@ -1160,61 +1157,46 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
     public void HideFromDiscover(string userId)
     {
+        var notInterested = notInterestedFromDiscover;
         notInterestedLoaded = false;
-        discoverResults = RemoveDiscover(discoverResults, userId);
-
-        var accountId = MyUserId;
-        var epoch = accountEpoch;
-        work.Run("discover not interested save", async token =>
+        if (Array.IndexOf(notInterested, userId) < 0)
         {
-            await EnsureNotInterestedLoadedAsync(token).ConfigureAwait(false);
-            if (epoch != accountEpoch)
-            {
-                return;
-            }
+            var grown = new string[notInterested.Length + 1];
+            Array.Copy(notInterested, grown, notInterested.Length);
+            grown[notInterested.Length] = userId;
+            notInterestedFromDiscover = grown;
 
-            var current = notInterestedFromDiscover;
-            if (Array.IndexOf(current, userId) < 0)
-            {
-                var grown = new string[current.Length + 1];
-                Array.Copy(current, grown, current.Length);
-                grown[current.Length] = userId;
-                notInterestedFromDiscover = grown;
-            }
+            var accountId = MyUserId;
+            work.Run("discover not interested save",
+                async token => await Task.Run(() => notInterestedArchive.Save(accountId, notInterestedFromDiscover), token)
+                    .ConfigureAwait(false));
+        }
 
-            await Task.Run(() => notInterestedArchive.Save(accountId, notInterestedFromDiscover), token)
-                .ConfigureAwait(false);
-        });
+        discoverResults = RemoveDiscover(discoverResults, userId);
     }
 
     public void RemoveFromNotInterested(string userId)
     {
-        notInterested = RemoveProfile(notInterested, userId);
+        var notInterested = notInterestedFromDiscover;
+        var index = Array.IndexOf(notInterested, userId);
+        if (index < 0)
+        {
+            return;
+        }
+
+        var trimmed = new string[notInterested.Length - 1];
+        Array.Copy(notInterested, trimmed, index);
+        Array.Copy(notInterested, index + 1, trimmed, index, notInterested.Length - index - 1);
+        notInterestedFromDiscover = trimmed;
+
+        this.notInterested = RemoveProfile(this.notInterested, userId);
+
         discoverLoaded = false;
 
         var accountId = MyUserId;
-        var epoch = accountEpoch;
-        work.Run("discover not interested remove", async token =>
-        {
-            await EnsureNotInterestedLoadedAsync(token).ConfigureAwait(false);
-            if (epoch != accountEpoch)
-            {
-                return;
-            }
-
-            var current = notInterestedFromDiscover;
-            var index = Array.IndexOf(current, userId);
-            if (index >= 0)
-            {
-                var trimmed = new string[current.Length - 1];
-                Array.Copy(current, trimmed, index);
-                Array.Copy(current, index + 1, trimmed, index, current.Length - index - 1);
-                notInterestedFromDiscover = trimmed;
-            }
-
-            await Task.Run(() => notInterestedArchive.Save(accountId, notInterestedFromDiscover), token)
-                .ConfigureAwait(false);
-        });
+        work.Run("discover not interested remove",
+            async token => await Task.Run(() => notInterestedArchive.Save(accountId, notInterestedFromDiscover), token)
+                .ConfigureAwait(false));
     }
 
     private static VelvetProfileDto[] RemoveDiscover(VelvetProfileDto[] source, string userId)
@@ -1271,23 +1253,22 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
             return;
         }
 
+        var accountId = MyUserId;
         loadingNotInterested = true;
         var epoch = accountEpoch;
         work.Run("notInterested", async token =>
         {
-            try
+            if (!notInterestedIdsLoaded)
             {
-                await EnsureNotInterestedLoadedAsync(token).ConfigureAwait(false);
-            }
-            catch (Exception exception)
-            {
-                AepLog.Warning(exception, "Velvet not-interested ids load failed");
-                return false;
-            }
+                var stored = await Task.Run(() => notInterestedArchive.Load(accountId), token).ConfigureAwait(false);
+                if (epoch != accountEpoch)
+                {
+                    return;
+                }
 
-            if (epoch != accountEpoch)
-            {
-                return false;
+                notInterestedFromDiscover = MergeNotInterested(notInterestedFromDiscover, stored);
+                discoverResults = WithoutNotInterested(discoverResults);
+                notInterestedIdsLoaded = true;
             }
 
             var ids = notInterestedFromDiscover;
@@ -1295,26 +1276,22 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
             for (var index = 0; index < ids.Length; index++)
             {
                 var user = await client.UserAsync(ids[index], token).ConfigureAwait(false);
-                if (epoch != accountEpoch)
-                {
-                    return false;
-                }
-
-                if (user is not null)
+                if (user is not null && epoch == accountEpoch)
                 {
                     list.Add(user);
                 }
             }
 
-            notInterested = list.ToArray();
-            return true;
-        }, succeeded =>
+            if (epoch == accountEpoch)
+            {
+                notInterested = list.ToArray();
+            }
+        }, () =>
         {
-            if (epoch == accountEpoch && succeeded)
+            if (epoch == accountEpoch)
             {
                 notInterestedLoaded = true;
             }
-
             loadingNotInterested = false;
         });
     }
@@ -1740,35 +1717,11 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
     private void EnsureNotInterestedLoaded()
     {
-        if (!session.IsSignedIn || notInterestedIdsLoaded)
+        if (notInterestedIdsLoaded || loadingNotInterestedIds)
         {
             return;
         }
 
-        work.Run("discover not interested load", token => EnsureNotInterestedLoadedAsync(token));
-    }
-
-    private Task EnsureNotInterestedLoadedAsync(CancellationToken token)
-    {
-        if (notInterestedIdsLoaded)
-        {
-            return Task.CompletedTask;
-        }
-
-        lock (notInterestedIdsSync)
-        {
-            if (notInterestedIdsLoaded)
-            {
-                return Task.CompletedTask;
-            }
-
-            notInterestedIdsLoadTask ??= LoadNotInterestedIdsAsync(token);
-            return notInterestedIdsLoadTask;
-        }
-    }
-
-    private async Task LoadNotInterestedIdsAsync(CancellationToken token)
-    {
         var accountId = MyUserId;
         if (accountId.Length == 0)
         {
@@ -1777,30 +1730,24 @@ internal sealed class VelvetStore : ChatThreadStoreBase<VelvetMessageDto, Velvet
 
         loadingNotInterestedIds = true;
         var epoch = accountEpoch;
-        try
+        work.Run("discover not interested load", async token =>
         {
             var ids = await Task.Run(() => notInterestedArchive.Load(accountId), token).ConfigureAwait(false);
-            if (epoch != accountEpoch)
+            if (epoch != accountEpoch || ids.Length == 0)
             {
                 return;
             }
 
             notInterestedFromDiscover = MergeNotInterested(notInterestedFromDiscover, ids);
             discoverResults = WithoutNotInterested(discoverResults);
-        }
-        finally
+        }, () =>
         {
-            loadingNotInterestedIds = false;
             if (epoch == accountEpoch)
             {
                 notInterestedIdsLoaded = true;
             }
-
-            lock (notInterestedIdsSync)
-            {
-                notInterestedIdsLoadTask = null;
-            }
-        }
+            loadingNotInterestedIds = false;
+        });
     }
 
     private static string[] MergeNotInterested(string[] existing, string[] incoming)
