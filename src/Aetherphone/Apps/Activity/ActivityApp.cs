@@ -31,7 +31,7 @@ internal sealed partial class ActivityApp : IPhoneApp
     public string Id => "character";
     public string DisplayName => Loc.T(L.Character.Activity);
     public string Glyph => "Ac";
-    public int BadgeCount => configuration.ShowActivityBadge? tracker.VenturesReady : 0;
+    public int BadgeCount => configuration.ShowActivityBadge ? tracker.VenturesReady : 0;
 
     private readonly GameData gameData;
     private readonly ActivityTracker tracker;
@@ -102,8 +102,7 @@ internal sealed partial class ActivityApp : IPhoneApp
     {
         return NotificationToggleButton.Draw(content, scale, "character.badge.toggle",
             !configuration.ShowActivityBadge, AppPalettes.Activity.Accent, AppPalettes.Activity.TitleInk,
-            AppPalettes.Activity.MutedInk, Loc.T(L.Character.ShowBadge), Loc.T(L.Character.HideBadge),
-            FontAwesomeIcon.Users, FontAwesomeIcon.UsersSlash);
+            AppPalettes.Activity.MutedInk, Loc.T(L.Character.ShowBadge), Loc.T(L.Character.HideBadge));
     }
 
     private void DrawScreenTabs(float scale)
