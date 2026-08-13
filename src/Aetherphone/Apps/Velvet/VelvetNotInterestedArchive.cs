@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Aetherphone.Apps.Velvet;
 
-internal sealed class StoredHiddenList
+internal sealed class StoredNotInterestedList
 {
     [JsonProperty("ids")] public List<string> UserIds { get; set; } = new();
 }
@@ -39,7 +39,7 @@ internal sealed class VelvetNotInterestedArchive
                 return Array.Empty<string>();
             }
 
-            var stored = JsonConvert.DeserializeObject<StoredHiddenList>(File.ReadAllText(path));
+            var stored = JsonConvert.DeserializeObject<StoredNotInterestedList>(File.ReadAllText(path));
             return stored?.UserIds is { Count: > 0 } ids ? ids.ToArray() : Array.Empty<string>();
         }
         catch (Exception exception)
@@ -62,7 +62,7 @@ internal sealed class VelvetNotInterestedArchive
             {
                 var path = PathFor(accountId);
                 var temp = path + ".tmp";
-                var stored = new StoredHiddenList { UserIds = userIds.ToList() };
+                var stored = new StoredNotInterestedList { UserIds = userIds.ToList() };
                 File.WriteAllText(temp, JsonConvert.SerializeObject(stored));
                 File.Move(temp, path, true);
             }
