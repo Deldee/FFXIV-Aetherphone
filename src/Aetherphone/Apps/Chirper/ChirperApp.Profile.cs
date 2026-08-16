@@ -112,6 +112,81 @@ internal sealed partial class ChirperApp
         }
     }
 
+    private void OpenHashtag(string tag)
+    {
+        actions.Reset();
+        store.OpenHashtagPosts(tag);
+        router.Push(ChirperRoute.Hashtag(tag));
+    }
+
+    private string HashtagTitle(string tag)
+    {
+        if (!string.Equals(hashtagTitleTag, tag, StringComparison.Ordinal))
+        {
+            hashtagTitleTag = tag;
+            hashtagTitle = "#" + tag;
+        }
+
+        return hashtagTitle;
+    }
+
+    private void DrawHashtag(Rect area, string tag)
+    {
+        store.EnsureHashtagPosts(tag);
+        var context = new PhoneContext(area, theme, navigation);
+        AppHeader.Draw(context, HashtagTitle(tag), back);
+        var scale = UiScale.Current;
+        var top = area.Min.Y + AppHeader.Height * scale;
+        var body = new Rect(new Vector2(area.Min.X, top), area.Max);
+        using (AppSurface.Begin(body))
+        {
+            var posts = store.HashtagPosts;
+            if (posts.Length == 0)
+            {
+                Typography.DrawCentered(new Vector2(body.Center.X, top + 60f * scale),
+                    store.HashtagLoading ? Loc.T(L.Common.Loading) : Loc.T(L.Social.HashtagEmpty),
+                    AppPalettes.Chirper.MutedInk);
+                return;
+            }
+
+            ImGui.Dummy(new Vector2(0f, FeedTopPadding * scale));
+            hashtagVirtualizer.BeginFrame();
+            renderedUnderlyingIds.Clear();
+            for (var index = 0; index < posts.Length; index++)
+            {
+                var post = posts[index];
+                if (HiddenByMediaPreference(post))
+                {
+                    continue;
+                }
+
+                if (!renderedUnderlyingIds.Add(post.RepostOfId ?? post.Id))
+                {
+                    continue;
+                }
+
+                if (hashtagVirtualizer.Skip(post.Id))
+                {
+                    continue;
+                }
+
+                DrawPost(post);
+                hashtagVirtualizer.Record(post.Id);
+            }
+
+            if (store.HashtagLoadingMore)
+            {
+                InfiniteScroll.DrawLoadingRow(body.Center.X, AppPalettes.Chirper.MutedInk);
+            }
+
+            ImGui.Dummy(new Vector2(0f, 24f * scale));
+            if (InfiniteScroll.ReachedBottom() && store.HasMoreHashtagPosts && !store.HashtagLoadingMore)
+            {
+                store.LoadMoreHashtagPosts();
+            }
+        }
+    }
+
     private void DrawDiscover(Rect area)
     {
         var context = new PhoneContext(area, theme, navigation);
@@ -149,7 +224,8 @@ internal sealed partial class ChirperApp
         {
             var radius = 16f * scale;
             var center = new Vector2(area.Min.X + 16f * scale + radius, rowCenterY);
-            DrawAvatar(ImGui.GetWindowDrawList(), center, radius, me.Name, me.World, me.AvatarUrl, 0.9f, 28);
+            DrawAvatar(ImGui.GetWindowDrawList(), center, radius, me.Name, me.World, me.AvatarUrl, 0.9f, 28,
+                Frames.Of(me.FrameId));
             if (UiInteract.HoverClick(center - new Vector2(radius, radius), center + new Vector2(radius, radius)))
             {
                 OpenProfile(me.Id);

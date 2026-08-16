@@ -3,6 +3,7 @@ using Aetherphone.Core.Aethernet.Contracts;
 using Aetherphone.Core.Localization;
 using Aetherphone.Core.Media;
 using Aetherphone.Core.Onboarding;
+using Aetherphone.Core.Social;
 using Aetherphone.Windows.Components;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
@@ -69,19 +70,26 @@ internal sealed partial class AethergramApp
         var drawList = ImGui.GetWindowDrawList();
         var rounding = 8f * scale;
         var photos = PostMedia.Photos(post.MediaUrls, post.MediaUrl);
-        var texture = images.Get(photos.Length > 0 ? photos[0] : null);
-        if (texture is null)
+        if (SensitiveReveals.ShouldVeil(post.Sensitive, post.Id, configuration.ShowSensitiveContent))
         {
-            Squircle.Fill(drawList, min, max, rounding, ImGui.GetColorU32(AppPalettes.Aethergram.FieldSurface));
-            return;
+            SensitiveVeil.Draw(drawList, min, max, rounding);
         }
-
-        var (uv0, uv1) = ImageFit.CoverSquare(texture.Size);
-        drawList.AddImageRounded(texture.Handle, min, max, uv0, uv1, 0xFFFFFFFFu, rounding,
-            ImDrawFlags.RoundCornersAll);
-        if (photos.Length > 1)
+        else
         {
-            MultiPhotoBadge.Draw(drawList, new Vector2(max.X - 8f * scale, min.Y + 8f * scale), scale);
+            var texture = images.Get(photos.Length > 0 ? photos[0] : null);
+            if (texture is null)
+            {
+                Squircle.Fill(drawList, min, max, rounding, ImGui.GetColorU32(AppPalettes.Aethergram.FieldSurface));
+                return;
+            }
+
+            var (uv0, uv1) = ImageFit.CoverSquare(texture.Size);
+            drawList.AddImageRounded(texture.Handle, min, max, uv0, uv1, 0xFFFFFFFFu, rounding,
+                ImDrawFlags.RoundCornersAll);
+            if (photos.Length > 1)
+            {
+                MultiPhotoBadge.Draw(drawList, new Vector2(max.X - 8f * scale, min.Y + 8f * scale), scale);
+            }
         }
 
         if (ImGui.IsItemHovered())
@@ -106,7 +114,7 @@ internal sealed partial class AethergramApp
         var rowCenterY = area.Min.Y + AppHeader.Height * scale * 0.5f;
         var logoLeft = area.Min.X + 16f * scale;
         var chevronReserve = store.IsSignedIn ? 32f * scale : 0f;
-        var trailingReserve = (store.IsSignedIn ? 148f * scale : 16f * scale) + chevronReserve;
+        var trailingReserve = (store.IsSignedIn ? 184f * scale : 16f * scale) + chevronReserve;
         var maxLogoWidth = MathF.Max(1f, area.Max.X - trailingReserve - logoLeft);
         var logoStyle = new TextStyle(1.3f, FontWeight.Bold);
         var logoHeight = Typography.Measure(DisplayName, logoStyle).Y;
@@ -127,6 +135,18 @@ internal sealed partial class AethergramApp
                 AppSkin.Transparent, 0.85f))
         {
             scopeMenu.Toggle(ScopeMenuId, anchor);
+        }
+
+        var mediaOn = configuration.AethergramShowGifPosts && configuration.AethergramShowCommentMedia;
+        var mediaRadius = 16f * scale;
+        var mediaCenter = new Vector2(area.Max.X - 132f * scale, rowCenterY);
+        if (ui.IconButton(mediaCenter, mediaRadius, FontAwesomeIcon.Image.ToIconString(),
+                mediaOn ? Accent : AppPalettes.Aethergram.MutedInk, AppPalettes.Aethergram.FieldSurface, 1.1f,
+                Loc.T(L.Aethergram.MediaFilters), HoverLabelSide.Below))
+        {
+            mediaFilterMenu.Toggle(MediaFilterMenuId, new Rect(
+                mediaCenter - new Vector2(mediaRadius, mediaRadius),
+                mediaCenter + new Vector2(mediaRadius, mediaRadius)));
         }
 
         var refreshCenter = new Vector2(area.Max.X - 96f * scale, rowCenterY);

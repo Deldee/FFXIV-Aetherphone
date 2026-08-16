@@ -1,4 +1,5 @@
 using Aetherphone.Apps.Aethergram;
+using Aetherphone.Apps.AetherStream;
 using Aetherphone.Apps.Announcements;
 using Aetherphone.Apps.Calendar;
 using Aetherphone.Apps.Camera;
@@ -39,18 +40,22 @@ using Aetherphone.Apps.YellowPages;
 using Aetherphone.Core.Aethernet;
 using Aetherphone.Core.Photos;
 using Aetherphone.Core.Telephony;
+using Aetherphone.Core.Video;
+using Aetherphone.Windows;
 using Aetherphone.Windows.Widgets;
 
 namespace Aetherphone.Core.Apps;
 
 internal static class AppRegistry
 {
-    public static AppBundle BuildDefault(PhoneServices services)
+    public static AppBundle BuildDefault(PhoneServices services, VideoPlayer video, ScreenController screen,
+        AetherStreamQueue videoQueue, WatchAlongSession watchAlong, StreamSuggestionNotifier streamSuggestions,
+        AetherStreamScreenWindow screenWindow)
     {
         var contactBook = new ContactBook(services.Aethernet.Contacts, services.AethernetSession);
         var apps = new List<IPhoneApp>
         {
-            new LinkpearlApp(services.Messages, services.Linkshells, services.LinkshellMutes, services.LinkpearlNotificationGate, services.ChatBridge, services.LinkshellBridge, services.LinkpearlLauncher, services.Lodestone, services.Notifications, services.GameData, services.Lookup, services.Confirm),
+            new LinkpearlApp(services.ChatInbox, services.ChatTabs, services.ChatArchive, services.LinkpearlNotificationGate, services.LinkpearlLauncher, services.Lodestone, services.MarketLauncher, services.Notifications, services.GameData, services.Lookup, services.Confirm, services.ChatLog, services.ChatSend),
             new ActivityApp(services.GameData, services.Activity, services.Configuration),
             new HealthApp(services.Health, services.GameData, services.Confirm),
         };
@@ -78,25 +83,30 @@ internal static class AppRegistry
         apps.Add(new WalletApp(services.GameData, services.Textures, services.Configuration));
         apps.Add(new InventoryApp(services.InventoryCapture, services.GameData, services.Textures));
         apps.Add(new JobsApp(services.GameData, services.Textures, services.Configuration, services.Confirm, services.CharacterWatch));
-        apps.Add(new MusicApp(services.Radio, services.SongSearch, services.Playback, services.SongHistory, services.Playlists, services.Media, services.Http, services.Textures, services.Aethernet, services.AethernetSession, services.Report, photoLibrary, services.WallpaperImages, services.Confirm, services.Configuration, services.RadioLauncher));
+        apps.Add(new MusicApp(services.Radio, services.SongSearch, services.SongResolver, services.Playback, services.SongHistory, services.Playlists, services.Media, services.Http, services.Textures, services.Aethernet, services.AethernetSession, services.Report, photoLibrary, services.WallpaperImages, services.Confirm, services.Configuration, services.RadioLauncher));
         apps.Add(new ClockApp(services.Configuration, services.Confirm));
         apps.Add(new NotesApp(services.Configuration, services.Confirm));
         apps.Add(new CalculatorApp());
+        apps.Add(new AetherStreamApp(video, screen, videoQueue, services.Configuration, services.Confirm,
+            services.RemoteImages, services.Http, services.AethernetSession, services.Lodestone, watchAlong,
+            streamSuggestions, services.AetherStreamLauncher, screenWindow));
         apps.Add(new ShortcutsApp(services.Shortcuts, services.ShortcutRunner, services.Confirm));
         apps.Add(new TimersApp(services.Configuration));
         apps.Add(new DailiesApp(services.Configuration, services.GameData));
         apps.Add(new FishingApp());
         apps.Add(new GamesApp(services.GameStats, services.GameData, services.Textures, services.Coins,
             services.CoinSessions));
-        apps.Add(new NotificationsApp(services.Notifications, services.SocialNotifications, services.LinkpearlLauncher, services.VelvetLauncher, services.DmLauncher, services.GramDmLauncher, services.SocialLauncher, services.MusterLauncher, services.YellowPagesLauncher, services.AnnouncementsLauncher, services.SafetyLauncher, services.RadioLauncher, services.CasinoLauncher));
+        apps.Add(new NotificationsApp(services.Notifications, services.SocialNotifications, services.LinkpearlLauncher, services.VelvetLauncher, services.DmLauncher, services.GramDmLauncher, services.SocialLauncher, services.MusterLauncher, services.YellowPagesLauncher, services.AnnouncementsLauncher, services.SafetyLauncher, services.RadioLauncher, services.CasinoLauncher, services.AetherStreamLauncher));
         apps.Add(new SettingsApp(services, photoLibrary));
         var calendarEvents = new CalendarEvents(services.Http, services.AethernetSession);
         apps.Add(new CalendarApp(services.Configuration, calendarEvents, services.Confirm));
         apps.Add(new Aetherphone.Apps.Coin.CoinApp(services.AethernetSession, services.Coins, services.CoinCatalog,
-            services.Confirm, services.BadgeCatalog, services.RemoteImages, services.Casino));
+            services.Confirm, services.Conduct, services.BadgeCatalog, services.RemoteImages, services.Casino,
+            services.FrameCatalog, services.Loadout, services.Lodestone));
         apps.Add(new CasinoApp(services.AethernetSession, services.Coins, services.Casino, services.CasinoPlay,
             services.CasinoHistory, services.CasinoRooms, services.CasinoTables, services.CasinoSpin,
-            services.CasinoTurns, services.CasinoLauncher, services.GameStats, services.Confirm));
+            services.CasinoTurns, services.CasinoLauncher, services.GameStats, services.Confirm,
+            services.Conduct, services.RemoteImages, services.Lodestone));
         apps.Add(new AppStoreApp(services.Installer, apps));
         apps.Add(new HousingApp(services.Housing, services.Configuration, services.Confirm));
 

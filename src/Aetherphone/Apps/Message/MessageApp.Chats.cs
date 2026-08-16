@@ -9,6 +9,7 @@ using Aetherphone.Core.Theme;
 using Aetherphone.Windows.Components;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
+using Aetherphone.Core.Social;
 
 namespace Aetherphone.Apps.Message;
 
@@ -53,6 +54,15 @@ internal sealed partial class MessageApp
             if (filter.Trim().Length > 0 || chatFilter != ChatFilterAll)
             {
                 EmptyState.Draw(listRect, ui, FontAwesomeIcon.Search, Loc.T(L.Phone.NoOneFound), string.Empty);
+            }
+            else if (store.ThreadListFailed)
+            {
+                threadListFailure.Set(store.ThreadListFailure);
+                if (EmptyState.Draw(listRect, ui, FontAwesomeIcon.ExclamationTriangle,
+                        Loc.T(L.Failure.CouldNotLoad), threadListFailure.Text(), Loc.T(L.Common.Retry)))
+                {
+                    store.RefreshConversations();
+                }
             }
             else if (EmptyState.Draw(listRect, ui, FontAwesomeIcon.Comments, Loc.T(L.DirectMessages.Empty),
                          Loc.T(L.DirectMessages.EmptyHint), Loc.T(L.DirectMessages.NewMessage)))
@@ -224,7 +234,7 @@ internal sealed partial class MessageApp
         else
         {
             AvatarView.DrawRemote(drawList, avatarCenter, radius, theme, title, string.Empty, item.OtherAvatarUrl,
-                images, lodestone, 0.95f, 32);
+                images, lodestone, 0.95f, 32, 1f, Frames.Of(item.FrameId));
         }
 
         var timeLabel = ChatTime(item.LastMessageAtUnix);

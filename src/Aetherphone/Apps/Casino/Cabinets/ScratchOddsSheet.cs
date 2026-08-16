@@ -109,15 +109,16 @@ internal sealed class ScratchOddsSheet
         ImGui.SetCursorScreenPos(contentMin);
         using (ImRaii.Child("##scratchOddsRows", contentSize, false, ImGuiWindowFlags.NoBackground))
         {
-            DrawRows(ui, contentSize.X, scale, tier);
+            DrawRows(ui, scale, tier);
         }
 
         return new Rect(panelMin, panelMax);
     }
 
-    private static void DrawRows(AppSkin ui, float width, float scale, int tier)
+    private static void DrawRows(AppSkin ui, float scale, int tier)
     {
         var drawList = ImGui.GetWindowDrawList();
+        var width = ScrollLayout.NativeScrollContentWidth();
         var intro = Loc.T(L.Casino.ScratchOddsIntro);
         var introOrigin = ImGui.GetCursorScreenPos();
         var introBlock = Typography.MeasureWrappedBlock(intro, TextStyles.Footnote, width);
@@ -155,12 +156,7 @@ internal sealed class ScratchOddsSheet
             ImGui.Dummy(new Vector2(width, RowHeight * scale));
         }
 
-        ImGui.Dummy(new Vector2(width, 8f * scale));
-        var anyWin = Loc.T(L.Casino.ScratchOddsAnyWin, ChancePercent(ScratchRules.WinCountPerMillion(tier)));
-        var anyWinOrigin = ImGui.GetCursorScreenPos();
-        var anyWinBlock = Typography.MeasureWrappedBlock(anyWin, TextStyles.Footnote, width);
-        Typography.DrawWrappedLeft(anyWinOrigin, anyWin, ui.MutedInk, TextStyles.Footnote, width);
-        ImGui.Dummy(new Vector2(width, anyWinBlock.Y + Metrics.Space.Lg * scale));
+        ImGui.Dummy(new Vector2(width, Metrics.Space.Lg * scale));
     }
 
     private static string ChancePercent(long countPerMillion)

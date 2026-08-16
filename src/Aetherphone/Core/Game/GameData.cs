@@ -12,9 +12,12 @@ namespace Aetherphone.Core.Game;
 internal sealed class GameData
 {
     private const uint FramedJobIconBaseId = 62100;
+    public const int ChineseSimplifiedClientLanguage = 4;
+    private const uint ChinaRegionId = 5;
 
     private readonly IDataManager data;
     private readonly IObjectTable objectTable;
+    private readonly IFramework framework;
     private uint[]? collectableMountIds;
     private uint[]? collectableMinionIds;
     private uint[]? triviaActionIds;
@@ -23,11 +26,13 @@ internal sealed class GameData
     private byte[]? weeklyHuntBillIndices;
     private Dictionary<uint, uint[]>? classJobIdsByCategory;
     private Dictionary<string, string>? worldRegionCodes;
+    private bool? chineseGameClient;
 
-    public GameData(IDataManager data, IObjectTable objectTable)
+    public GameData(IDataManager data, IObjectTable objectTable, IFramework framework)
     {
         this.data = data;
         this.objectTable = objectTable;
+        this.framework = framework;
     }
 
     public IPlayerCharacter? LocalPlayer => objectTable.LocalPlayer;
@@ -212,10 +217,39 @@ internal sealed class GameData
             2 => "North-America",
             3 => "Europe",
             4 => "Oceania",
+            5 => "中国",
             _ => string.Empty,
         };
 
     public string LocalRegionCode() => RegionCodeFromId(RegionId());
+
+    public bool IsChineseGameClient()
+    {
+        if (chineseGameClient is { } known)
+        {
+            return known;
+        }
+
+        if ((int)data.Language == ChineseSimplifiedClientLanguage)
+        {
+            chineseGameClient = true;
+            return true;
+        }
+
+        if (!framework.IsInFrameworkUpdateThread)
+        {
+            return false;
+        }
+
+        var regionId = RegionId();
+        if (regionId == 0)
+        {
+            return false;
+        }
+
+        chineseGameClient = regionId == ChinaRegionId;
+        return chineseGameClient.Value;
+    }
 
     public string RegionCodeForWorld(string? worldName)
     {
@@ -263,6 +297,7 @@ internal sealed class GameData
             2 => "NA",
             3 => "EU",
             4 => "OCE",
+            5 => "CN",
             _ => string.Empty,
         };
 

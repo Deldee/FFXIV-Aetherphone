@@ -2,6 +2,7 @@ using Aetherphone.Core;
 using Aetherphone.Core.Aethernet;
 using Aetherphone.Core.Apps;
 using Aetherphone.Core.Coins;
+using Aetherphone.Core.Conduct;
 using Aetherphone.Core.Confirm;
 using Aetherphone.Core.Localization;
 using Aetherphone.Core.Onboarding;
@@ -29,6 +30,7 @@ internal sealed partial class CasinoApp : IPhoneApp
     private readonly Core.Casino.CasinoSpinStore casinoSpin;
     private readonly Core.Casino.CasinoLauncher launcher;
     private readonly ConfirmService confirm;
+    private readonly ConductGateService conduct;
     private readonly CashierDrawer cashier;
     private readonly Cabinets.SlotsCabinet slots;
     private readonly Cabinets.ScratchCabinet scratch;
@@ -39,6 +41,10 @@ internal sealed partial class CasinoApp : IPhoneApp
     private readonly Tables.BlackjackTable blackjack;
     private readonly Tables.TableBrowser browser;
     private readonly Tables.TableDoor tableDoor;
+    private readonly JackpotRail jackpotRail = new();
+    private readonly GameRulesSheet rulesSheet = new();
+    private readonly BottomTabBar bottomNav = new();
+    private readonly NavTab[] navTabs = new NavTab[4];
     private readonly AppSkin ui = new(AppPalettes.Casino);
     private readonly ViewRouter<CasinoRoute> router;
     private readonly RouterDraw<CasinoRoute> drawView;
@@ -50,14 +56,16 @@ internal sealed partial class CasinoApp : IPhoneApp
     private PhoneTheme theme = PhoneTheme.Default;
     private INavigator navigation = null!;
     private Rect screenArea;
+    private CasinoTab tab;
     private string pendingTableId = string.Empty;
-    private bool greetedWithCashier;
 
     public CasinoApp(AethernetSession session, CoinStore coins, Core.Casino.CasinoStore casino,
         Core.Casino.CasinoPlayStore casinoPlay, Core.Casino.CasinoHistoryStore history,
         Core.Casino.CasinoRoomsStore casinoRooms, Core.Casino.CasinoTablesStore casinoTables,
         Core.Casino.CasinoSpinStore casinoSpin, Core.Casino.CasinoTurnNotifier casinoTurns,
-        Core.Casino.CasinoLauncher launcher, Core.Games.GameStatsStore gameStats, ConfirmService confirm)
+        Core.Casino.CasinoLauncher launcher, Core.Games.GameStatsStore gameStats, ConfirmService confirm,
+        ConductGateService conduct, Core.Media.RemoteImageCache remoteImages,
+        Core.Lodestone.LodestoneService lodestone)
     {
         this.session = session;
         this.coins = coins;
@@ -69,6 +77,7 @@ internal sealed partial class CasinoApp : IPhoneApp
         this.casinoSpin = casinoSpin;
         this.launcher = launcher;
         this.confirm = confirm;
+        this.conduct = conduct;
         cashier = new CashierDrawer(casino, coins, confirm);
         slots = new Cabinets.SlotsCabinet(casino, casinoPlay, OpenCashier);
         scratch = new Cabinets.ScratchCabinet(casino, casinoPlay, OpenCashier);
@@ -76,7 +85,8 @@ internal sealed partial class CasinoApp : IPhoneApp
         wheel = new Cabinets.WheelCabinet(casino, casinoRooms, OpenCashier, PopRoute);
         bingo = new Cabinets.BingoCabinet(casino, casinoRooms, OpenCashier, PopRoute);
         dailySpin = new Cabinets.DailySpinCabinet(casinoSpin);
-        blackjack = new Tables.BlackjackTable(casino, casinoRooms, casinoTables, casinoTurns, OpenCashier, PopRoute);
+        blackjack = new Tables.BlackjackTable(casino, casinoRooms, casinoTables, casinoTurns, remoteImages,
+            lodestone, OpenCashier, PopRoute);
         openTable = OpenTable;
         openDoorFromRow = OpenDoor;
         browser = new Tables.TableBrowser(casinoTables, openTable, openDoorFromRow);
@@ -101,7 +111,10 @@ internal sealed partial class CasinoApp : IPhoneApp
         browser.Reset();
         tableDoor.Reset();
         pendingTableId = string.Empty;
+        tab = CasinoTab.Lobby;
+        rulesSheet.Close();
         ResetLimitsEditor();
+        jackpotRail.Snap(Core.Casino.CasinoChipLots.CoinsFor(casino.Jackpot));
         historyLoadFailed = false;
         history.Invalidate();
         coins.RefreshNow();
@@ -110,7 +123,6 @@ internal sealed partial class CasinoApp : IPhoneApp
         casinoTables.RefreshNow();
         casinoSpin.RefreshNow();
         casinoPlay.RecoverPendingRound();
-        greetedWithCashier = false;
         ConsumeLaunch();
     }
 
@@ -128,6 +140,7 @@ internal sealed partial class CasinoApp : IPhoneApp
         browser.Reset();
         tableDoor.Reset();
         pendingTableId = string.Empty;
+        rulesSheet.Close();
         ResetLimitsEditor();
     }
 
@@ -179,16 +192,21 @@ internal sealed partial class CasinoApp : IPhoneApp
         casinoTables.EnsureFresh();
         casinoSpin.EnsureFresh();
         ConsumeTableAnswers();
-        GreetWithCashier();
         screenArea = context.Content;
         barkeep.Tick();
         cashier.Gate();
         slots.Gate();
         scratch.Gate();
+        rulesSheet.Gate();
         router.Draw(context.Content, AppSkin.Transparent, ImGui.GetIO().DeltaTime, drawView);
         slots.DrawOverlay(screenArea, ui);
         scratch.DrawOverlay(screenArea, ui);
+        rulesSheet.Draw(screenArea, ui);
         cashier.Draw(screenArea, ui, openLimits);
+        if (rulesSheet.TakePlayRequest())
+        {
+            OpenGame(rulesSheet.GameId);
+        }
     }
 
     private void DrawView(CasinoRoute route, Rect area, int depth)
@@ -264,14 +282,23 @@ internal sealed partial class CasinoApp : IPhoneApp
 
     private void DrawFloorHeader(in PhoneContext context, Rect area)
     {
-        var cashierLabel = Loc.T(L.Casino.Cashier);
-        var reserve = AppSkin.HeaderActionWidth(cashierLabel) + 18f * UiScale.Current;
-        AppHeader.Draw(context, "casino.header", DisplayName, reserve, navigation.Back);
-        if (ui.HeaderAction(area, cashierLabel, !cashier.IsOpen))
+        var scale = UiScale.Current;
+        AppHeader.Draw(context, "casino.header", TabTitle(), 44f * scale, navigation.Back);
+        var rulesCenter = new Vector2(area.Max.X - 22f * scale, area.Min.Y + AppHeader.Height * scale * 0.5f);
+        if (ui.IconButton(rulesCenter, 14f * scale, FontAwesomeIcon.QuestionCircle.ToIconString(), ui.MutedInk,
+                AppSkin.Transparent, 0.9f, Loc.T(L.Conduct.Eyebrow), HoverLabelSide.Below))
         {
-            cashier.Open();
+            conduct.ShowRules(Id);
         }
     }
+
+    private string TabTitle() => tab switch
+    {
+        CasinoTab.Games => Loc.T(L.Casino.GamesHeading),
+        CasinoTab.Live => Loc.T(L.Casino.TabLive),
+        CasinoTab.Cashier => Loc.T(L.Casino.Cashier),
+        _ => DisplayName,
+    };
 
     private void DrawSlotsHeader(in PhoneContext context, Rect area)
     {
@@ -293,22 +320,6 @@ internal sealed partial class CasinoApp : IPhoneApp
         {
             scratch.OpenOdds();
         }
-    }
-
-    private void GreetWithCashier()
-    {
-        if (greetedWithCashier || casino.State is null)
-        {
-            return;
-        }
-
-        greetedWithCashier = true;
-        if (casino.HasChips || cashier.IsOpen || router.Current.Screen != CasinoScreen.Floor)
-        {
-            return;
-        }
-
-        cashier.Open();
     }
 
     private void OpenCashier()
@@ -347,7 +358,7 @@ internal sealed partial class CasinoApp : IPhoneApp
 
         if (route.Screen == CasinoScreen.Table)
         {
-            blackjack.Reset();
+            blackjack.Exit();
             return;
         }
 
@@ -440,19 +451,19 @@ internal sealed partial class CasinoApp : IPhoneApp
         var hosted = casinoTables.TakeHostedTable();
         if (hosted is not null)
         {
-            OpenDoor(hosted.RoomId, hosted.InviteToken);
+            OpenDoor(hosted.TableId, hosted.InviteToken);
         }
 
         var resolved = casinoTables.TakeResolvedTable();
         if (resolved is not null)
         {
-            if (resolved.Owner)
+            if (casinoTables.Owns(resolved))
             {
-                OpenDoor(resolved.RoomId, resolved.InviteToken);
+                OpenDoor(resolved.TableId, resolved.InviteToken);
             }
             else
             {
-                OpenTable(resolved.RoomId);
+                OpenTable(resolved.TableId);
             }
         }
 

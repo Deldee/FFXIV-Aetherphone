@@ -8,6 +8,7 @@ using Aetherphone.Core.Muster;
 using Aetherphone.Core.Notifications;
 using Aetherphone.Core.Onboarding;
 using Aetherphone.Core.Shell.Home;
+using Aetherphone.Core.Social;
 using Aetherphone.Core.Telephony;
 using Aetherphone.Core.Theme;
 using Aetherphone.Core.Wallpapers;
@@ -81,7 +82,7 @@ internal sealed class PhoneShell : IDisposable
             services.LinkpearlLauncher, services.VelvetLauncher, services.DmLauncher, services.GramDmLauncher,
             services.SocialLauncher, services.MusterLauncher, services.YellowPagesLauncher,
             services.AnnouncementsLauncher, services.SafetyLauncher, services.RadioLauncher,
-            services.CasinoLauncher);
+            services.CasinoLauncher, services.AetherStreamLauncher);
         MusterChatBridge.Bind(services.Musters, services.MusterLauncher, navigation);
         AdChatBridge.Bind(services.YellowPages, services.YellowPagesLauncher, navigation);
         banner = new NotificationBanner(notifications, VisibleAppId, PhoneVisible, router);
@@ -109,7 +110,7 @@ internal sealed class PhoneShell : IDisposable
         var conductOverlay = new ConductGateOverlay(services.Conduct);
         setup = new SetupOverlay(services.AethernetSession, services.Aethernet, services.GameData,
             services.RemoteImages, services.Lodestone, bundle.Photos, services.WallpaperImages, navigation,
-            configuration, services.Confirm);
+            configuration, services.Confirm, themes);
         painter = new ShellScreenPainter(themes, navigation, home);
         transition = new ShellTransitionRenderer(themes, navigation, home, painter);
         morph = new MinimizeMorphView(themes, minimize, minimizedView, notifications, painter);
@@ -132,6 +133,7 @@ internal sealed class PhoneShell : IDisposable
     {
         loading.Cancel();
         director.Suspend();
+        SensitiveReveals.Clear();
     }
 
     public void OpenApp(string appId)
@@ -170,8 +172,8 @@ internal sealed class PhoneShell : IDisposable
 
     public bool HomeEditing => home.Editing && navigation.Current is null;
 
-    public bool LandscapeActive => configuration.CameraLandscape && minimize.Phase == MinimizePhase.None &&
-                                   !navigation.IsTransitioning && navigation.Current?.Id == "camera";
+    public bool LandscapeActive => minimize.Phase == MinimizePhase.None && !navigation.IsTransitioning &&
+                                   navigation.Current is { } landscapeApp && AppLandscape.Held(landscapeApp.Id);
 
     public MinimizePhase MinimizePhase => minimize.Phase;
 

@@ -45,7 +45,7 @@ internal sealed partial class AethergramApp
 
             DrawAvatar(avatarCenter, avatarRadius - 1f * scale,
                 SocialIdentity.Name(post.AuthorDisplayName, post.AuthorHandle), string.Empty, post.AuthorAvatarUrl,
-                0.85f, 32);
+                0.85f, 32, Frames.Of(post.AuthorFrameId));
             var nameLeft = avatarCenter.X + avatarRadius + 12f * scale;
             var displayName = SocialIdentity.Name(post.AuthorDisplayName, post.AuthorHandle);
             var headerMeta = SocialIdentity.FeedMeta(post.AuthorHandle, TimeText.Short(post.CreatedAtUnix));
@@ -229,6 +229,11 @@ internal sealed partial class AethergramApp
                 DrawEarlierCommentsRow();
                 for (var index = 0; index < comments.Length; index++)
                 {
+                    if (HiddenByMediaPreference(comments[index]))
+                    {
+                        continue;
+                    }
+
                     DrawComment(comments[index]);
                 }
             }
@@ -305,8 +310,18 @@ internal sealed partial class AethergramApp
             commentLayout = commentLayouts.LayoutFor(comment.Id, comment.Text, comment.Mentions, textRight - textLeft);
         }
 
-        var textHeight = commentLayout?.Size.Y ?? Typography.MeasureWrapped(comment.Text, textRight - textLeft, 0.9f);
-        var bubbleHeight = padTop + nameHeight + 4f * scale + textHeight + padBottom;
+        var textHeight = comment.Text.Length == 0
+            ? 0f
+            : commentLayout?.Size.Y ?? Typography.MeasureWrapped(comment.Text, textRight - textLeft, 0.9f);
+        var mediaHeight = CommentMediaHidden(comment.MediaUrl)
+            ? 0f
+            : CommentMedia.MeasureHeight(comment, textRight - textLeft, scale);
+        var mediaGap = mediaHeight > 0f && textHeight > 0f ? 6f * scale : 0f;
+        var bubbleHeight = padTop + nameHeight + 4f * scale + textHeight + mediaGap + mediaHeight + padBottom;
+        if (canDelete)
+        {
+            bubbleHeight = MathF.Max(bubbleHeight, 72f * scale);
+        }
         var bubbleTop = origin.Y;
         var bubbleBottom = bubbleTop + bubbleHeight;
         var bubbleMin = new Vector2(bubbleLeft, bubbleTop);
@@ -321,7 +336,7 @@ internal sealed partial class AethergramApp
 
         var avatarCenter = new Vector2(avatarCenterX, bubbleTop + avatarRadius + 2f * scale);
         DrawAvatar(avatarCenter, avatarRadius, SocialIdentity.Name(comment.AuthorDisplayName, comment.AuthorHandle),
-            string.Empty, comment.AuthorAvatarUrl, 0.8f, 28);
+            string.Empty, comment.AuthorAvatarUrl, 0.8f, 28, Frames.Of(comment.AuthorFrameId));
 
         var nameTop = bubbleTop + padTop;
         var commentNameHovering = UiInteract.Hover(new Vector2(textLeft, nameTop),
@@ -342,23 +357,38 @@ internal sealed partial class AethergramApp
         }
 
         var textTop = nameTop + nameHeight + 4f * scale;
-        ImGui.SetCursorScreenPos(new Vector2(textLeft, textTop));
-        if (commentLayout is null)
+        if (textHeight > 0f)
         {
-            using (Typography.WrapAt(textRight))
-            using (ImRaii.PushColor(ImGuiCol.Text, AppPalettes.Aethergram.BodyInk))
-            using (Plugin.Fonts.Push(0.9f))
+            ImGui.SetCursorScreenPos(new Vector2(textLeft, textTop));
+            if (commentLayout is null)
             {
-                Typography.Wrapped(comment.Text);
+                using (Typography.WrapAt(textRight))
+                using (ImRaii.PushColor(ImGuiCol.Text, AppPalettes.Aethergram.BodyInk))
+                using (Plugin.Fonts.Push(0.9f))
+                {
+                    Typography.Wrapped(comment.Text);
+                }
+            }
+            else
+            {
+                using (Plugin.Fonts.Push(0.9f))
+                {
+                    DrawRichBody(drawList, commentLayout, new Vector2(textLeft, textTop));
+                }
             }
         }
-        else
+
+        if (comment.MediaUrl is { } commentMediaUrl && !CommentMediaHidden(commentMediaUrl))
         {
-            using (Plugin.Fonts.Push(0.9f))
+            var mediaRect = CommentMedia.Draw(drawList, images, comment,
+                new Vector2(textLeft, textTop + textHeight + mediaGap), textRight - textLeft, scale,
+                AppPalettes.Aethergram.FieldSurface, AppPalettes.Aethergram.MutedInk);
+            if (UiInteract.HoverClick(mediaRect.Min, mediaRect.Max))
             {
-                DrawRichBody(drawList, commentLayout, new Vector2(textLeft, textTop));
+                photoViewer.Open(this, () => GifMedia.Texture(images, commentMediaUrl, ImGui.GetTime()));
             }
         }
+
         if (UiInteract.HoverClick(new Vector2(origin.X, bubbleTop), new Vector2(textLeft + nameWidth, textTop)))
         {
             OpenProfile(comment.AuthorId);
@@ -383,11 +413,6 @@ internal sealed partial class AethergramApp
         }
 
         var heartCenter = new Vector2(bubbleRight - 16f * scale, (bubbleTop + bubbleBottom) * 0.5f);
-        if (canDelete)
-        {
-            heartCenter.Y = MathF.Max(heartCenter.Y, bubbleTop + 36f * scale);
-        }
-
         if (CommentHeart.Draw(ui, heartCenter, comment.Liked, comment.LikeCount, AppPalettes.Aethergram.MutedInk,
                 AppPalettes.Aethergram.MutedInk, Loc.T(L.Aethergram.Like), out _))
         {
@@ -403,13 +428,45 @@ internal sealed partial class AethergramApp
         var style = new CommentComposerStyle(new Vector4(1f, 1f, 1f, 0.10f), AppPalettes.Aethergram.FieldSurface,
             AppPalettes.Aethergram.TitleInk, Accent, theme.SurfaceMuted, new Vector4(1f, 1f, 1f, 1f), true, 9f, 54f,
             0.8f);
+        var returned = Interlocked.Exchange(ref commentRestore, null);
+        if (returned is not null)
+        {
+            commentDraft = returned;
+        }
+
+        var returnedAttachment = Interlocked.Exchange(ref commentAttachmentRestore, null);
+        if (returnedAttachment is not null)
+        {
+            commentAttachment.Restore(returnedAttachment);
+        }
+
+        if (commentFailure.Failed)
+        {
+            Typography.DrawWrappedCentered(new Vector2(bar.Center.X,
+                    bar.Min.Y - 22f * UiScale.Current - commentAttachment.StripHeight(UiScale.Current)),
+                commentFailure.Text(), AppPalettes.Aethergram.MutedInk, TextStyles.Footnote,
+                bar.Width - 28f * UiScale.Current);
+        }
+
         if (CommentComposerBar.Draw(bar, screen, ui, theme, style, "##gramComment", Loc.T(L.Aethergram.AddComment),
                 ref commentDraft, MaxCommentLength, commentMentions, mentionPopup, images, lodestone, store.Commenting,
-                ref commentFocusPending, commentEmoji))
+                ref commentFocusPending, commentEmoji, commentAttachment, library, wallpaperImages))
         {
             var text = commentDraft;
+            var attachmentPath = commentAttachment.Path;
             commentDraft = string.Empty;
-            store.AddComment(postId, text, _ => { });
+            commentAttachment.Clear();
+            commentFailure.Clear();
+            store.AddComment(postId, text, attachmentPath, accepted =>
+            {
+                if (accepted)
+                {
+                    return;
+                }
+
+                commentRestore = text;
+                commentAttachmentRestore = attachmentPath;
+            }, commentFailure.Set);
         }
     }
 

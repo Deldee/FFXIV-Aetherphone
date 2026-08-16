@@ -3,6 +3,7 @@ using Aetherphone.Core.Aethernet;
 using Aetherphone.Core.Aethernet.Clients;
 using Aetherphone.Core.Aethernet.Contracts;
 using Aetherphone.Core.Media;
+using Aetherphone.Core.Net;
 using Aetherphone.Core.Social;
 using Aetherphone.Core.Wallpapers;
 
@@ -22,8 +23,9 @@ internal sealed class AethergramStore : SocialFeedStore
         this.grams = grams;
     }
 
-    protected override Task<FeedPage?> FetchFeedAsync(string feedKey, string? cursor, CancellationToken token) =>
-        grams.FeedAsync(feedKey, cursor, token);
+    protected override Task<FeedPage?> FetchFeedAsync(string feedKey, string? cursor, CancellationToken token,
+        Action<AepFailure>? onFailure = null) =>
+        grams.FeedAsync(feedKey, cursor, token, onFailure);
 
     protected override Task<FeedPage?> FetchProfilePostsAsync(string userId, string? cursor, CancellationToken token) =>
         grams.UserGramsAsync(userId, cursor, token);
@@ -31,11 +33,14 @@ internal sealed class AethergramStore : SocialFeedStore
     protected override Task<FeedPage?> FetchTaggedPostsAsync(string userId, string? cursor, CancellationToken token) =>
         grams.UserTaggedAsync(userId, cursor, token);
 
+    protected override Task<FeedPage?> FetchHashtagPostsAsync(string tag, string? cursor, CancellationToken token) =>
+        grams.TagPostsAsync(tag, cursor, token);
+
     // aspects holds one choice per photo. The post's MediaWidth/MediaHeight is the first photo's
     // aspect box, which frames the whole carousel; each photo is baked to fit inside its own box
     // and is contain-fit into that frame at draw time.
     public void CreateGram(string[] sourcePaths, WallpaperCrop[] crops, PostAspect[] aspects, string caption,
-        PhotoTagInput[]? photoTags, Action<bool> onComplete)
+        PhotoTagInput[]? photoTags, bool sensitive, Action<bool> onComplete)
     {
         if (posting || sourcePaths.Length == 0)
         {
@@ -49,16 +54,41 @@ internal sealed class AethergramStore : SocialFeedStore
             var (containerWidth, containerHeight) = PostAspects.Size(aspects[0], GramSize);
             for (var index = 0; index < sourcePaths.Length; index++)
             {
-                var (bakedWidth, bakedHeight) = PostAspects.Size(aspects[index], GramSize);
-                var baked = ImageProcessor.BakeCroppedJpeg(sourcePaths[index], crops[index], bakedWidth, bakedHeight,
-                    PostAspects.RevealsWholeImage(aspects[index]));
-                var upload = await media.UploadUrlAsync("image/jpeg", "gram", token).ConfigureAwait(false);
+                byte[] bytes;
+                string contentType;
+                if (GifMedia.IsGif(sourcePaths[index]))
+                {
+                    bytes = await File.ReadAllBytesAsync(sourcePaths[index], token).ConfigureAwait(false);
+                    if (bytes.Length == 0 || bytes.Length > GifMedia.MaxBytes)
+                    {
+                        AepLog.Warning($"Gram upload rejected a GIF of {bytes.Length} bytes; the cap is {GifMedia.MaxBytes}");
+                        return false;
+                    }
+
+                    var (gifWidth, gifHeight) = ImageProcessor.IdentifyDimensions(bytes);
+                    contentType = "image/gif";
+                    if (index == 0 && gifWidth > 0 && gifHeight > 0)
+                    {
+                        containerWidth = gifWidth;
+                        containerHeight = gifHeight;
+                    }
+                }
+                else
+                {
+                    var (bakedWidth, bakedHeight) = PostAspects.Size(aspects[index], GramSize);
+                    var baked = ImageProcessor.BakeCroppedJpeg(sourcePaths[index], crops[index], bakedWidth,
+                        bakedHeight, PostAspects.RevealsWholeImage(aspects[index]));
+                    bytes = baked.Bytes;
+                    contentType = "image/jpeg";
+                }
+
+                var upload = await media.UploadUrlAsync(contentType, "gram", token).ConfigureAwait(false);
                 if (upload is null)
                 {
                     return false;
                 }
 
-                var uploaded = await media.UploadImageAsync(upload.UploadUrl, baked.Bytes, "image/jpeg", token)
+                var uploaded = await media.UploadImageAsync(upload.UploadUrl, bytes, contentType, token)
                     .ConfigureAwait(false);
                 if (!uploaded)
                 {
@@ -69,7 +99,7 @@ internal sealed class AethergramStore : SocialFeedStore
             }
 
             var created = await grams.CreateAsync(caption.Trim(), keys, containerWidth, containerHeight, photoTags,
-                token).ConfigureAwait(false);
+                sensitive, token).ConfigureAwait(false);
             if (created is null)
             {
                 return false;

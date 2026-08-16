@@ -5,6 +5,7 @@ using Aetherphone.Core.Maps;
 using Aetherphone.Core.Media;
 using Aetherphone.Core.Muster;
 using Aetherphone.Core.Theme;
+using Aetherphone.Core.Venues;
 using Aetherphone.Core.YellowPages;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
@@ -89,13 +90,20 @@ internal readonly struct TranscriptMessage
     public readonly TranscriptReaction[] Reactions;
     public readonly int SenderBadges;
     public readonly string[]? SenderBadgeIds;
+    public readonly string ChannelTag;
+    public readonly Vector4 ChannelTint;
+    public readonly TextRun[]? Runs;
 
     public TranscriptMessage(string id, string senderId, string body, int kind, long createdAtUnix, int mediaWidth,
         int mediaHeight, long? readAtUnix, string senderName, Vector4 senderTint, byte flags = 0,
         string? replyToId = null, string replySenderName = "", string replyBody = "", int replyKind = 0,
         int durationSecs = 0, TranscriptReaction[]? reactions = null, int senderBadges = 0,
-        string[]? senderBadgeIds = null)
+        string[]? senderBadgeIds = null, string channelTag = "", Vector4 channelTint = default,
+        TextRun[]? runs = null)
     {
+        ChannelTag = channelTag;
+        ChannelTint = channelTint;
+        Runs = runs;
         SenderBadges = senderBadges;
         SenderBadgeIds = senderBadgeIds;
         Id = id;
@@ -123,7 +131,8 @@ internal readonly record struct ChatPostCard(
     string AuthorName,
     string Snippet,
     string? ThumbnailUrl,
-    bool Available);
+    bool Available,
+    bool Sensitive = false);
 
 internal interface IChatTranscriptPostCards
 {
@@ -153,6 +162,10 @@ internal interface IChatTranscriptMedia
 internal interface IChatTranscriptInteractions
 {
     void OnMessageContext(string messageId);
+
+    void OnLinkClick(string messageId, int target)
+    {
+    }
 
     void OnQuoteClick(string messageId);
 
@@ -212,6 +225,8 @@ internal sealed class ChatTranscript
     private const float BubbleGap = 3f;
     private const float QuoteSenderScale = 0.75f;
     private const float QuotePreviewScale = 0.80f;
+    private const float TravelPillHeight = 26f;
+    private const float TravelIconSpace = 17f;
     private static readonly Vector4 SeenTickColor = new(0.45f, 0.83f, 1f, 1f);
 
     private const float FlashSeconds = 1.6f;
@@ -471,8 +486,15 @@ internal sealed class ChatTranscript
         var rect = new Vector2(textLeft, origin.Y);
         var hovering = UiInteract.Hover(rect, new Vector2(rect.X + maxWidth, rect.Y + 16f * scale));
         var name = FirstName(message.SenderName);
+        var nameStyle = new TextStyle(0.78f, FontWeight.SemiBold);
         UserName.Draw("chattranscript.sender." + message.Id, name, message.SenderBadges, message.SenderBadgeIds, textLeft, origin.Y, maxWidth,
-            new TextStyle(0.78f, FontWeight.SemiBold), message.SenderTint, hovering, theme);
+            nameStyle, message.SenderTint, hovering, theme);
+        if (message.ChannelTag.Length > 0)
+        {
+            var tagLeft = textLeft + MathF.Min(maxWidth, Typography.Measure(name, nameStyle).X) + 6f * scale;
+            DrawChannelTag(message, tagLeft, origin.Y, origin.X + maxWidth, scale);
+        }
+
         if (!string.Equals(name, message.SenderName, StringComparison.Ordinal))
         {
             var nameWidth = MathF.Min(maxWidth, Typography.Measure(name, new TextStyle(0.78f, FontWeight.SemiBold)).X);
@@ -482,6 +504,24 @@ internal sealed class ChatTranscript
         }
 
         ImGui.SetCursorScreenPos(new Vector2(origin.X, origin.Y + 16f * scale));
+    }
+
+    private static void DrawChannelTag(TranscriptMessage message, float left, float top, float limit, float scale)
+    {
+        var label = Typography.FitText(message.ChannelTag, MathF.Max(0f, limit - left) - 10f * scale,
+            TextStyles.Caption2);
+        if (label.Length == 0)
+        {
+            return;
+        }
+
+        var drawList = ImGui.GetWindowDrawList();
+        var size = Typography.Measure(label, TextStyles.Caption2);
+        var min = new Vector2(left, top + 1f * scale);
+        var max = min + size + new Vector2(10f * scale, 3f * scale);
+        Squircle.Fill(drawList, min, max, (max.Y - min.Y) * 0.5f,
+            ImGui.GetColorU32(Palette.WithAlpha(message.ChannelTint, 0.18f)));
+        Typography.DrawCentered(drawList, (min + max) * 0.5f, label, message.ChannelTint, TextStyles.Caption2);
     }
 
     private void DrawSystemMessage(TranscriptMessage message, in ChatTranscriptModel model)
@@ -528,8 +568,12 @@ internal sealed class ChatTranscript
         var paddingX = 11f * scale;
         var paddingY = 7f * scale;
         var wrap = available * 0.74f - paddingX * 2f;
-        var linkLayout = deleted ? null : LinkText.LayoutFor(message.Body, wrap);
-        var textSize = linkLayout is null ? ImGui.CalcTextSize(message.Body, false, wrap) : linkLayout.Size;
+        var runs = deleted ? null : message.Runs;
+        var runLayout = runs is null ? null : RunText.Layout(message.Id, runs, wrap);
+        var linkLayout = deleted || runs is not null ? null : LinkText.LayoutFor(message.Body, wrap);
+        var textSize = runLayout is not null
+            ? runLayout.Size
+            : linkLayout is null ? ImGui.CalcTextSize(message.Body, false, wrap) : linkLayout.Size;
         var deletedIconWidth = deleted ? 17f * scale : 0f;
         var stamp = MeasureStamp(message, mine, scale);
         var stampGap = 7f * scale;
@@ -597,7 +641,16 @@ internal sealed class ChatTranscript
         }
 
         var textPos = fx.Apply(new Vector2(bubbleMin.X + paddingX + deletedIconWidth, contentTop));
-        if (linkLayout is null)
+        if (runLayout is not null && runs is not null)
+        {
+            var runInk = Palette.WithAlpha(ink, ink.W);
+            var tapped = RunText.Draw(drawList, runLayout, runs, textPos, runInk, fx.Alpha, entrance >= 1f);
+            if (tapped >= 0 && model.Interactions is { } linkTarget)
+            {
+                linkTarget.OnLinkClick(message.Id, tapped);
+            }
+        }
+        else if (linkLayout is null)
         {
             drawList.AddText(ImGui.GetFont(), ImGui.GetFontSize() * fx.Pop, textPos,
                 ImGui.GetColorU32(Palette.WithAlpha(ink, ink.W * fx.Alpha)), message.Body, wrap * fx.Pop);
@@ -718,8 +771,12 @@ internal sealed class ChatTranscript
             var thumbMin = fx.Apply(new Vector2(bubbleMin.X + paddingX, contentTop));
             var thumbMax = fx.Apply(new Vector2(bubbleMin.X + paddingX + innerWidth, contentTop + innerWidth));
             var rounding = 10f * scale * fx.Pop;
-            var texture = card.ThumbnailUrl is null ? null : cards.Thumbnail(card.ThumbnailUrl);
-            if (texture is null)
+            var texture = card.Sensitive || card.ThumbnailUrl is null ? null : cards.Thumbnail(card.ThumbnailUrl);
+            if (card.Sensitive)
+            {
+                SensitiveVeil.Draw(drawList, thumbMin, thumbMax, rounding);
+            }
+            else if (texture is null)
             {
                 Squircle.Fill(drawList, thumbMin, thumbMax, rounding,
                     ImGui.GetColorU32(new Vector4(1f, 1f, 1f, 0.08f * fx.Alpha)));
@@ -803,6 +860,13 @@ internal sealed class ChatTranscript
 
         var worldLine = LocationShare.WorldLine(location);
         var detailLine = location.Ward > 0 ? LocationShare.HousingLine(location) : LocationShare.CoordinateText(location);
+        var destination = TravelPlanner.Resolve(in location);
+        var canTravel = TravelPlanner.CanGo(in destination);
+        var travelLabel = canTravel ? Loc.T(L.Travel.GoThere) : string.Empty;
+        var travelLabelSize = canTravel
+            ? Typography.Measure(travelLabel, TextStyles.FootnoteEmphasized)
+            : Vector2.Zero;
+        var travelHeight = canTravel ? TravelPillHeight * scale : 0f;
         var stamp = MeasureStamp(message, mine, scale);
         var maxTextWidth = available * 0.74f - paddingX * 2f - badgeColumn;
         var eyebrowSize = Typography.Measure(eyebrow, TextStyles.FootnoteEmphasized);
@@ -818,12 +882,19 @@ internal sealed class ChatTranscript
             contentWidth = MathF.Max(contentWidth, forwardLabel.X);
         }
 
+        if (canTravel)
+        {
+            contentWidth = MathF.Max(contentWidth,
+                travelLabelSize.X + (TravelIconSpace + 24f) * scale);
+        }
+
         var textHeight = eyebrowSize.Y + 3f * scale + zoneSize.Y
                          + (worldSize.Y > 0f ? 2f * scale + worldSize.Y : 0f)
                          + (detailSize.Y > 0f ? 2f * scale + detailSize.Y : 0f);
         var forwardBlock = forwardLabel.Y > 0f ? forwardLabel.Y + 3f * scale : 0f;
+        var travelBlock = canTravel ? 7f * scale + travelHeight : 0f;
         var bubbleWidth = contentWidth + paddingX * 2f;
-        var bubbleHeight = paddingY + forwardBlock + textHeight + 4f * scale + stamp.Height + paddingY;
+        var bubbleHeight = paddingY + forwardBlock + textHeight + travelBlock + 4f * scale + stamp.Height + paddingY;
         var start = ImGui.GetCursorScreenPos();
         var bubbleMin = new Vector2(mine ? start.X + available - bubbleWidth : start.X, start.Y);
         var bubbleMax = bubbleMin + new Vector2(bubbleWidth, bubbleHeight);
@@ -889,11 +960,45 @@ internal sealed class ChatTranscript
                 TextStyles.Footnote.Scale * fx.Pop, TextStyles.Footnote.Weight);
         }
 
+        var travelHovered = false;
+        if (canTravel)
+        {
+            var travelTop = bubbleMin.Y + paddingY + forwardBlock + textHeight + 7f * scale;
+            var travelMin = new Vector2(bubbleMin.X + paddingX, travelTop);
+            var travelMax = new Vector2(bubbleMax.X - paddingX, travelTop + travelHeight);
+            travelHovered = entrance >= 1f && Hovering(travelMin, travelMax);
+            var travelFill = mine
+                ? new Vector4(1f, 1f, 1f, travelHovered ? 0.30f : 0.20f)
+                : Palette.WithAlpha(model.Accent, travelHovered ? 0.34f : 0.22f);
+            Squircle.Fill(drawList, fx.Apply(travelMin), fx.Apply(travelMax), travelHeight * 0.5f * fx.Pop,
+                ImGui.GetColorU32(Palette.WithAlpha(travelFill, travelFill.W * fx.Alpha)));
+            var travelCenterY = travelTop + travelHeight * 0.5f;
+            var iconSpace = TravelIconSpace * scale;
+            var contentLeft = (travelMin.X + travelMax.X) * 0.5f - (travelLabelSize.X + iconSpace) * 0.5f;
+            AppSkin.Icon(drawList, fx.Apply(new Vector2(contentLeft + iconSpace * 0.4f, travelCenterY)),
+                FontAwesomeIcon.LocationArrow.ToIconString(),
+                Palette.WithAlpha(accentInk, accentInk.W * fx.Alpha), 0.62f * fx.Pop);
+            Typography.Draw(drawList,
+                fx.Apply(new Vector2(contentLeft + iconSpace, travelCenterY - travelLabelSize.Y * 0.5f)),
+                travelLabel, Palette.WithAlpha(accentInk, accentInk.W * fx.Alpha),
+                TextStyles.FootnoteEmphasized.Scale * fx.Pop, TextStyles.FootnoteEmphasized.Weight);
+            if (travelHovered)
+            {
+                ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                HoverTooltip.Show(new Rect(travelMin, travelMax), TravelPlanner.Label(in destination),
+                    HoverLabelSide.Above);
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                {
+                    StartTravel(in destination);
+                }
+            }
+        }
+
         var timeColor = mine ? new Vector4(1f, 1f, 1f, 0.72f) : Palette.WithAlpha(model.MutedInk, 0.95f);
         DrawStamp(drawList, stamp, new Vector2(bubbleMax.X - paddingX, bubbleMax.Y - paddingY), fx, timeColor);
         if (entrance >= 1f && Hovering(bubbleMin, bubbleMax))
         {
-            if (location.MapId != 0)
+            if (location.MapId != 0 && !travelHovered)
             {
                 ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                 HoverTooltip.Show(new Rect(bubbleMin, bubbleMax), Loc.T(L.DirectMessages.LocationOpenMap),
@@ -912,6 +1017,24 @@ internal sealed class ChatTranscript
 
         var chipRow = DrawReactionChips(drawList, message, mine, bubbleMin, bubbleMax, fx.Alpha, model, scale);
         ImGui.SetCursorScreenPos(new Vector2(start.X, start.Y + bubbleHeight + chipRow + BubbleGap * scale));
+    }
+
+    private static void StartTravel(in TravelDestination destination)
+    {
+        var outcome = TravelPlanner.Go(in destination);
+        if (outcome == LifestreamOutcome.Started)
+        {
+            return;
+        }
+
+        if (outcome == LifestreamOutcome.NotInstalled)
+        {
+            ImGui.SetClipboardText(TravelPlanner.Command(in destination));
+            CopyToast.Show();
+            return;
+        }
+
+        CopyToast.Show(TravelPlanner.Notice(outcome, in destination));
     }
 
     private void DrawMusterBubble(TranscriptMessage message, int index, string musterId, in ChatTranscriptModel model)

@@ -86,12 +86,25 @@ internal sealed class CameraApp : IPhoneApp
         flashAge = FlashDuration + 1f;
         reticleAge = ReticleDuration + 1f;
         shutterPress = 0f;
+        SyncLandscape();
         DetachCaptureHooks();
     }
 
     public void OnClosed()
     {
+        AppLandscape.Release(Id);
         DetachCaptureHooks();
+    }
+
+    private void SyncLandscape()
+    {
+        if (configuration.CameraLandscape)
+        {
+            AppLandscape.Request(Id);
+            return;
+        }
+
+        AppLandscape.Release(Id);
     }
 
     public void Draw(in PhoneContext context)
@@ -135,6 +148,7 @@ internal sealed class CameraApp : IPhoneApp
 
         configuration.CameraLandscape = !configuration.CameraLandscape;
         configuration.Save();
+        SyncLandscape();
     }
 
     private void AdvanceTimers(float delta)
@@ -236,15 +250,7 @@ internal sealed class CameraApp : IPhoneApp
     {
         for (var index = 0; index < handlers.Count; index++)
         {
-            var handler = handlers[index];
-            handler.RemoveName();
-            handler.RemoveTitle();
-            handler.RemoveFreeCompanyTag();
-            handler.RemoveLevelPrefix();
-            handler.RemoveStatusPrefix();
-            handler.RemoveTargetSuffix();
-            handler.MarkerIconId = 0;
-            handler.NameIconId = -1;
+            NamePlateStripper.Strip(handlers[index]);
         }
     }
 

@@ -2,9 +2,11 @@ using Aetherphone.Core.Announcements;
 using Aetherphone.Core.Apps;
 using Aetherphone.Core.Casino;
 using Aetherphone.Core.Linkpearl;
+using Aetherphone.Core.GameChat;
 using Aetherphone.Core.Moderation;
 using Aetherphone.Core.Muster;
 using Aetherphone.Core.Radio;
+using Aetherphone.Core.Video;
 using Aetherphone.Core.YellowPages;
 
 namespace Aetherphone.Core.Notifications;
@@ -23,6 +25,7 @@ internal sealed class NotificationRouter
     private const string MusicAppId = "music";
     private const string CasinoAppId = "casino";
     private const string CasinoGroupPrefix = "casino:";
+    private const string AetherStreamAppId = "aetherstream";
     private const int TypeLike = 0;
     private const int TypeComment = 1;
     private const int TypeFollow = 2;
@@ -54,16 +57,18 @@ internal sealed class NotificationRouter
     private readonly SafetyLauncher safetyLauncher;
     private readonly RadioLauncher radioLauncher;
     private readonly CasinoLauncher casinoLauncher;
+    private readonly AetherStreamLauncher aetherStreamLauncher;
 
     public NotificationRouter(INavigator navigation, NotificationService notifications,
         SocialNotificationService socialNotifications, LinkpearlLauncher linkpearlLauncher,
         VelvetLauncher velvetLauncher, DmLauncher dmLauncher, GramDmLauncher gramDmLauncher, SocialLauncher socialLauncher,
         MusterLauncher musterLauncher, YellowPagesLauncher yellowPagesLauncher,
         AnnouncementsLauncher announcementsLauncher, SafetyLauncher safetyLauncher, RadioLauncher radioLauncher,
-        CasinoLauncher casinoLauncher)
+        CasinoLauncher casinoLauncher, AetherStreamLauncher aetherStreamLauncher)
     {
         this.radioLauncher = radioLauncher;
         this.casinoLauncher = casinoLauncher;
+        this.aetherStreamLauncher = aetherStreamLauncher;
         this.navigation = navigation;
         this.notifications = notifications;
         this.socialNotifications = socialNotifications;
@@ -107,14 +112,7 @@ internal sealed class NotificationRouter
 
         if (notification.AppId == MessagesAppId && !string.IsNullOrEmpty(notification.GroupKey))
         {
-            if (LinkshellChannel.TryParse(notification.GroupKey, out var channel))
-            {
-                linkpearlLauncher.RequestLinkshell(channel, notification.Title);
-            }
-            else
-            {
-                linkpearlLauncher.Request(notification.Title, notification.GroupKey);
-            }
+            linkpearlLauncher.Request(notification.GroupKey);
         }
         else if (notification.AppId == DmAppId && notification.GroupKey is { } dmKey
                  && dmKey.StartsWith(CallGroupPrefix, StringComparison.Ordinal))
@@ -162,6 +160,10 @@ internal sealed class NotificationRouter
                  && tableKey.StartsWith(CasinoGroupPrefix, StringComparison.Ordinal))
         {
             casinoLauncher.RequestTable(tableKey[CasinoGroupPrefix.Length..]);
+        }
+        else if (notification.AppId == AetherStreamAppId && notification.GroupKey == StreamSuggestionNotifier.GroupKey)
+        {
+            aetherStreamLauncher.RequestUpNext();
         }
         else if (notification.AppId == SettingsAppId)
         {

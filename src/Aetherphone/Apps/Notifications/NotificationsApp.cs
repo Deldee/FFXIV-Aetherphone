@@ -3,6 +3,7 @@ using Aetherphone.Core.Announcements;
 using Aetherphone.Core.Apps;
 using Aetherphone.Core.Localization;
 using Aetherphone.Core.Linkpearl;
+using Aetherphone.Core.GameChat;
 using Aetherphone.Core.Moderation;
 using Aetherphone.Core.Muster;
 using Aetherphone.Core.Notifications;
@@ -33,6 +34,7 @@ internal sealed class NotificationsApp : IPhoneApp
     private readonly SafetyLauncher safetyLauncher;
     private readonly RadioLauncher radioLauncher;
     private readonly Core.Casino.CasinoLauncher casinoLauncher;
+    private readonly Core.Video.AetherStreamLauncher aetherStreamLauncher;
     private NotificationCenter? center;
 
     public NotificationsApp(NotificationService notifications, SocialNotificationService socialNotifications,
@@ -40,10 +42,11 @@ internal sealed class NotificationsApp : IPhoneApp
         VelvetLauncher velvetLauncher, DmLauncher dmLauncher, GramDmLauncher gramDmLauncher,
         SocialLauncher socialLauncher, MusterLauncher musterLauncher, YellowPagesLauncher yellowPagesLauncher,
         AnnouncementsLauncher announcementsLauncher, SafetyLauncher safetyLauncher, RadioLauncher radioLauncher,
-        Core.Casino.CasinoLauncher casinoLauncher)
+        Core.Casino.CasinoLauncher casinoLauncher, Core.Video.AetherStreamLauncher aetherStreamLauncher)
     {
         this.radioLauncher = radioLauncher;
         this.casinoLauncher = casinoLauncher;
+        this.aetherStreamLauncher = aetherStreamLauncher;
         this.notifications = notifications;
         this.socialNotifications = socialNotifications;
         this.linkpearlLauncher = linkpearlLauncher;
@@ -72,7 +75,7 @@ internal sealed class NotificationsApp : IPhoneApp
         center ??= new NotificationCenter(notifications,
             new NotificationRouter(context.Navigation, notifications, socialNotifications, linkpearlLauncher,
                 velvetLauncher, dmLauncher, gramDmLauncher, socialLauncher, musterLauncher, yellowPagesLauncher,
-                announcementsLauncher, safetyLauncher, radioLauncher, casinoLauncher));
+                announcementsLauncher, safetyLauncher, radioLauncher, casinoLauncher, aetherStreamLauncher));
         var scale = UiScale.Current;
         var content = context.Content;
         var body = new Rect(new Vector2(content.Min.X, content.Min.Y + AppHeader.Height * scale), content.Max);

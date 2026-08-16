@@ -1,6 +1,7 @@
 using Aetherphone.Core;
 using Aetherphone.Core.Apps;
 using Aetherphone.Core.Localization;
+using Aetherphone.Core.Media;
 using Aetherphone.Core.Platform;
 using Aetherphone.Core.Social;
 using Aetherphone.Core.Theme;
@@ -25,6 +26,7 @@ internal sealed partial class ChirperApp
             quoteTargetId = null;
             composeAttachments.Clear();
             composePicking = false;
+            composeSensitive = false;
             store.RefreshFeed(SocialFeedScope.ForYou);
             store.RefreshFeed(SocialFeedScope.Following);
             feedScrollTopPending = true;
@@ -35,7 +37,7 @@ internal sealed partial class ChirperApp
         if (composeOutcome == 2)
         {
             composeOutcome = 0;
-            composeStatus = Loc.T(L.Account.CannotReach);
+            composeStatus = composeFailure.Failed ? composeFailure.Text() : Loc.T(L.Account.CannotReach);
         }
 
         var pickedPath = Interlocked.Exchange(ref pendingComposePickedPath, null);
@@ -116,7 +118,7 @@ internal sealed partial class ChirperApp
             if (me is not null)
             {
                 DrawAvatar(drawList, new Vector2(cardMin.X + pad + radius, cardMin.Y + pad + radius), radius, me.Name,
-                    me.World, me.AvatarUrl, 0.95f, 48);
+                    me.World, me.AvatarUrl, 0.95f, 48, Frames.Of(me.FrameId));
             }
 
             if (displayName.Length > 0)
@@ -207,8 +209,19 @@ internal sealed partial class ChirperApp
                 else
                 {
                     composeStatus = ComposeHasGif()
-                        ? Loc.T(L.Chirper.GifRidesAlone)
+                        ? Loc.T(L.Common.GifRidesAlone)
                         : Loc.T(L.Chirper.MaxPhotos, ChirperStore.MaxImages);
+                }
+            }
+
+            if (composeAttachments.Count > 0)
+            {
+                var sensitiveCenter = new Vector2(photoCenter.X + emojiRadius * 2f + 14f * scale, footerY);
+                if (ui.IconButton(sensitiveCenter, emojiRadius, FontAwesomeIcon.EyeSlash.ToIconString(),
+                        composeSensitive ? Accent : AppPalettes.Chirper.MutedInk, new Vector4(0f, 0f, 0f, 0f), 1.2f,
+                        Loc.T(composeSensitive ? L.Moderation.SensitiveOn : L.Moderation.MarkSensitive)))
+                {
+                    composeSensitive = !composeSensitive;
                 }
             }
 
@@ -231,6 +244,7 @@ internal sealed partial class ChirperApp
         }
 
         composeStatus = string.Empty;
+        composeFailure.Clear();
         var attachments = composeAttachments.ToArray();
         if (quoteTargetId is not null)
         {
@@ -238,7 +252,8 @@ internal sealed partial class ChirperApp
         }
         else
         {
-            store.Compose(draft, attachments, ok => composeOutcome = ok ? 1 : 2);
+            store.Compose(draft, attachments, composeSensitive && attachments.Length > 0,
+                ok => composeOutcome = ok ? 1 : 2, composeFailure.Set);
         }
     }
 
@@ -384,7 +399,7 @@ internal sealed partial class ChirperApp
 
     private bool ComposeHasGif()
     {
-        return composeAttachments.Count > 0 && ChirperStore.IsGifPath(composeAttachments[0]);
+        return composeAttachments.Count > 0 && GifMedia.IsGif(composeAttachments[0]);
     }
 
     private void AddComposeAttachment(string path)
@@ -395,10 +410,10 @@ internal sealed partial class ChirperApp
             return;
         }
 
-        var addingGif = ChirperStore.IsGifPath(path);
+        var addingGif = GifMedia.IsGif(path);
         if (ComposeHasGif() || (addingGif && composeAttachments.Count > 0))
         {
-            composeStatus = Loc.T(L.Chirper.GifRidesAlone);
+            composeStatus = Loc.T(L.Common.GifRidesAlone);
             return;
         }
 
@@ -408,14 +423,10 @@ internal sealed partial class ChirperApp
             return;
         }
 
-        if (addingGif)
+        if (addingGif && !GifMedia.FitsSizeCap(path))
         {
-            var info = new FileInfo(path);
-            if (!info.Exists || info.Length == 0 || info.Length > ChirperStore.MaxGifBytes)
-            {
-                composeStatus = Loc.T(L.Chirper.GifTooLarge);
-                return;
-            }
+            composeStatus = Loc.T(L.Common.GifTooLarge);
+            return;
         }
 
         for (var index = 0; index < composeAttachments.Count; index++)

@@ -30,6 +30,7 @@ internal sealed class AccountPage : ISettingsPage, IDisposable
     }
 
     private const string LodestoneProfileUrl = "https://na.finalfantasyxiv.com/lodestone/my/setting/profile/";
+    private const string RisingStonesProfileSettingsUrl = "https://ff14risingstones.web.sdo.com/pc/index.html#/me/settings/main";
     public string Title => Loc.T(L.Account.Title);
 
     public string Summary =>
@@ -61,11 +62,9 @@ internal sealed class AccountPage : ISettingsPage, IDisposable
     private readonly PatreonLinkFlow patreonFlow;
     private readonly CancellationTokenSource cancellation = new();
     private readonly List<ulong> accountIds = new();
+    private string risingStonesUuid = string.Empty;
     private int accountIdsStamp = -1;
     private volatile bool avatarBusy;
-    private volatile BadgeStyle[]? communityBadges;
-    private bool communityBadgesRequested;
-    private UserDto? communityBadgesUser;
     private bool meRequested;
     private int lastDrawnFrame = -2;
 
@@ -103,14 +102,8 @@ internal sealed class AccountPage : ISettingsPage, IDisposable
         if (frame - lastDrawnFrame > 1)
         {
             accountState.RefreshNow();
-            communityBadgesRequested = false;
         }
 
-        if (!ReferenceEquals(communityBadgesUser, session.CurrentUser))
-        {
-            communityBadgesUser = session.CurrentUser;
-            communityBadgesRequested = false;
-        }
 
         lastDrawnFrame = frame;
         var theme = context.Theme;
@@ -252,7 +245,7 @@ internal sealed class AccountPage : ISettingsPage, IDisposable
         var radius = 38f * scale;
         var avatarCenter = new Vector2(centerX, origin.Y + 10f * scale + radius);
         AvatarView.DrawRemote(drawList, avatarCenter, radius, theme, user.Name, user.World, user.AvatarUrl, images,
-            lodestone, 2.0f, 64);
+            lodestone, 2.0f, 64, 1f, Frames.Of(user.FrameId));
         var avatarExtent = new Vector2(radius, radius);
         var avatarMin = avatarCenter - avatarExtent;
         var avatarMax = avatarCenter + avatarExtent;
@@ -296,126 +289,9 @@ internal sealed class AccountPage : ISettingsPage, IDisposable
 
     private void DrawCommunityBadgesSection(PhoneTheme theme, float scale)
     {
-        RequestCommunityBadges();
-        var badges = communityBadges;
-        if (badges is null || badges.Length == 0)
-        {
-            return;
-        }
-
         ImGui.Dummy(new Vector2(0f, 14f * scale));
         SettingsSection.Header(Loc.T(L.Account.BadgesSection), theme);
-        var card = GroupCard.Begin(theme, badges.Length);
-        var light = RoleInk.IsLight(theme);
-        var toggledIndex = -1;
-        for (var index = 0; index < badges.Length; index++)
-        {
-            if (DrawCommunityBadgeRow(card.NextRow(), badges[index], index, light, theme, scale))
-            {
-                toggledIndex = index;
-            }
-        }
-
-        card.End();
-        ImGui.Dummy(new Vector2(0f, 8f * scale));
-        SettingsSection.Hint(Loc.T(L.Account.BadgesHint), theme);
-        if (toggledIndex >= 0)
-        {
-            ToggleCommunityBadge(toggledIndex);
-        }
-    }
-
-    private bool DrawCommunityBadgeRow(Rect row, BadgeStyle badge, int index, bool light, PhoneTheme theme, float scale)
-    {
-        var drawList = ImGui.GetWindowDrawList();
-        var glyphSize = 16f * scale;
-        BadgeStrip.DrawOne(drawList, new Vector2(row.Min.X + glyphSize * 0.5f, row.Center.Y), badge, images, light,
-            glyphSize);
-        var rowId = "account.communitybadge." + index;
-        var toggleWidth = Metrics.Size.ToggleWidth * scale;
-        var toggleHeight = Metrics.Size.ToggleHeight * scale;
-        var toggleMin = new Vector2(row.Max.X - toggleWidth, row.Center.Y - toggleHeight * 0.5f);
-        var labelLeft = row.Min.X + glyphSize + 10f * scale;
-        var labelMaxWidth = MathF.Max(1f, toggleMin.X - 10f * scale - labelLeft);
-        var labelSize = Typography.Measure(badge.Name, TextStyles.BodyEmphasized);
-        Marquee.DrawLeftAuto(rowId, badge.Name, labelLeft, row.Center.Y - labelSize.Y * 0.5f, labelMaxWidth,
-            TextStyles.BodyEmphasized, theme.TextStrong);
-        var shown = !badge.Hidden;
-        var next = Toggle.Draw(rowId + ".toggle",
-            new Rect(toggleMin, toggleMin + new Vector2(toggleWidth, toggleHeight)), shown, theme);
-        return next != shown;
-    }
-
-    private void RequestCommunityBadges()
-    {
-        if (communityBadgesRequested || !session.IsSignedIn)
-        {
-            return;
-        }
-
-        communityBadgesRequested = true;
-        var token = cancellation.Token;
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                var awarded = await account.AwardedBadgesAsync(token).ConfigureAwait(false);
-                if (awarded is null)
-                {
-                    communityBadgesRequested = false;
-                    return;
-                }
-
-                var parsed = new BadgeStyle[awarded.Badges.Length];
-                for (var index = 0; index < awarded.Badges.Length; index++)
-                {
-                    parsed[index] = BadgeStyle.From(awarded.Badges[index]);
-                }
-
-                communityBadges = parsed;
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception exception)
-            {
-                AepLog.Warning(exception, "Community badges load failed");
-                communityBadgesRequested = false;
-            }
-        });
-    }
-
-    private void ToggleCommunityBadge(int index)
-    {
-        var badges = communityBadges;
-        if (badges is null || index >= badges.Length)
-        {
-            return;
-        }
-
-        var badge = badges[index];
-        var hidden = !badge.Hidden;
-        badges[index] = badge with { Hidden = hidden };
-        var token = cancellation.Token;
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                var fresh = await account.SetBadgeVisibilityAsync(badge.Id, hidden, token).ConfigureAwait(false);
-                if (fresh is null)
-                {
-                    badges[index] = badge;
-                }
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception exception)
-            {
-                AepLog.Warning(exception, "Badge visibility update failed");
-                badges[index] = badge;
-            }
-        });
+        SettingsSection.Hint(Loc.T(L.Loadout.SettingsMoved), theme);
     }
 
     private void DrawPatreonSection(PhoneTheme theme, float scale)
@@ -560,14 +436,13 @@ internal sealed class AccountPage : ISettingsPage, IDisposable
                 AddAccount();
             }
 
-            if (SettingsRow.Bool(actions.NextRow(), Loc.T(L.Account.FollowCharacter), session.FollowsCharacter, theme))
+            var followCharacter = SettingsRow.Bool(actions.NextRow(), Loc.T(L.Account.FollowCharacter),
+                session.FollowsCharacter, theme, null, Loc.T(L.Account.FollowCharacterHint));
+            actions.End();
+            if (followCharacter != session.FollowsCharacter)
             {
                 ToggleFollowCharacter();
             }
-
-            actions.End();
-            ImGui.Dummy(new Vector2(0f, 8f * scale));
-            SettingsSection.Hint(Loc.T(L.Account.FollowCharacterHint), theme);
         }
         else
         {
@@ -888,6 +763,18 @@ internal sealed class AccountPage : ISettingsPage, IDisposable
             return;
         }
 
+        if (gameData.IsChineseGameClient())
+        {
+            if (flow.RisingStonesActive)
+            {
+                DrawRisingStonesVerifyStep(theme);
+                return;
+            }
+
+            DrawRisingStonesSignedOut(theme);
+            return;
+        }
+
         if (flow.XivAuthActive)
         {
             DrawXivAuthStep(theme);
@@ -929,6 +816,113 @@ internal sealed class AccountPage : ISettingsPage, IDisposable
         using (ImRaii.PushColor(ImGuiCol.Text, theme.TextMuted))
         {
             Typography.Wrapped(Loc.T(L.Account.LodestoneHint));
+        }
+
+        DrawStatus(theme);
+    }
+
+    private void DrawRisingStonesSignedOut(PhoneTheme theme)
+    {
+        var scale = UiScale.Current;
+        DrawAccountsSection(theme, scale, false);
+        ImGui.Dummy(new Vector2(0f, 6f * scale));
+        using (ImRaii.PushColor(ImGuiCol.Text, theme.TextMuted))
+        {
+            Typography.Wrapped(Loc.T(L.Account.RisingStonesIntro));
+        }
+
+        ImGui.Dummy(new Vector2(0f, 12f * scale));
+        DrawRisingStonesUuidField(theme, scale);
+        ImGui.Dummy(new Vector2(0f, 6f * scale));
+        using (ImRaii.PushColor(ImGuiCol.Text, theme.TextMuted))
+        {
+            Typography.Wrapped(Loc.T(L.Account.RisingStonesUuidHint));
+        }
+
+        ImGui.Dummy(new Vector2(0f, 14f * scale));
+        if (PrimaryButton(Loc.T(L.Account.RisingStonesSignIn), theme) && !flow.Busy && risingStonesUuid.Length > 0)
+        {
+            flow.StartRisingStones(risingStonesUuid);
+        }
+
+        DrawStatus(theme);
+    }
+
+    private void DrawRisingStonesUuidField(PhoneTheme theme, float scale)
+    {
+        var origin = ImGui.GetCursorScreenPos();
+        var width = ImGui.GetContentRegionAvail().X;
+        var height = 44f * scale;
+        var drawList = ImGui.GetWindowDrawList();
+        Squircle.Fill(drawList, origin, new Vector2(origin.X + width, origin.Y + height), 9f * scale,
+            ImGui.GetColorU32(theme.GroupedCard));
+        ImGui.SetCursorScreenPos(new Vector2(origin.X + 12f * scale,
+            origin.Y + height * 0.5f - ImGui.GetFrameHeight() * 0.5f));
+        ImGui.SetNextItemWidth(width - 24f * scale);
+        using (ImRaii.PushColor(ImGuiCol.FrameBg, new Vector4(0f, 0f, 0f, 0f)).Push(ImGuiCol.Text, theme.TextStrong))
+        {
+            ImGui.InputTextWithHint("##risingStonesUuid", Loc.T(L.Account.RisingStonesUuidLabel),
+                ref risingStonesUuid, SignInFlow.RisingStonesUuidMaxLength, ImGuiInputTextFlags.CharsDecimal);
+        }
+
+        ImGui.SetCursorScreenPos(origin);
+        ImGui.Dummy(new Vector2(width, height));
+    }
+
+    private void DrawRisingStonesVerifyStep(PhoneTheme theme)
+    {
+        var scale = UiScale.Current;
+        ImGui.Dummy(new Vector2(0f, 4f * scale));
+        using (Plugin.Fonts.Push(1.3f, FontWeight.SemiBold))
+        {
+            using (ImRaii.PushColor(ImGuiCol.Text, theme.TextStrong))
+            {
+                Typography.Plain(Loc.T(L.Account.RisingStonesVerifyTitle));
+            }
+        }
+
+        ImGui.Dummy(new Vector2(0f, 4f * scale));
+        using (ImRaii.PushColor(ImGuiCol.Text, theme.TextMuted))
+        {
+            Typography.Wrapped(Loc.T(L.Account.RisingStonesVerifyIntro));
+        }
+
+        var code = flow.ChallengeCode;
+        ImGui.Dummy(new Vector2(0f, 10f * scale));
+        if (DrawCodeCard(theme, code))
+        {
+            ImGui.SetClipboardText(code);
+        }
+
+        ImGui.Dummy(new Vector2(0f, 12f * scale));
+        DrawStepRow("1", Loc.T(L.Account.Step1), theme);
+        DrawStepRow("2", Loc.T(L.Account.RisingStonesStep2), theme);
+        DrawStepRow("3", Loc.T(L.Account.RisingStonesStep3), theme);
+        DrawStepRow("4", Loc.T(L.Account.Step4), theme);
+        ImGui.Dummy(new Vector2(0f, 12f * scale));
+        var spacing = 8f * scale;
+        var half = (ImGui.GetContentRegionAvail().X - spacing) * 0.5f;
+        if (Button(Loc.T(L.Account.CopyCode), theme, half))
+        {
+            ImGui.SetClipboardText(code);
+        }
+
+        ImGui.SameLine(0f, spacing);
+        if (Button(Loc.T(L.Account.RisingStonesOpen), theme, half))
+        {
+            UrlActions.OpenInBrowser(RisingStonesProfileSettingsUrl);
+        }
+
+        ImGui.Dummy(new Vector2(0f, 8f * scale));
+        if (PrimaryButton(Loc.T(L.Account.VerifyAdded), theme) && !flow.Busy)
+        {
+            flow.VerifyChallenge();
+        }
+
+        ImGui.Dummy(new Vector2(0f, 2f * scale));
+        if (GhostButton(Loc.T(L.Common.Cancel), theme))
+        {
+            ResetFlow();
         }
 
         DrawStatus(theme);
@@ -1001,7 +995,7 @@ internal sealed class AccountPage : ISettingsPage, IDisposable
             Typography.Wrapped(Loc.T(L.Account.VerifyIntro));
         }
 
-        var code = flow.LodestoneCode;
+        var code = flow.ChallengeCode;
         ImGui.Dummy(new Vector2(0f, 10f * scale));
         if (DrawCodeCard(theme, code))
         {
@@ -1030,7 +1024,7 @@ internal sealed class AccountPage : ISettingsPage, IDisposable
         ImGui.Dummy(new Vector2(0f, 8f * scale));
         if (PrimaryButton(Loc.T(L.Account.VerifyAdded), theme) && !flow.Busy)
         {
-            flow.VerifyLodestone();
+            flow.VerifyChallenge();
         }
 
         ImGui.Dummy(new Vector2(0f, 2f * scale));

@@ -1,6 +1,7 @@
 using Aetherphone.Core.Aethernet;
 using Aetherphone.Core.Aethernet.Clients;
 using Aetherphone.Core.Aethernet.Contracts;
+using Aetherphone.Core.Localization;
 using Aetherphone.Core.Media;
 using Aetherphone.Core.Net;
 using Aetherphone.Core.Wallpapers;
@@ -22,6 +23,9 @@ internal enum FollowState
 
 internal abstract class SocialFeedStore : IDisposable
 {
+    private const int CommentImageDimension = 1280;
+    private const string CommentUploadScope = "comment";
+
     protected readonly AethernetSession session;
     protected readonly AccountClient account;
     protected readonly SocialClient client;
@@ -65,8 +69,11 @@ internal abstract class SocialFeedStore : IDisposable
     private volatile bool userListFailed;
     private UserListKind userListKind;
     private volatile string? userListSourceId;
+    private int userListGeneration;
     private readonly FeedLane<PostDto> taggedLane = new(ByNewestFirst);
     private volatile string? taggedUserId;
+    private readonly FeedLane<PostDto> hashtagLane = new(ByNewestFirst);
+    private volatile string? hashtagTag;
     private string? lastAccountId;
 
     protected SocialFeedStore(
@@ -126,14 +133,18 @@ internal abstract class SocialFeedStore : IDisposable
         detailComments = Array.Empty<CommentDto>();
         commentsCursor = null;
         discoverResults = Array.Empty<UserDto>();
+        Interlocked.Increment(ref userListGeneration);
         userListKey = null;
         userListResults = Array.Empty<UserDto>();
         userListCursor = null;
+        userListLoading = false;
+        userListFailed = false;
         savedLane.Clear();
         followRequests = Array.Empty<UserDto>();
         followRequestsCursor = null;
         followRequestsLoaded = false;
         ClearTagged();
+        ClearHashtag();
     }
 
     public MentionSuggestions NewMentionSuggestions() => new(account, work);
@@ -143,6 +154,10 @@ internal abstract class SocialFeedStore : IDisposable
     public PostDto[] Feed(SocialFeedScope scope) => Lane(scope).Items;
 
     public bool IsLoading(SocialFeedScope scope) => Lane(scope).Loading;
+
+    public bool FeedFailed(SocialFeedScope scope) => Lane(scope).Failed;
+
+    public AepFailure FeedFailure(SocialFeedScope scope) => Lane(scope).Failure;
 
     public bool HasMoreFeed(SocialFeedScope scope) => Lane(scope).HasMore;
 
@@ -199,7 +214,8 @@ internal abstract class SocialFeedStore : IDisposable
         : user.FollowRequested ? FollowState.Requested
         : FollowState.None;
 
-    protected abstract Task<FeedPage?> FetchFeedAsync(string feedKey, string? cursor, CancellationToken token);
+    protected abstract Task<FeedPage?> FetchFeedAsync(string feedKey, string? cursor, CancellationToken token,
+        Action<AepFailure>? onFailure = null);
 
     protected abstract Task<FeedPage?> FetchProfilePostsAsync(string userId, string? cursor, CancellationToken token);
 
@@ -258,6 +274,76 @@ internal abstract class SocialFeedStore : IDisposable
         taggedLane.Clear();
     }
 
+    protected virtual Task<FeedPage?> FetchHashtagPostsAsync(string tag, string? cursor, CancellationToken token) =>
+        Task.FromResult<FeedPage?>(null);
+
+    public PostDto[] HashtagPosts => hashtagLane.Items;
+
+    public bool HashtagLoading => hashtagLane.Loading;
+    public bool HashtagLoadingMore => hashtagLane.LoadingMore;
+    public bool HasMoreHashtagPosts => hashtagLane.HasMore;
+
+    public void OpenHashtagPosts(string tag)
+    {
+        if (!session.IsSignedIn || hashtagLane.Loading)
+        {
+            return;
+        }
+
+        RefreshHashtagLane(tag);
+    }
+
+    public void EnsureHashtagPosts(string tag)
+    {
+        if (!session.IsSignedIn || hashtagLane.Loading || string.Equals(hashtagTag, tag, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        RefreshHashtagLane(tag);
+    }
+
+    private void RefreshHashtagLane(string tag)
+    {
+        hashtagTag = tag;
+        hashtagLane.Clear();
+        hashtagLane.Loading = true;
+        work.Run("hashtag load", async token =>
+        {
+            var page = await FetchHashtagPostsAsync(tag, null, token).ConfigureAwait(false);
+            if (page is not null && string.Equals(hashtagTag, tag, StringComparison.Ordinal))
+            {
+                hashtagLane.ApplyRefresh(page.Items, page.NextCursor);
+            }
+        }, () => hashtagLane.Loading = false);
+    }
+
+    public void LoadMoreHashtagPosts()
+    {
+        var tag = hashtagTag;
+        var cursor = hashtagLane.Cursor;
+        if (!session.IsSignedIn || tag is null || cursor is null || hashtagLane.LoadingMore || hashtagLane.Loading)
+        {
+            return;
+        }
+
+        hashtagLane.LoadingMore = true;
+        work.Run("hashtag more", async token =>
+        {
+            var page = await FetchHashtagPostsAsync(tag, cursor, token).ConfigureAwait(false);
+            if (page is not null && string.Equals(hashtagTag, tag, StringComparison.Ordinal))
+            {
+                hashtagLane.ApplyMore(page.Items, page.NextCursor);
+            }
+        }, () => hashtagLane.LoadingMore = false);
+    }
+
+    protected void ClearHashtag()
+    {
+        hashtagTag = null;
+        hashtagLane.Clear();
+    }
+
     public void EnsureMe()
     {
         ReconcileAccountBadges();
@@ -305,11 +391,17 @@ internal abstract class SocialFeedStore : IDisposable
         lane.Loading = true;
         work.Run("feed refresh", async token =>
         {
-            var page = await FetchFeedAsync(FeedKey(scope), null, token).ConfigureAwait(false);
+            var reported = AepFailure.None;
+            var page = await FetchFeedAsync(FeedKey(scope), null, token, failure => reported = failure)
+                .ConfigureAwait(false);
             if (page is not null)
             {
                 lane.ApplyRefresh(page.Items, page.NextCursor);
+                return;
             }
+
+            lane.RecordFailure(reported.Failed ? reported : AepFailure.Transport(AepFailureKind.Offline));
+            AepLog.Warning($"Feed '{FeedKey(scope)}' failed to refresh: {lane.Failure.Describe()}");
         }, () => lane.Loading = false);
     }
 
@@ -330,11 +422,17 @@ internal abstract class SocialFeedStore : IDisposable
         lane.LoadingMore = true;
         work.Run("feed more", async token =>
         {
-            var page = await FetchFeedAsync(FeedKey(scope), cursor, token).ConfigureAwait(false);
+            var reported = AepFailure.None;
+            var page = await FetchFeedAsync(FeedKey(scope), cursor, token, failure => reported = failure)
+                .ConfigureAwait(false);
             if (page is not null)
             {
                 lane.ApplyMore(page.Items, page.NextCursor);
+                return;
             }
+
+            lane.RecordFailure(reported.Failed ? reported : AepFailure.Transport(AepFailureKind.Offline));
+            AepLog.Warning($"Feed '{FeedKey(scope)}' failed to load more: {lane.Failure.Describe()}");
         }, () => lane.LoadingMore = false);
     }
 
@@ -409,10 +507,11 @@ internal abstract class SocialFeedStore : IDisposable
         }, () => commentsLoadingMore = false);
     }
 
-    public void AddComment(string postId, string text, Action<bool> onComplete)
+    public void AddComment(string postId, string text, string? attachmentPath, Action<bool> onComplete,
+        Action<AepFailure>? onFailure = null)
     {
         var trimmed = text.Trim();
-        if (trimmed.Length == 0 || commenting)
+        if ((trimmed.Length == 0 && attachmentPath is null) || commenting)
         {
             return;
         }
@@ -420,9 +519,28 @@ internal abstract class SocialFeedStore : IDisposable
         commenting = true;
         work.Run("comment", async token =>
         {
-            var created = await client.AddCommentAsync(postId, trimmed, token).ConfigureAwait(false);
+            string? mediaKey = null;
+            var mediaWidth = 0;
+            var mediaHeight = 0;
+            if (attachmentPath is not null)
+            {
+                var uploaded = await UploadImagesAsync(new[] { attachmentPath }, 1, CommentImageDimension,
+                    CommentUploadScope, token, onFailure).ConfigureAwait(false);
+                if (uploaded is null || uploaded.Value.Keys.Length == 0)
+                {
+                    return false;
+                }
+
+                mediaKey = uploaded.Value.Keys[0];
+                mediaWidth = uploaded.Value.Width;
+                mediaHeight = uploaded.Value.Height;
+            }
+
+            var created = await client.AddCommentAsync(postId, trimmed, mediaKey, mediaWidth, mediaHeight, token,
+                onFailure).ConfigureAwait(false);
             if (created is null)
             {
+                AepLog.Warning($"Comment on {postId} was not accepted");
                 return false;
             }
 
@@ -434,6 +552,73 @@ internal abstract class SocialFeedStore : IDisposable
             BumpCommentCount(postId, 1);
             return true;
         }, onComplete, () => commenting = false);
+    }
+
+    protected async Task<(string[] Keys, int Width, int Height)?> UploadImagesAsync(
+        IReadOnlyList<string> imagePaths, int maxImages, int maxDimension, string uploadScope,
+        CancellationToken token, Action<AepFailure>? onFailure = null)
+    {
+        if (imagePaths.Count == 0)
+        {
+            return (Array.Empty<string>(), 0, 0);
+        }
+
+        var keys = new string[Math.Min(imagePaths.Count, maxImages)];
+        var firstWidth = 0;
+        var firstHeight = 0;
+        for (var index = 0; index < keys.Length; index++)
+        {
+            byte[] bytes;
+            string contentType;
+            int width;
+            int height;
+            if (GifMedia.IsGif(imagePaths[index]))
+            {
+                bytes = await File.ReadAllBytesAsync(imagePaths[index], token).ConfigureAwait(false);
+                if (bytes.Length == 0 || bytes.Length > GifMedia.MaxBytes)
+                {
+                    AepLog.Warning($"Upload to {uploadScope} rejected a GIF of {bytes.Length} bytes; the cap is {GifMedia.MaxBytes}");
+                    onFailure?.Invoke(new AepFailure(AepFailureKind.Server, 0, FailureCodes.MediaInvalidImage, null,
+                        null, null));
+                    return null;
+                }
+
+                (width, height) = ImageProcessor.IdentifyDimensions(bytes);
+                contentType = "image/gif";
+            }
+            else
+            {
+                var baked = ImageProcessor.BakeJpeg(imagePaths[index], maxDimension);
+                bytes = baked.Bytes;
+                width = baked.Width;
+                height = baked.Height;
+                contentType = "image/jpeg";
+            }
+
+            var upload = await media.UploadUrlAsync(contentType, uploadScope, token, onFailure).ConfigureAwait(false);
+            if (upload is null)
+            {
+                return null;
+            }
+
+            var sent = await media.UploadImageAsync(upload.UploadUrl, bytes, contentType, token)
+                .ConfigureAwait(false);
+            if (!sent)
+            {
+                AepLog.Warning($"Upload to {uploadScope} could not store image {index + 1} of {keys.Length}");
+                onFailure?.Invoke(AepFailure.Transport(AepFailureKind.Offline));
+                return null;
+            }
+
+            keys[index] = upload.Key;
+            if (index == 0)
+            {
+                firstWidth = width;
+                firstHeight = height;
+            }
+        }
+
+        return (keys, firstWidth, firstHeight);
     }
 
     public void DeleteComment(string postId, string commentId)
@@ -709,6 +894,37 @@ internal abstract class SocialFeedStore : IDisposable
         });
     }
 
+    public void SetSensitive(string postId, bool sensitive, Action<AepFailure>? onFailure = null)
+    {
+        ApplySensitiveEverywhere(postId, sensitive);
+        work.Run("sensitive toggle", async token =>
+        {
+            var updated = await client.SetSensitiveAsync(postId, sensitive, token, onFailure).ConfigureAwait(false);
+            if (updated is null)
+            {
+                ApplySensitiveEverywhere(postId, !sensitive);
+            }
+        });
+    }
+
+    private void ApplySensitiveEverywhere(string postId, bool sensitive)
+    {
+        forYouLane.Items = MapSensitive(forYouLane.Items, postId, sensitive);
+        followingLane.Items = MapSensitive(followingLane.Items, postId, sensitive);
+        profileLane.Items = MapSensitive(profileLane.Items, postId, sensitive);
+        taggedLane.Items = MapSensitive(taggedLane.Items, postId, sensitive);
+        savedLane.Items = MapSensitive(savedLane.Items, postId, sensitive);
+        if (detailPost is { } current && current.Id == postId)
+        {
+            detailPost = current with { Sensitive = sensitive };
+        }
+    }
+
+    private static PostDto[] MapSensitive(PostDto[] source, string postId, bool sensitive) =>
+        CopyOnWrite.Map(source,
+            post => post.Id == postId && post.Sensitive != sensitive,
+            post => post with { Sensitive = sensitive });
+
     private void ApplySavedEverywhere(string postId, bool saved)
     {
         forYouLane.Items = MapSaved(forYouLane.Items, postId, saved);
@@ -749,10 +965,21 @@ internal abstract class SocialFeedStore : IDisposable
         work.Run("report", token => safety.ReportAsync(targetType, targetId, reason, token), onComplete);
     }
 
-    public void Block(string userId, Action<bool> onComplete)
+    public void Block(string userId, Action<bool> onComplete, Action<AepFailure>? onFailure = null)
     {
         RemoveAuthorEverywhere(userId);
-        work.Run("block", token => safety.BlockAsync(userId, token), onComplete);
+        work.Run("block", async token =>
+        {
+            var blocked = await safety.BlockAsync(userId, token, onFailure).ConfigureAwait(false);
+            if (!blocked)
+            {
+                AepLog.Warning($"Block of {userId} failed; restoring the feeds that were cleared optimistically");
+                RefreshFeed(SocialFeedScope.ForYou);
+                RefreshFeed(SocialFeedScope.Following);
+            }
+
+            return blocked;
+        }, onComplete);
     }
 
     private void RemoveAuthorEverywhere(string userId)
@@ -874,32 +1101,50 @@ internal abstract class SocialFeedStore : IDisposable
         OpenProfile(current);
     }
 
-    public void OpenUserList(string sourceId, UserListKind kind)
+    public void EnsureUserList(string sourceId, UserListKind kind)
     {
-        var key = $"{(int)kind}:{sourceId}";
-        if (userListKey == key && (userListResults.Length > 0 || userListLoading))
+        if (userListKey == UserListKeyFor(sourceId, kind))
         {
             return;
         }
 
+        OpenUserList(sourceId, kind);
+    }
+
+    public void OpenUserList(string sourceId, UserListKind kind)
+    {
+        var key = UserListKeyFor(sourceId, kind);
+        if (userListKey == key && userListLoading)
+        {
+            return;
+        }
+
+        var generation = Interlocked.Increment(ref userListGeneration);
+        var keepStaleRows = userListKey == key && userListResults.Length > 0;
+        var staleCursor = userListCursor;
         userListKind = kind;
         userListSourceId = sourceId;
         userListKey = key;
-        userListResults = Array.Empty<UserDto>();
+        if (!keepStaleRows)
+        {
+            userListResults = Array.Empty<UserDto>();
+        }
+
         userListCursor = null;
         userListFailed = false;
         userListLoading = true;
         work.Run("user list", async token =>
         {
             var page = await FetchUserListPageAsync(kind, sourceId, null, token).ConfigureAwait(false);
-            if (userListKey != key)
+            if (Volatile.Read(ref userListGeneration) != generation)
             {
                 return;
             }
 
             if (page is null)
             {
-                userListFailed = true;
+                userListFailed = !keepStaleRows;
+                userListCursor = keepStaleRows ? staleCursor : null;
             }
             else
             {
@@ -908,7 +1153,7 @@ internal abstract class SocialFeedStore : IDisposable
             }
         }, () =>
         {
-            if (userListKey == key)
+            if (Volatile.Read(ref userListGeneration) == generation)
             {
                 userListLoading = false;
             }
@@ -917,21 +1162,21 @@ internal abstract class SocialFeedStore : IDisposable
 
     public void LoadMoreUserList()
     {
-        var key = userListKey;
         var sourceId = userListSourceId;
         var cursor = userListCursor;
-        if (!session.IsSignedIn || key is null || sourceId is null || cursor is null
+        if (!session.IsSignedIn || userListKey is null || sourceId is null || cursor is null
             || userListLoadingMore || userListLoading)
         {
             return;
         }
 
         var kind = userListKind;
+        var generation = Volatile.Read(ref userListGeneration);
         userListLoadingMore = true;
         work.Run("user list more", async token =>
         {
             var page = await FetchUserListPageAsync(kind, sourceId, cursor, token).ConfigureAwait(false);
-            if (page is null || userListKey != key)
+            if (page is null || Volatile.Read(ref userListGeneration) != generation)
             {
                 return;
             }
@@ -940,6 +1185,8 @@ internal abstract class SocialFeedStore : IDisposable
             userListCursor = page.NextCursor;
         }, () => userListLoadingMore = false);
     }
+
+    private static string UserListKeyFor(string sourceId, UserListKind kind) => $"{(int)kind}:{sourceId}";
 
     private async Task<UserListPage?> FetchUserListPageAsync(
         UserListKind kind, string sourceId, string? cursor, CancellationToken token) =>

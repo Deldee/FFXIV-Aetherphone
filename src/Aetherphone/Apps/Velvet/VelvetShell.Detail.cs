@@ -67,7 +67,7 @@ internal sealed partial class VelvetShell
             var avatarCenter = new Vector2(origin.X + avatarRadius, origin.Y + headerHeight * 0.5f);
             var authorName = DisplayNameOf(post.OwnerDisplayName, post.OwnerHandle);
             VAvatar.Draw(drawList, avatarCenter, avatarRadius, theme, authorName, string.Empty, post.OwnerAvatarUrl,
-                images, lodestone, -1);
+                images, lodestone, -1, null, Frames.Of(post.OwnerFrameId));
             var nameLeft = avatarCenter.X + avatarRadius + 10f * scale;
             var ownerSub = post.OwnerHandle.Length > 0 ? "@" + post.OwnerHandle : string.Empty;
             var ownerTime = TimeText.Short(post.CreatedAtUnix);
@@ -266,7 +266,7 @@ internal sealed partial class VelvetShell
         var avatarCenter = new Vector2(origin.X + avatarRadius, origin.Y + avatarRadius);
         var authorName = DisplayNameOf(comment.AuthorDisplayName, comment.AuthorHandle);
         VAvatar.Draw(drawList, avatarCenter, avatarRadius, theme, authorName, string.Empty, comment.AuthorAvatarUrl,
-            images, lodestone, -1);
+            images, lodestone, -1, null, Frames.Of(comment.AuthorFrameId));
         var textLeft = avatarCenter.X + avatarRadius + 10f * scale;
         var wrapWidth = origin.X + width - 28f * scale - textLeft;
         var nameMaxWidth = wrapWidth * 0.55f;
@@ -353,13 +353,36 @@ internal sealed partial class VelvetShell
     {
         var style = new CommentComposerStyle(VelvetTheme.Hairline, VelvetTheme.PlumWell, VelvetTheme.TitleInk,
             VelvetTheme.Rose, VelvetTheme.PlumWell, VelvetTheme.OnAccent, true, 9f, 54f, 0.85f);
+        var returned = Interlocked.Exchange(ref commentRestore, null);
+        if (returned is not null)
+        {
+            commentDraft = returned;
+        }
+
+        if (commentFailure.Failed)
+        {
+            Typography.DrawWrappedCentered(new Vector2(bar.Center.X, bar.Min.Y - 22f * UiScale.Current),
+                commentFailure.Text(), VelvetTheme.MutedInk, TextStyles.Footnote,
+                bar.Width - 28f * UiScale.Current);
+        }
+
         var focusPending = false;
         if (CommentComposerBar.Draw(bar, screen, ui, theme, style, "##velvetComment", Loc.T(L.Velvet.AddComment),
                 ref commentDraft, 500, commentMentions, mentionPopup, images, lodestone, store.Commenting,
                 ref focusPending, commentEmoji))
         {
-            store.AddComment(postId, commentDraft, _ => { });
+            var text = commentDraft;
             commentDraft = string.Empty;
+            commentFailure.Clear();
+            store.AddComment(postId, text, accepted =>
+            {
+                if (accepted)
+                {
+                    return;
+                }
+
+                commentRestore = text;
+            }, commentFailure.Set);
         }
     }
 
@@ -410,6 +433,7 @@ internal sealed partial class VelvetShell
                     Name = DisplayNameOf(user.DisplayName, user.Handle),
                     World = string.Empty,
                     AvatarUrl = user.AvatarUrl,
+                    FrameId = user.FrameId,
                     RoleBadges = user.Badges,
                     RoleBadgeIds = user.ProfileBadges,
                     UserId = user.Id,

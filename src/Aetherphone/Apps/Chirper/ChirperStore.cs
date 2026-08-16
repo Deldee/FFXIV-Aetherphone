@@ -2,7 +2,9 @@ using Aetherphone.Core;
 using Aetherphone.Core.Aethernet;
 using Aetherphone.Core.Aethernet.Clients;
 using Aetherphone.Core.Aethernet.Contracts;
+using Aetherphone.Core.Localization;
 using Aetherphone.Core.Media;
+using Aetherphone.Core.Net;
 using Aetherphone.Core.Social;
 using Aetherphone.Core.Wallpapers;
 
@@ -12,16 +14,9 @@ internal sealed class ChirperStore : SocialFeedStore
 {
     public const int MaxImages = 4;
 
-    public const long MaxGifBytes = 4L * 1024 * 1024;
-
     private const int MaxImageDimension = 1600;
 
     private const string UploadScope = "chirp";
-
-    public static bool IsGifPath(string path)
-    {
-        return path.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
-    }
 
     private volatile bool avatarBusy;
 
@@ -33,13 +28,18 @@ internal sealed class ChirperStore : SocialFeedStore
 
     public bool AvatarBusy => avatarBusy;
 
-    protected override Task<FeedPage?> FetchFeedAsync(string feedKey, string? cursor, CancellationToken token) =>
-        client.FeedAsync(feedKey, cursor, token);
+    protected override Task<FeedPage?> FetchFeedAsync(string feedKey, string? cursor, CancellationToken token,
+        Action<AepFailure>? onFailure = null) =>
+        client.FeedAsync(feedKey, cursor, token, onFailure);
 
     protected override Task<FeedPage?> FetchProfilePostsAsync(string userId, string? cursor, CancellationToken token) =>
         client.UserPostsAsync(userId, cursor, token);
 
-    public void Compose(string text, IReadOnlyList<string> imagePaths, Action<bool> onComplete)
+    protected override Task<FeedPage?> FetchHashtagPostsAsync(string tag, string? cursor, CancellationToken token) =>
+        client.TagPostsAsync(tag, cursor, token);
+
+    public void Compose(string text, IReadOnlyList<string> imagePaths, bool sensitive, Action<bool> onComplete,
+        Action<AepFailure>? onFailure = null)
     {
         var trimmed = text.Trim();
         if ((trimmed.Length == 0 && imagePaths.Count == 0) || posting)
@@ -50,14 +50,16 @@ internal sealed class ChirperStore : SocialFeedStore
         posting = true;
         work.Run("compose", async token =>
         {
-            var uploaded = await UploadImagesAsync(imagePaths, token).ConfigureAwait(false);
+            var uploaded = await UploadImagesAsync(imagePaths, MaxImages, MaxImageDimension, UploadScope, token,
+                onFailure).ConfigureAwait(false);
             if (uploaded is null)
             {
                 return false;
             }
 
             var (keys, width, height) = uploaded.Value;
-            var created = await client.CreatePostAsync(trimmed, keys.Length > 0 ? keys : null, width, height, token)
+            var created = await client.CreatePostAsync(trimmed, keys.Length > 0 ? keys : null, width, height,
+                    sensitive, token, onFailure)
                 .ConfigureAwait(false);
             if (created is null)
             {
@@ -67,67 +69,6 @@ internal sealed class ChirperStore : SocialFeedStore
             AcceptCreatedPost(created);
             return true;
         }, onComplete, () => posting = false);
-    }
-
-    private async Task<(string[] Keys, int Width, int Height)?> UploadImagesAsync(
-        IReadOnlyList<string> imagePaths, CancellationToken token)
-    {
-        if (imagePaths.Count == 0)
-        {
-            return (Array.Empty<string>(), 0, 0);
-        }
-
-        var keys = new string[Math.Min(imagePaths.Count, MaxImages)];
-        var firstWidth = 0;
-        var firstHeight = 0;
-        for (var index = 0; index < keys.Length; index++)
-        {
-            byte[] bytes;
-            string contentType;
-            int width;
-            int height;
-            if (IsGifPath(imagePaths[index]))
-            {
-                bytes = await File.ReadAllBytesAsync(imagePaths[index], token).ConfigureAwait(false);
-                if (bytes.Length == 0 || bytes.Length > MaxGifBytes)
-                {
-                    return null;
-                }
-
-                (width, height) = ImageProcessor.IdentifyDimensions(bytes);
-                contentType = "image/gif";
-            }
-            else
-            {
-                var baked = ImageProcessor.BakeJpeg(imagePaths[index], MaxImageDimension);
-                bytes = baked.Bytes;
-                width = baked.Width;
-                height = baked.Height;
-                contentType = "image/jpeg";
-            }
-
-            var upload = await media.UploadUrlAsync(contentType, UploadScope, token).ConfigureAwait(false);
-            if (upload is null)
-            {
-                return null;
-            }
-
-            var sent = await media.UploadImageAsync(upload.UploadUrl, bytes, contentType, token)
-                .ConfigureAwait(false);
-            if (!sent)
-            {
-                return null;
-            }
-
-            keys[index] = upload.Key;
-            if (index == 0)
-            {
-                firstWidth = width;
-                firstHeight = height;
-            }
-        }
-
-        return (keys, firstWidth, firstHeight);
     }
 
     public void ToggleReaction(PostDto post, int kind)
@@ -228,7 +169,8 @@ internal sealed class ChirperStore : SocialFeedStore
         posting = true;
         work.Run("quote", async token =>
         {
-            var uploaded = await UploadImagesAsync(imagePaths, token).ConfigureAwait(false);
+            var uploaded = await UploadImagesAsync(imagePaths, MaxImages, MaxImageDimension, UploadScope, token)
+                .ConfigureAwait(false);
             if (uploaded is null)
             {
                 return false;
