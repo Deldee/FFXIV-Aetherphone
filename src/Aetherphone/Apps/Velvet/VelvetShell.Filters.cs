@@ -87,6 +87,7 @@ internal sealed partial class VelvetShell
         if (!merged || await SaveFiltersAsync().ConfigureAwait(false))
         {
             configuration.VelvetMutesMigrated = true;
+            configuration.VelvetMutes = new VelvetFilterPreferences();
             configuration.Save();
         }
     }
