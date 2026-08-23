@@ -1,8 +1,6 @@
 using Aetherphone.Core;
 using Aetherphone.Core.Social;
 using Newtonsoft.Json;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Aetherphone.Apps.Velvet;
 
@@ -85,16 +83,5 @@ internal sealed class VelvetFilterArchive
         }
     }
 
-    private string PathFor(string accountId)
-    {
-        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(accountId.ToLowerInvariant()));
-        var builder = new StringBuilder(hash.Length * 2 + 5);
-        for (var index = 0; index < hash.Length; index++)
-        {
-            builder.Append(hash[index].ToString("x2"));
-        }
-
-        builder.Append(".json");
-        return Path.Combine(baseDir.FullName, builder.ToString());
-    }
+    private string PathFor(string accountId) => HashedFileName.For(baseDir, accountId.ToLowerInvariant());
 }
