@@ -20,8 +20,7 @@ internal sealed class NotificationsPage : ISettingsPage
     private readonly ISettingsNavigator navigator;
     private readonly AppNotificationPage appPage;
     private readonly AppInstaller installer;
-    private (NotificationChannel Channel, string Name)[] sortedChannels =
-        Array.Empty<(NotificationChannel Channel, string Name)>();
+    private readonly NotificationChannel[] sortedChannels = BuildChannelsArray();
     private LanguageInfo? sortedLanguage;
 
     public NotificationsPage(Configuration configuration, ISettingsNavigator navigator, AppNotificationPage appPage,
@@ -66,14 +65,13 @@ internal sealed class NotificationsPage : ISettingsPage
             var apps = GroupCard.Begin(theme, CountInstalled(NotificationChannels.All));
             for (var index = 0; index < sortedChannels.Length; index++)
             {
-                var entry = sortedChannels[index];
-                var channel = entry.Channel;
+                var channel = sortedChannels[index];
                 if (!installer.IsInstalled(channel.AppId))
                 {
                     continue;
                 }
 
-                if (SettingsRow.AppLink(apps.NextRow(), channel.AppId, channel.Accent, entry.Name,
+                if (SettingsRow.AppLink(apps.NextRow(), channel.AppId, channel.Accent, Loc.T(channel.Name),
                         Summarize(channel.AppId), theme))
                 {
                     appPage.Show(channel);
@@ -92,20 +90,25 @@ internal sealed class NotificationsPage : ISettingsPage
             return;
         }
 
+        Array.Sort(sortedChannels, static (left, right) =>
+        {
+            var primary = Loc.Culture.CompareInfo.Compare(Loc.T(left.Name), Loc.T(right.Name),
+                CompareOptions.IgnoreCase);
+            return primary != 0 ? primary : string.CompareOrdinal(left.AppId, right.AppId);
+        });
+        sortedLanguage = Loc.Current;
+    }
+
+    private static NotificationChannel[] BuildChannelsArray()
+    {
         var channels = NotificationChannels.All;
-        var sorted = new (NotificationChannel Channel, string Name)[channels.Count];
+        var array = new NotificationChannel[channels.Count];
         for (var index = 0; index < channels.Count; index++)
         {
-            sorted[index] = (channels[index], Loc.T(channels[index].Name));
+            array[index] = channels[index];
         }
 
-        Array.Sort(sorted, static (left, right) =>
-        {
-            var primary = Loc.Culture.CompareInfo.Compare(left.Name, right.Name, CompareOptions.IgnoreCase);
-            return primary != 0 ? primary : string.CompareOrdinal(left.Channel.AppId, right.Channel.AppId);
-        });
-        sortedChannels = sorted;
-        sortedLanguage = Loc.Current;
+        return array;
     }
 
     private int CountInstalled(IReadOnlyList<NotificationChannel> channels)
