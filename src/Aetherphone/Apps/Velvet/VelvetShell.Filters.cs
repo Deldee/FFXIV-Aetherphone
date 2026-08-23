@@ -19,10 +19,10 @@ internal sealed partial class VelvetShell
         surface == VelvetPage.Feed ? feedExclude : discoverExclude;
 
     private VelvetFilterPreferences IncludePreferencesFor(VelvetPage surface) =>
-        surface == VelvetPage.Feed ? configuration.VelvetFeedInclude : configuration.VelvetDiscoverInclude;
+        surface == VelvetPage.Feed ? storedFilters.FeedInclude : storedFilters.DiscoverInclude;
 
     private VelvetFilterPreferences ExcludePreferencesFor(VelvetPage surface) =>
-        surface == VelvetPage.Feed ? configuration.VelvetFeedExclude : configuration.VelvetDiscoverExclude;
+        surface == VelvetPage.Feed ? storedFilters.FeedExclude : storedFilters.DiscoverExclude;
 
     private void LoadInclude(VelvetPage surface) => IncludeFor(surface).LoadFrom(IncludePreferencesFor(surface));
 
@@ -31,35 +31,58 @@ internal sealed partial class VelvetShell
     private void SaveInclude(VelvetPage surface)
     {
         IncludeFor(surface).SaveInto(IncludePreferencesFor(surface));
-        configuration.Save();
+        SaveFilters();
     }
 
     private void SaveExclude(VelvetPage surface)
     {
         ExcludeFor(surface).SaveInto(ExcludePreferencesFor(surface));
-        configuration.Save();
+        SaveFilters();
     }
 
-    // One-time copy of the old shared mute list into both surfaces' own exclude filter, so
-    // upgrading users keep their mutes. Runs once; each surface owns its copy from then on and
-    // the legacy list is never read again, even if the user later clears their copy back out.
-    private void MigrateLegacyMutes()
+    private void SaveFilters() => filterArchive.Save(filtersAccountId, storedFilters);
+
+    // Filters live per account, same as the not interested list, so switching accounts on the
+    // same install never mixes one person's filters into another's. Runs at construction and
+    // again every time the signed-in account actually changes.
+    private void LoadFiltersForAccount(string accountId)
     {
-        if (configuration.VelvetMutesMigrated)
+        filtersAccountId = accountId;
+        var loaded = filterArchive.Load(accountId);
+        storedFilters.DiscoverInclude = loaded.DiscoverInclude;
+        storedFilters.DiscoverExclude = loaded.DiscoverExclude;
+        storedFilters.FeedInclude = loaded.FeedInclude;
+        storedFilters.FeedExclude = loaded.FeedExclude;
+        MigrateLegacyMutes(accountId);
+        LoadInclude(VelvetPage.Discover);
+        LoadExclude(VelvetPage.Discover);
+        LoadInclude(VelvetPage.Feed);
+        LoadExclude(VelvetPage.Feed);
+    }
+
+    // One-time copy of the old shared, account-agnostic mute list into whichever account is
+    // signed in the first time this runs, so upgrading users keep their mutes. Runs once ever,
+    // gated on the account actually receiving it so the flag isn't burned before anyone is
+    // signed in; the legacy list is never read again afterward.
+    private void MigrateLegacyMutes(string accountId)
+    {
+        if (accountId.Length == 0 || configuration.VelvetMutesMigrated)
         {
             return;
         }
 
         configuration.VelvetMutesMigrated = true;
+        configuration.Save();
         var legacy = new VelvetFilterSelection();
         legacy.LoadFrom(configuration.VelvetMutes);
-        if (legacy.Any)
+        if (!legacy.Any)
         {
-            legacy.SaveInto(configuration.VelvetDiscoverExclude);
-            legacy.SaveInto(configuration.VelvetFeedExclude);
+            return;
         }
 
-        configuration.Save();
+        legacy.SaveInto(storedFilters.DiscoverExclude);
+        legacy.SaveInto(storedFilters.FeedExclude);
+        SaveFilters();
     }
 
     private void ApplyDiscoverFilters() =>

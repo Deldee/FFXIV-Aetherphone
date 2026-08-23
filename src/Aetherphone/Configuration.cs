@@ -272,10 +272,6 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public bool VelvetBlurByDefault { get; set; } = true;
     public VelvetFilterPreferences VelvetMutes { get; set; } = new();
     public bool VelvetMutesMigrated { get; set; }
-    public VelvetFilterPreferences VelvetDiscoverInclude { get; set; } = new();
-    public VelvetFilterPreferences VelvetDiscoverExclude { get; set; } = new();
-    public VelvetFilterPreferences VelvetFeedInclude { get; set; } = new();
-    public VelvetFilterPreferences VelvetFeedExclude { get; set; } = new();
     public List<string> VelvetPinnedThreads { get; set; } = new();
     public List<string> MessagePinnedChats { get; set; } = new();
     public List<string> MessageArchivedChats { get; set; } = new();
