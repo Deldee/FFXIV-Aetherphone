@@ -40,6 +40,13 @@ internal sealed partial class VelvetShell
         return Task.Run(() => filterArchive.Save(accountId, storedFilters));
     }
 
+    private void SyncSurface(VelvetPage surface)
+    {
+        SaveInclude(surface);
+        SaveExclude(surface);
+        SaveFilters();
+    }
+
     private void LoadFiltersForAccount(string accountId) => _ = LoadFiltersForAccountAsync(accountId);
 
     private async Task LoadFiltersForAccountAsync(string accountId)
@@ -138,9 +145,7 @@ internal sealed partial class VelvetShell
         {
             include.Clear();
             exclude.Clear();
-            SaveInclude(surface);
-            SaveExclude(surface);
-            SaveFilters();
+            SyncSurface(surface);
             ApplyFilters(surface);
         }
 
@@ -209,19 +214,9 @@ internal sealed partial class VelvetShell
             Gap(40f);
         }
 
-        if (changedExclude)
-        {
-            SaveExclude(surface);
-        }
-
-        if (changedInclude)
-        {
-            SaveInclude(surface);
-        }
-
         if (changedInclude || changedExclude)
         {
-            SaveFilters();
+            SyncSurface(surface);
             ApplyFilters(surface);
         }
     }

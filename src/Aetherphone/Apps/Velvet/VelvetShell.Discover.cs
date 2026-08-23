@@ -120,9 +120,7 @@ internal sealed partial class VelvetShell
                     {
                         discoverInclude.Clear();
                         discoverExclude.Clear();
-                        SaveInclude(VelvetPage.Discover);
-                        SaveExclude(VelvetPage.Discover);
-                        SaveFilters();
+                        SyncSurface(VelvetPage.Discover);
                         ApplyFilters(VelvetPage.Discover);
                     }
                 }
@@ -284,17 +282,9 @@ internal sealed partial class VelvetShell
             width, scale);
         if (removed >= 0)
         {
-            if (RemoveActiveFilter(include, exclude, activeFilterKinds[removed], activeFilterFlags[removed],
-                    activeFilterTokens[removed], activeFilterExcluded[removed]))
-            {
-                SaveExclude(surface);
-            }
-            else
-            {
-                SaveInclude(surface);
-            }
-
-            SaveFilters();
+            RemoveActiveFilter(include, exclude, activeFilterKinds[removed], activeFilterFlags[removed],
+                activeFilterTokens[removed], activeFilterExcluded[removed]);
+            SyncSurface(surface);
             ApplyFilters(surface);
         }
 
