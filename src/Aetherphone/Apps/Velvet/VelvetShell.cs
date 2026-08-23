@@ -85,7 +85,9 @@ internal sealed partial class VelvetShell : IResumableApp
     private bool raceKnown;
     private ulong raceContentId;
     private readonly VelvetFilterSelection discoverInclude = new();
+    private readonly VelvetFilterSelection discoverExclude = new();
     private readonly VelvetFilterSelection feedInclude = new();
+    private readonly VelvetFilterSelection feedExclude = new();
     private readonly ActionSheet postSheet = new();
     private readonly ActionSheet threadSheet = new();
     private VelvetMessagesTab messagesTab = VelvetMessagesTab.Chats;
@@ -134,7 +136,11 @@ internal sealed partial class VelvetShell : IResumableApp
         drawView = DrawView;
         back = () => router.Pop();
         threadView = new ThreadView(this);
-        LoadMutes();
+        MigrateLegacyMutes();
+        LoadInclude(VelvetPage.Discover);
+        LoadExclude(VelvetPage.Discover);
+        LoadInclude(VelvetPage.Feed);
+        LoadExclude(VelvetPage.Feed);
     }
 
     public string Id => "velvet";
@@ -182,8 +188,6 @@ internal sealed partial class VelvetShell : IResumableApp
         messagesTab = VelvetMessagesTab.Chats;
         avatarLightbox.Reset();
         store.ClearDiscover();
-        discoverInclude.Clear();
-        feedInclude.Clear();
         RefreshAndConsumeLaunch();
     }
 

@@ -36,25 +36,27 @@ internal sealed class VelvetFilterSelection
         Tags.Clear();
     }
 
-    public void LoadFrom(VelvetMutePreferences stored)
+    public void LoadFrom(VelvetFilterPreferences stored)
     {
         Clear();
         Intent = stored.Intent;
         Gender = stored.Gender;
         Sexuality = stored.Sexuality;
         Relationship = stored.Relationship;
+        Region = stored.Region;
         CopyInto(stored.Roles, Roles);
         CopyInto(stored.Kinks, Kinks);
         CopyInto(stored.Limits, Limits);
         CopyInto(stored.Tags, Tags);
     }
 
-    public void SaveInto(VelvetMutePreferences stored)
+    public void SaveInto(VelvetFilterPreferences stored)
     {
         stored.Intent = Intent;
         stored.Gender = Gender;
         stored.Sexuality = Sexuality;
         stored.Relationship = Relationship;
+        stored.Region = Region;
         stored.Roles = new List<string>(Roles);
         stored.Kinks = new List<string>(Kinks);
         stored.Limits = new List<string>(Limits);
