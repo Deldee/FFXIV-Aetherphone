@@ -108,7 +108,7 @@ internal sealed partial class VelvetShell
                     }
                 }
 
-                if (!paging && !failed && discoverInclude.Any)
+                if (!paging && !failed && (discoverInclude.Any || discoverExclude.Any))
                 {
                     var buttonWidth = 168f * scale;
                     var buttonTop = listRect.Min.Y + 150f * scale;
@@ -119,7 +119,9 @@ internal sealed partial class VelvetShell
                             ConfirmButtonTone.Primary, "velvet.discover.clearFilters"))
                     {
                         discoverInclude.Clear();
+                        discoverExclude.Clear();
                         SaveInclude(VelvetPage.Discover);
+                        SaveExclude(VelvetPage.Discover);
                         SaveFilters();
                         ApplyFilters(VelvetPage.Discover);
                     }
