@@ -28,61 +28,74 @@ internal sealed partial class VelvetShell
 
     private void LoadExclude(VelvetPage surface) => ExcludeFor(surface).LoadFrom(ExcludePreferencesFor(surface));
 
-    private void SaveInclude(VelvetPage surface)
+    private void SaveInclude(VelvetPage surface) => IncludeFor(surface).SaveInto(IncludePreferencesFor(surface));
+
+    private void SaveExclude(VelvetPage surface) => ExcludeFor(surface).SaveInto(ExcludePreferencesFor(surface));
+
+    private void SaveFilters() => _ = SaveFiltersAsync();
+
+    private Task<bool> SaveFiltersAsync()
     {
-        IncludeFor(surface).SaveInto(IncludePreferencesFor(surface));
-        SaveFilters();
+        var accountId = filtersAccountId;
+        return Task.Run(() => filterArchive.Save(accountId, storedFilters));
     }
 
-    private void SaveExclude(VelvetPage surface)
-    {
-        ExcludeFor(surface).SaveInto(ExcludePreferencesFor(surface));
-        SaveFilters();
-    }
+    private void LoadFiltersForAccount(string accountId) => _ = LoadFiltersForAccountAsync(accountId);
 
-    private void SaveFilters() => filterArchive.Save(filtersAccountId, storedFilters);
-
-    // Filters live per account, same as the not interested list, so switching accounts on the
-    // same install never mixes one person's filters into another's. Runs at construction and
-    // again every time the signed-in account actually changes.
-    private void LoadFiltersForAccount(string accountId)
+    private async Task LoadFiltersForAccountAsync(string accountId)
     {
         filtersAccountId = accountId;
-        var loaded = filterArchive.Load(accountId);
-        storedFilters.DiscoverInclude = loaded.DiscoverInclude;
-        storedFilters.DiscoverExclude = loaded.DiscoverExclude;
-        storedFilters.FeedInclude = loaded.FeedInclude;
-        storedFilters.FeedExclude = loaded.FeedExclude;
-        MigrateLegacyMutes(accountId);
-        LoadInclude(VelvetPage.Discover);
-        LoadExclude(VelvetPage.Discover);
-        LoadInclude(VelvetPage.Feed);
-        LoadExclude(VelvetPage.Feed);
-    }
-
-    // One-time copy of the old shared, account-agnostic mute list into whichever account is
-    // signed in the first time this runs, so upgrading users keep their mutes. Runs once ever,
-    // gated on the account actually receiving it so the flag isn't burned before anyone is
-    // signed in; the legacy list is never read again afterward.
-    private void MigrateLegacyMutes(string accountId)
-    {
-        if (accountId.Length == 0 || configuration.VelvetMutesMigrated)
+        var loaded = await Task.Run(() => filterArchive.Load(accountId)).ConfigureAwait(false);
+        if (!string.Equals(filtersAccountId, accountId, StringComparison.Ordinal))
         {
             return;
         }
 
-        configuration.VelvetMutesMigrated = true;
-        configuration.Save();
+        var migrating = accountId.Length > 0 && !configuration.VelvetMutesMigrated;
+        var merged = false;
+        await Plugin.Framework.RunOnFrameworkThread(() =>
+        {
+            storedFilters.DiscoverInclude = loaded.DiscoverInclude;
+            storedFilters.DiscoverExclude = loaded.DiscoverExclude;
+            storedFilters.FeedInclude = loaded.FeedInclude;
+            storedFilters.FeedExclude = loaded.FeedExclude;
+            if (migrating)
+            {
+                merged = MergeLegacyMutes();
+            }
+
+            LoadInclude(VelvetPage.Discover);
+            LoadExclude(VelvetPage.Discover);
+            LoadInclude(VelvetPage.Feed);
+            LoadExclude(VelvetPage.Feed);
+            ApplyDiscoverFilters();
+            ApplyFeedFilters();
+        }).ConfigureAwait(false);
+
+        if (!migrating)
+        {
+            return;
+        }
+
+        if (!merged || await SaveFiltersAsync().ConfigureAwait(false))
+        {
+            configuration.VelvetMutesMigrated = true;
+            configuration.Save();
+        }
+    }
+
+    private bool MergeLegacyMutes()
+    {
         var legacy = new VelvetFilterSelection();
         legacy.LoadFrom(configuration.VelvetMutes);
         if (!legacy.Any)
         {
-            return;
+            return false;
         }
 
-        legacy.SaveInto(storedFilters.DiscoverExclude);
-        legacy.SaveInto(storedFilters.FeedExclude);
-        SaveFilters();
+        legacy.MergeInto(storedFilters.DiscoverExclude);
+        legacy.MergeInto(storedFilters.FeedExclude);
+        return true;
     }
 
     private void ApplyDiscoverFilters() =>
@@ -127,6 +140,7 @@ internal sealed partial class VelvetShell
             exclude.Clear();
             SaveInclude(surface);
             SaveExclude(surface);
+            SaveFilters();
             ApplyFilters(surface);
         }
 
@@ -207,6 +221,7 @@ internal sealed partial class VelvetShell
 
         if (changedInclude || changedExclude)
         {
+            SaveFilters();
             ApplyFilters(surface);
         }
     }

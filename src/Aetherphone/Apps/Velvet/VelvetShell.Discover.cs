@@ -120,6 +120,7 @@ internal sealed partial class VelvetShell
                     {
                         discoverInclude.Clear();
                         SaveInclude(VelvetPage.Discover);
+                        SaveFilters();
                         ApplyFilters(VelvetPage.Discover);
                     }
                 }
@@ -291,6 +292,7 @@ internal sealed partial class VelvetShell
                 SaveInclude(surface);
             }
 
+            SaveFilters();
             ApplyFilters(surface);
         }
 

@@ -63,6 +63,23 @@ internal sealed class VelvetFilterSelection
         stored.Tags = new List<string>(Tags);
     }
 
+    public void MergeInto(VelvetFilterPreferences stored)
+    {
+        stored.Intent |= Intent;
+        stored.Gender |= Gender;
+        stored.Sexuality |= Sexuality;
+        stored.Relationship |= Relationship;
+        if (stored.Region.Length == 0)
+        {
+            stored.Region = Region;
+        }
+
+        MergeUnique(stored.Roles, Roles);
+        MergeUnique(stored.Kinks, Kinks);
+        MergeUnique(stored.Limits, Limits);
+        MergeUnique(stored.Tags, Tags);
+    }
+
     public static VelvetDiscoverFilter Combine(VelvetFilterSelection include, VelvetFilterSelection exclude) =>
         new(VelvetIntent.Sanitize(include.Intent), VelvetIntent.Sanitize(exclude.Intent),
             VelvetGender.Sanitize(include.Gender), VelvetGender.Sanitize(exclude.Gender),
@@ -78,6 +95,17 @@ internal sealed class VelvetFilterSelection
         for (var index = 0; index < source.Count; index++)
         {
             target.Add(source[index]);
+        }
+    }
+
+    private static void MergeUnique(List<string> target, HashSet<string> source)
+    {
+        foreach (var value in source)
+        {
+            if (!target.Contains(value))
+            {
+                target.Add(value);
+            }
         }
     }
 }

@@ -44,7 +44,13 @@ internal sealed class VelvetFilterArchive
             }
 
             var stored = JsonConvert.DeserializeObject<StoredVelvetFilters>(File.ReadAllText(path));
-            return stored ?? new StoredVelvetFilters();
+            return new StoredVelvetFilters
+            {
+                DiscoverInclude = stored?.DiscoverInclude ?? new VelvetFilterPreferences(),
+                DiscoverExclude = stored?.DiscoverExclude ?? new VelvetFilterPreferences(),
+                FeedInclude = stored?.FeedInclude ?? new VelvetFilterPreferences(),
+                FeedExclude = stored?.FeedExclude ?? new VelvetFilterPreferences(),
+            };
         }
         catch (Exception exception)
         {
@@ -53,11 +59,11 @@ internal sealed class VelvetFilterArchive
         }
     }
 
-    public void Save(string accountId, StoredVelvetFilters filters)
+    public bool Save(string accountId, StoredVelvetFilters filters)
     {
         if (accountId.Length == 0)
         {
-            return;
+            return false;
         }
 
         try
@@ -69,10 +75,13 @@ internal sealed class VelvetFilterArchive
                 File.WriteAllText(temp, JsonConvert.SerializeObject(filters));
                 File.Move(temp, path, true);
             }
+
+            return true;
         }
         catch (Exception exception)
         {
             AepLog.Warning(exception, $"VelvetFilterArchive write failed for {accountId}");
+            return false;
         }
     }
 

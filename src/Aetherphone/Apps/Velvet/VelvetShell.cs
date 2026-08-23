@@ -152,8 +152,8 @@ internal sealed partial class VelvetShell : IResumableApp
 
     private void OnFilterAccountChanged()
     {
-        var accountId = session.CurrentUser?.Id;
-        if (accountId is null || string.Equals(accountId, filtersAccountId, StringComparison.Ordinal))
+        var accountId = session.CurrentUser?.Id ?? string.Empty;
+        if (string.Equals(accountId, filtersAccountId, StringComparison.Ordinal))
         {
             return;
         }
@@ -265,6 +265,13 @@ internal sealed partial class VelvetShell : IResumableApp
             TourHolds.Hold(Id);
             EmptyState.Draw(context.Content, ui, FontAwesomeIcon.Moon, Loc.T(L.Velvet.SignedOutTitle),
                 Loc.T(L.Velvet.SignedOutHint));
+            return;
+        }
+
+        if (session.CurrentUser is null)
+        {
+            TourHolds.Hold(Id);
+            EmptyState.Draw(context.Content, ui, FontAwesomeIcon.Spinner, Loc.T(L.Common.Loading), string.Empty);
             return;
         }
 
