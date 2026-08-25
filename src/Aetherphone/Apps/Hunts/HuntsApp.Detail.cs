@@ -661,7 +661,8 @@ internal sealed partial class HuntsApp
             var (normalizedX, normalizedY) = MapPixelMath.NormalizeToFullCanvas(rawX, rawY);
             var dotPosition = new Vector2(min.X + normalizedX * (max.X - min.X),
                 min.Y + normalizedY * (max.Y - min.Y));
-            DrawAetheryteDot(drawList, dotPosition, scale, poi, territoryId, worldId, mapId, view.ZoneInstance);
+            DrawAetheryteDot(drawList, dotPosition, scale, poi, territoryId, worldId, mapId, view.ZoneInstance,
+                confirmedPoiId);
         }
 
         drawList.PopClipRect();
@@ -719,7 +720,7 @@ internal sealed partial class HuntsApp
     }
 
     private void DrawAetheryteDot(ImDrawListPtr drawList, Vector2 center, float scale, HuntPoiEntry poi,
-        uint territoryId, uint worldId, uint mapId, int zoneInstance)
+        uint territoryId, uint worldId, uint mapId, int zoneInstance, int? confirmedPoiId)
     {
         var iconRadius = MapAetheryteIconSize * 0.5f * scale;
         var iconMin = new Vector2(center.X - iconRadius, center.Y - iconRadius);
@@ -738,7 +739,9 @@ internal sealed partial class HuntsApp
 
         if (UiInteract.Click(hitMin, hitMax, hovered) && territoryId != 0 && worldId != 0)
         {
-            NavigateToCoordinate(territoryId, worldId, mapId, zoneCatalog.ResolveCoordinate(poi.Id), zoneInstance);
+            var flagCoordinate = confirmedPoiId is { } confirmed ? zoneCatalog.ResolveCoordinate(confirmed) : null;
+            NavigateToCoordinate(territoryId, worldId, mapId, zoneCatalog.ResolveCoordinate(poi.Id), flagCoordinate,
+                zoneInstance);
         }
     }
 
@@ -785,7 +788,7 @@ internal sealed partial class HuntsApp
         var label = alreadyThere ? Loc.T(L.Hunts.PlaceFlagOnMap) : Loc.T(L.Hunts.NavigateToLocation);
         if (ui.PillButton(rect, label, true, "hunts.detail.navigate"))
         {
-            NavigateToCoordinate(territoryId, worldId, mapId, coordinate, view.ZoneInstance);
+            NavigateToCoordinate(territoryId, worldId, mapId, coordinate, coordinate, view.ZoneInstance);
         }
 
         ImGui.SetCursorScreenPos(origin);
@@ -793,16 +796,16 @@ internal sealed partial class HuntsApp
         return true;
     }
 
-    private void NavigateToCoordinate(uint territoryId, uint worldId, uint mapId, (float X, float Y)? coordinate,
-        int zoneInstance)
+    private void NavigateToCoordinate(uint territoryId, uint worldId, uint mapId, (float X, float Y)? targetCoordinate,
+        (float X, float Y)? flagCoordinate, int zoneInstance)
     {
         ArmPendingInstanceSync(worldId, territoryId, zoneInstance);
 
         var destination = TravelPlanner.ResolveNearestAetheryteTo(territoryId, worldId, LocationShare.CurrentWorldId(),
-            Plugin.ClientState.TerritoryType, coordinate);
+            Plugin.ClientState.TerritoryType, targetCoordinate);
         if (destination.Kind == TravelKind.AlreadyThere)
         {
-            if (coordinate is { } here)
+            if (flagCoordinate is { } here)
             {
                 DropFlag(territoryId, mapId, here.X, here.Y);
             }
@@ -810,7 +813,7 @@ internal sealed partial class HuntsApp
             return;
         }
 
-        TravelToHuntZone(in destination, worldId, territoryId, mapId, coordinate);
+        TravelToHuntZone(in destination, worldId, territoryId, mapId, flagCoordinate);
     }
 
     private void TravelToHuntZone(in TravelDestination destination, uint worldId, uint territoryId, uint mapId,
