@@ -55,6 +55,7 @@ internal sealed partial class HuntsApp
     private string? detailMapConfirmedZoneId;
     private bool detailMapFinalPhase;
     private bool detailMapZoneConfirmed;
+    private HuntPoiEntry? detailMapFinalPoint;
 
     private uint pendingFlagWorldId;
     private uint pendingFlagTerritoryId;
@@ -102,11 +103,16 @@ internal sealed partial class HuntsApp
         detailMapAetherytePoints.Clear();
         detailMapFinalPhase = false;
         detailMapZoneConfirmed = false;
+        detailMapFinalPoint = null;
 
         if (mob is null || mob.ZoneIds.Length == 0)
         {
             return;
         }
+
+        var finalPhaseWindowIndex = activePhase is { } activeWindowPhase && mob.Windows.Length > 0
+            ? Math.Clamp(activeWindowPhase.WindowNum - 1, 0, mob.Windows.Length - 1)
+            : 0;
 
         var poiIds = new HashSet<int>();
         if (activePhase is { } phase && mob.Windows.Length > 0)
@@ -131,6 +137,11 @@ internal sealed partial class HuntsApp
                 var phases = mob.Windows[windowIndex].Phases;
                 for (var phaseIndex = 0; phaseIndex < phases.Length; phaseIndex++)
                 {
+                    if (mob.Rank == "SS" && phases.Length > 1 && phaseIndex == phases.Length - 1)
+                    {
+                        continue;
+                    }
+
                     var zonePoiIds = phases[phaseIndex].ZonePoiIds;
                     for (var poiIndex = 0; poiIndex < zonePoiIds.Length; poiIndex++)
                     {
@@ -138,6 +149,11 @@ internal sealed partial class HuntsApp
                     }
                 }
             }
+        }
+
+        if (mob.Rank != "SS")
+        {
+            poiIds.RemoveWhere(mobCatalog.IsSsRankPoi);
         }
 
         if (confirmedZoneId is { Length: > 0 } && Array.IndexOf(mob.ZoneIds, confirmedZoneId) >= 0)
@@ -154,6 +170,7 @@ internal sealed partial class HuntsApp
             }
 
             PopulateAetherytePoints(confirmedZoneId);
+            detailMapFinalPoint = ResolveFinalPhasePoint(mob, finalPhaseWindowIndex, confirmedZoneId);
             return;
         }
 
@@ -182,6 +199,33 @@ internal sealed partial class HuntsApp
         detailMapZoneId = bestZoneId;
         detailMapPoints.AddRange(bestPoints);
         PopulateAetherytePoints(bestZoneId);
+        detailMapFinalPoint = ResolveFinalPhasePoint(mob, finalPhaseWindowIndex, bestZoneId);
+    }
+
+    private HuntPoiEntry? ResolveFinalPhasePoint(HuntMobDefinition mob, int windowIndex, string zoneId)
+    {
+        if (mob.Rank != "SS" || zoneId.Length == 0 || windowIndex < 0 || windowIndex >= mob.Windows.Length)
+        {
+            return null;
+        }
+
+        var phases = mob.Windows[windowIndex].Phases;
+        if (phases.Length < 2)
+        {
+            return null;
+        }
+
+        var finalPhasePoiIds = phases[^1].ZonePoiIds;
+        for (var poiIndex = 0; poiIndex < finalPhasePoiIds.Length; poiIndex++)
+        {
+            var found = zoneCatalog.FindPoi(finalPhasePoiIds[poiIndex]);
+            if (found is { } resolved && string.Equals(resolved.ZoneId, zoneId, StringComparison.Ordinal))
+            {
+                return resolved.Poi;
+            }
+        }
+
+        return null;
     }
 
     private void PopulateAetherytePoints(string zoneId)
@@ -584,6 +628,28 @@ internal sealed partial class HuntsApp
             var soleCandidate = unsightedCount == 1 && poi.Id == soleUnsightedPoiId;
             DrawSpawnDot(drawList, dotPosition, scale, poi.Id, confirmedKnown, finalLocationResolved, sighted,
                 soleCandidate);
+        }
+
+        if (detailMapFinalPoint is { } finalPoint)
+        {
+            var finalPointAlreadyDrawn = false;
+            for (var checkIndex = 0; checkIndex < detailMapPoints.Count; checkIndex++)
+            {
+                if (detailMapPoints[checkIndex].Id == finalPoint.Id)
+                {
+                    finalPointAlreadyDrawn = true;
+                    break;
+                }
+            }
+
+            if (!finalPointAlreadyDrawn)
+            {
+                var (rawX, rawY) = finalPoint.ParsedLocation();
+                var (normalizedX, normalizedY) = MapPixelMath.NormalizeToFullCanvas(rawX, rawY);
+                var dotPosition = new Vector2(min.X + normalizedX * (max.X - min.X),
+                    min.Y + normalizedY * (max.Y - min.Y));
+                DrawSpawnDot(drawList, dotPosition, scale, finalPoint.Id, false, true, false, false);
+            }
         }
 
         var worldId = HuntDataCenterWorlds.WorldRowId(view.WorldId);
