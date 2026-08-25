@@ -185,6 +185,66 @@ public sealed class HuntsRealtimeClientTests
     }
 
     [Fact]
+    public async Task SightingSetFrameDispatchesSightingReportReceived()
+    {
+        var client = new HuntsRealtimeClient(null!);
+        HuntsSocketSightingReport? received = null;
+        var mobReportFired = false;
+        client.SightingReportReceived += report => received = report;
+        client.MobReportReceived += _ => mobReportFired = true;
+
+        var frame = "42[\"message\",{\"type\":\"mob\",\"subType\":\"report\",\"data\":{\"action\":\"sighting_set\",\"id\":{\"mobId\":\"thousand_cast_theda\",\"worldId\":\"midgardsormr\"},\"data\":{\"zonePoiId\":429,\"sightedAt\":\"2026-08-25T19:36:32.481Z\",\"reporterName\":\"Myname'es Jeff\"}}}]";
+
+        await InvokeAsync(client, frame);
+
+        Assert.False(mobReportFired);
+        Assert.NotNull(received);
+        Assert.Equal("sighting_set", received!.Action);
+        Assert.Equal("thousand_cast_theda", received.MobId);
+        Assert.Equal("midgardsormr", received.WorldId);
+        Assert.Equal(429, received.ZonePoiId);
+    }
+
+    [Fact]
+    public async Task SightingReplaceFrameDispatchesSightingReportReceived()
+    {
+        var client = new HuntsRealtimeClient(null!);
+        HuntsSocketSightingReport? received = null;
+        client.SightingReportReceived += report => received = report;
+
+        var frame = "42[\"message\",{\"type\":\"mob\",\"subType\":\"report\",\"data\":{\"action\":\"sighting_replace\",\"id\":{\"mobId\":\"narrow_rift\",\"worldId\":\"jenova\"},\"data\":[{\"zonePoiId\":1133,\"sightedAt\":\"2026-08-25T19:37:32.744Z\",\"prevLocation\":true,\"mobId2\":\"narrow_rift\",\"worldId2\":\"jenova\"}]}}]";
+
+        await InvokeAsync(client, frame);
+
+        Assert.NotNull(received);
+        Assert.Equal("sighting_replace", received!.Action);
+        Assert.Equal("narrow_rift", received.MobId);
+        Assert.Equal("jenova", received.WorldId);
+        Assert.NotNull(received.ReplaceEntries);
+        Assert.Single(received.ReplaceEntries!);
+        Assert.Equal(1133, received.ReplaceEntries![0].ZonePoiId);
+        Assert.True(received.ReplaceEntries![0].PrevLocation);
+    }
+
+    [Fact]
+    public async Task SightingClearFrameDispatchesSightingReportReceived()
+    {
+        var client = new HuntsRealtimeClient(null!);
+        HuntsSocketSightingReport? received = null;
+        client.SightingReportReceived += report => received = report;
+
+        var frame = "42[\"message\",{\"type\":\"mob\",\"subType\":\"report\",\"data\":{\"action\":\"sighting_clear\",\"id\":{\"mobId\":\"ixtab\",\"worldId\":\"adamantoise\"},\"data\":{\"zonePoiId\":1014}}}]";
+
+        await InvokeAsync(client, frame);
+
+        Assert.NotNull(received);
+        Assert.Equal("sighting_clear", received!.Action);
+        Assert.Equal("ixtab", received.MobId);
+        Assert.Equal("adamantoise", received.WorldId);
+        Assert.Equal(1014, received.ZonePoiId);
+    }
+
+    [Fact]
     public async Task UnknownMessageTypeIsIgnored()
     {
         var client = new HuntsRealtimeClient(null!);

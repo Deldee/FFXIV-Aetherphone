@@ -81,10 +81,28 @@ internal sealed class HuntsStatus
     public HuntSpawnEntryDto[]? Spawns { get; set; }
 
     [JsonPropertyName("sightings")]
-    public JsonNode[]? Sightings { get; set; }
+    public HuntSightingEntryDto[]? Sightings { get; set; }
 
     [JsonPropertyName("theory")]
     public JsonNode? Theory { get; set; }
+}
+
+internal sealed class HuntSightingEntryDto
+{
+    [JsonPropertyName("zonePoiId")]
+    public int ZonePoiId { get; set; }
+
+    [JsonPropertyName("mobId2")]
+    public string MobId { get; set; } = string.Empty;
+
+    [JsonPropertyName("worldId2")]
+    public string WorldId { get; set; } = string.Empty;
+
+    [JsonPropertyName("sightedAt")]
+    public DateTimeOffset? SightedAt { get; set; }
+
+    [JsonPropertyName("prevLocation")]
+    public bool PrevLocation { get; set; }
 }
 
 internal sealed class HuntWindowDto
@@ -372,6 +390,34 @@ internal sealed class HuntsSocketReporter
     public string? Name { get; set; }
 }
 
+internal sealed class HuntsSocketSightingIdentity
+{
+    [JsonPropertyName("mobId")]
+    public string MobId { get; set; } = string.Empty;
+
+    [JsonPropertyName("worldId")]
+    public string WorldId { get; set; } = string.Empty;
+}
+
+internal sealed class HuntsSocketSightingPoi
+{
+    [JsonPropertyName("zonePoiId")]
+    public int ZonePoiId { get; set; }
+}
+
+internal sealed class HuntsSocketSightingReport
+{
+    public string Action { get; init; } = string.Empty;
+
+    public string MobId { get; init; } = string.Empty;
+
+    public string WorldId { get; init; } = string.Empty;
+
+    public int ZonePoiId { get; init; }
+
+    public HuntSightingEntryDto[]? ReplaceEntries { get; init; }
+}
+
 [JsonSerializable(typeof(HuntsRefreshRequest))]
 [JsonSerializable(typeof(HuntsRefreshResponse))]
 [JsonSerializable(typeof(HuntsLoginRequest))]
@@ -383,6 +429,9 @@ internal sealed class HuntsSocketReporter
 [JsonSerializable(typeof(HuntLogEntryDto))]
 [JsonSerializable(typeof(HuntsSocketConnectPayload))]
 [JsonSerializable(typeof(HuntsSocketMessage))]
+[JsonSerializable(typeof(HuntsSocketSightingIdentity))]
+[JsonSerializable(typeof(HuntsSocketSightingPoi))]
+[JsonSerializable(typeof(HuntSightingEntryDto[]))]
 internal partial class HuntsJsonContext : JsonSerializerContext
 {
 }

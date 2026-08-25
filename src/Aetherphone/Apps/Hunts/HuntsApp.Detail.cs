@@ -553,6 +553,20 @@ internal sealed partial class HuntsApp
 
         var finalLocationResolved = detailMapFinalPhase && detailMapZoneConfirmed && detailMapPoints.Count == 1;
 
+        var unsightedCount = 0;
+        var soleUnsightedPoiId = 0;
+        for (var index = 0; index < detailMapPoints.Count; index++)
+        {
+            var poi = detailMapPoints[index];
+            if (hunts.IsPoiSighted(view.MobId, view.WorldId, poi.Id))
+            {
+                continue;
+            }
+
+            unsightedCount++;
+            soleUnsightedPoiId = poi.Id;
+        }
+
         drawList.PushClipRect(stage.Min, stage.Max, true);
         for (var index = 0; index < detailMapPoints.Count; index++)
         {
@@ -566,7 +580,10 @@ internal sealed partial class HuntsApp
             var (normalizedX, normalizedY) = MapPixelMath.NormalizeToFullCanvas(rawX, rawY);
             var dotPosition = new Vector2(min.X + normalizedX * (max.X - min.X),
                 min.Y + normalizedY * (max.Y - min.Y));
-            DrawSpawnDot(drawList, dotPosition, scale, poi.Id, confirmedKnown, finalLocationResolved);
+            var sighted = hunts.IsPoiSighted(view.MobId, view.WorldId, poi.Id);
+            var soleCandidate = unsightedCount == 1 && poi.Id == soleUnsightedPoiId;
+            DrawSpawnDot(drawList, dotPosition, scale, poi.Id, confirmedKnown, finalLocationResolved, sighted,
+                soleCandidate);
         }
 
         var worldId = HuntDataCenterWorlds.WorldRowId(view.WorldId);
@@ -606,9 +623,13 @@ internal sealed partial class HuntsApp
     }
 
     private void DrawSpawnDot(ImDrawListPtr drawList, Vector2 center, float scale, int poiId, bool confirmed,
-        bool finalLocation)
+        bool finalLocation, bool sighted, bool soleUnsightedCandidate)
     {
-        var ink = finalLocation ? frameTheme.Danger : confirmed ? OpenBarColor : ui.Accent;
+        var ink = finalLocation ? frameTheme.Danger
+            : confirmed ? OpenBarColor
+            : soleUnsightedCandidate ? OpenBarColor
+            : sighted ? ui.MutedInk
+            : ui.Accent;
         drawList.AddCircleFilled(center, MapDotRingRadius * scale, ImGui.GetColorU32(new Vector4(0f, 0f, 0f, 0.35f)),
             20);
         drawList.AddCircle(center, MapDotRingRadius * scale, ImGui.GetColorU32(Vector4.One), 20, 1.4f * scale);
