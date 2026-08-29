@@ -32,18 +32,23 @@ internal sealed partial class VelvetShell
 
     private void SaveExclude(VelvetPage surface) => ExcludeFor(surface).SaveInto(ExcludePreferencesFor(surface));
 
-    private void SaveFilters() => _ = SaveFiltersAsync();
+    private void LoadMutes() => mutes.LoadFrom(storedFilters.Mutes);
 
-    private Task<bool> SaveFiltersAsync()
+    private void SaveMutes() => mutes.SaveInto(storedFilters.Mutes);
+
+    private void SaveFilters() => _ = SaveFiltersAsync(storedFilters.Clone());
+
+    private Task<bool> SaveFiltersAsync(StoredVelvetFilters snapshot)
     {
         var accountId = filtersAccountId;
-        return Task.Run(() => filterArchive.Save(accountId, storedFilters));
+        return Task.Run(() => filterArchive.Save(accountId, snapshot));
     }
 
     private void SyncSurface(VelvetPage surface)
     {
         SaveInclude(surface);
         SaveExclude(surface);
+        SaveMutes();
         SaveFilters();
     }
 
@@ -58,14 +63,17 @@ internal sealed partial class VelvetShell
             return;
         }
 
-        var migrating = accountId.Length > 0 && !configuration.VelvetMutesMigrated;
+        var migrating = false;
         var merged = false;
+        var snapshot = new StoredVelvetFilters();
         await Plugin.Framework.RunOnFrameworkThread(() =>
         {
             storedFilters.DiscoverInclude = loaded.DiscoverInclude;
             storedFilters.DiscoverExclude = loaded.DiscoverExclude;
             storedFilters.FeedInclude = loaded.FeedInclude;
             storedFilters.FeedExclude = loaded.FeedExclude;
+            storedFilters.Mutes = loaded.Mutes;
+            migrating = accountId.Length > 0 && !configuration.VelvetMutesMigratedAccountIds.Contains(accountId);
             if (migrating)
             {
                 merged = MergeLegacyMutes();
@@ -75,8 +83,14 @@ internal sealed partial class VelvetShell
             LoadExclude(VelvetPage.Discover);
             LoadInclude(VelvetPage.Feed);
             LoadExclude(VelvetPage.Feed);
-            ApplyDiscoverFilters();
-            ApplyFeedFilters();
+            LoadMutes();
+            if (GateAccepted && configuration.IsVelvetOnboarded())
+            {
+                ApplyDiscoverFilters();
+                ApplyFeedFilters();
+            }
+
+            snapshot = storedFilters.Clone();
         }).ConfigureAwait(false);
 
         if (!migrating)
@@ -84,11 +98,13 @@ internal sealed partial class VelvetShell
             return;
         }
 
-        if (!merged || await SaveFiltersAsync().ConfigureAwait(false))
+        if (!merged || await SaveFiltersAsync(snapshot).ConfigureAwait(false))
         {
-            configuration.VelvetMutesMigrated = true;
-            configuration.VelvetMutes = new VelvetFilterPreferences();
-            configuration.Save();
+            await Plugin.Framework.RunOnFrameworkThread(() =>
+            {
+                configuration.VelvetMutesMigratedAccountIds.Add(accountId);
+                configuration.Save();
+            }).ConfigureAwait(false);
         }
     }
 
@@ -103,15 +119,16 @@ internal sealed partial class VelvetShell
 
         legacy.MergeInto(storedFilters.DiscoverExclude);
         legacy.MergeInto(storedFilters.FeedExclude);
+        legacy.MergeInto(storedFilters.Mutes);
         return true;
     }
 
     private void ApplyDiscoverFilters() =>
-        store.RefreshDiscover(VelvetFilterSelection.Combine(discoverInclude, discoverExclude),
+        store.RefreshDiscover(VelvetFilterSelection.Combine(discoverInclude, discoverExclude, mutes),
             discoverApplied.Trim(), discoverInclude.Region);
 
     private void ApplyFeedFilters() =>
-        store.SetFeedFilter(VelvetFilterSelection.Combine(feedInclude, feedExclude), feedInclude.Region);
+        store.SetFeedFilter(VelvetFilterSelection.Combine(feedInclude, feedExclude, mutes), feedInclude.Region);
 
     private void ApplyFilters(VelvetPage surface)
     {
@@ -122,6 +139,12 @@ internal sealed partial class VelvetShell
         }
 
         ApplyDiscoverFilters();
+    }
+
+    private void ApplyBothFilters()
+    {
+        ApplyDiscoverFilters();
+        ApplyFeedFilters();
     }
 
     private void OpenFilters(VelvetPage surface)
@@ -142,16 +165,18 @@ internal sealed partial class VelvetShell
             return;
         }
 
-        if ((include.Any || exclude.Any) && ui.HeaderAction(area, Loc.T(L.Velvet.FilterClearAll), true))
+        if ((include.Any || exclude.Any || mutes.Any) && ui.HeaderAction(area, Loc.T(L.Velvet.FilterClearAll), true))
         {
             include.Clear();
             exclude.Clear();
+            mutes.Clear();
             SyncSurface(surface);
-            ApplyFilters(surface);
+            ApplyBothFilters();
         }
 
         var changedInclude = false;
         var changedExclude = false;
+        var changedMutes = false;
         var body = new Rect(new Vector2(area.Min.X, area.Min.Y + VHeader.Height * scale), area.Max);
         using (AppSurface.Begin(body))
         {
@@ -171,7 +196,7 @@ internal sealed partial class VelvetShell
 
             VSectionHeader.Card(FontAwesomeIcon.VenusMars, Loc.T(L.Velvet.CardGender));
             Gap(6f);
-            DrawGenderFilterChips(include, exclude, ref changedInclude, ref changedExclude);
+            DrawGenderFilterChips(include, mutes, ref changedInclude, ref changedMutes);
             Gap(16f);
 
             VSectionHeader.Card(FontAwesomeIcon.Rainbow, Loc.T(L.Velvet.CardSexuality));
@@ -187,14 +212,14 @@ internal sealed partial class VelvetShell
 
             VSectionHeader.Card(FontAwesomeIcon.Fire, Loc.T(L.Velvet.CardKinks));
             Gap(6f);
-            DrawTriStateTokenChips(VelvetSuggestions.Kinks, VelvetSuggestions.KinkHue, include.Kinks, exclude.Kinks,
-                ref changedInclude, ref changedExclude);
+            DrawTriStateTokenChips(VelvetSuggestions.Kinks, VelvetSuggestions.KinkHue, include.Kinks, mutes.Kinks,
+                ref changedInclude, ref changedMutes);
             Gap(16f);
 
             VSectionHeader.Card(FontAwesomeIcon.ShieldAlt, Loc.T(L.Velvet.CardLimits));
             Gap(6f);
-            DrawTriStateTokenChips(VelvetSuggestions.Limits, VelvetTheme.Gold, include.Limits, exclude.Limits,
-                ref changedInclude, ref changedExclude);
+            DrawTriStateTokenChips(VelvetSuggestions.Limits, VelvetTheme.Gold, include.Limits, mutes.Limits,
+                ref changedInclude, ref changedMutes);
             Gap(16f);
 
             VSectionHeader.Card(FontAwesomeIcon.HandHoldingHeart, Loc.T(L.Velvet.CardRelationship));
@@ -215,10 +240,17 @@ internal sealed partial class VelvetShell
             Gap(40f);
         }
 
-        if (changedInclude || changedExclude)
+        if (changedInclude || changedExclude || changedMutes)
         {
             SyncSurface(surface);
-            ApplyFilters(surface);
+            if (changedMutes)
+            {
+                ApplyBothFilters();
+            }
+            else
+            {
+                ApplyFilters(surface);
+            }
         }
     }
 

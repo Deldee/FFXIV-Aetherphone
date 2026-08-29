@@ -108,7 +108,7 @@ internal sealed partial class VelvetShell
                     }
                 }
 
-                if (!paging && !failed && (discoverInclude.Any || discoverExclude.Any))
+                if (!paging && !failed && (discoverInclude.Any || discoverExclude.Any || mutes.Any))
                 {
                     var buttonWidth = 168f * scale;
                     var buttonTop = listRect.Min.Y + 150f * scale;
@@ -120,8 +120,9 @@ internal sealed partial class VelvetShell
                     {
                         discoverInclude.Clear();
                         discoverExclude.Clear();
+                        mutes.Clear();
                         SyncSurface(VelvetPage.Discover);
-                        ApplyFilters(VelvetPage.Discover);
+                        ApplyBothFilters();
                     }
                 }
 
@@ -201,7 +202,7 @@ internal sealed partial class VelvetShell
         var scale = UiScale.Current;
         var include = IncludeFor(surface);
         var exclude = ExcludeFor(surface);
-        if (!include.Any && !exclude.Any)
+        if (!include.Any && !exclude.Any && !mutes.Any)
         {
             Gap(6f);
             return;
@@ -236,7 +237,7 @@ internal sealed partial class VelvetShell
             }
         }
 
-        AddMaskFilterChips(GenderChipKind, include.Gender, exclude.Gender, VelvetGender.All, GenderLabelOf,
+        AddMaskFilterChips(GenderChipKind, include.Gender, mutes.Gender, VelvetGender.All, GenderLabelOf,
             FontAwesomeIcon.VenusMars);
         AddMaskFilterChips(SexualityChipKind, include.Sexuality, exclude.Sexuality, VelvetSexuality.All,
             SexualityLabelOf, FontAwesomeIcon.Rainbow);
@@ -260,9 +261,9 @@ internal sealed partial class VelvetShell
         }
 
         AddTokenFilterChips(RoleChipKind, VelvetSuggestions.Roles, include.Roles, exclude.Roles, VelvetTheme.Rose);
-        AddTokenFilterChips(KinkChipKind, VelvetSuggestions.Kinks, include.Kinks, exclude.Kinks,
+        AddTokenFilterChips(KinkChipKind, VelvetSuggestions.Kinks, include.Kinks, mutes.Kinks,
             VelvetSuggestions.KinkHue);
-        AddTokenFilterChips(LimitChipKind, VelvetSuggestions.Limits, include.Limits, exclude.Limits,
+        AddTokenFilterChips(LimitChipKind, VelvetSuggestions.Limits, include.Limits, mutes.Limits,
             VelvetTheme.Gold);
         var tagCategories = VelvetSuggestions.TagCategories;
         for (var index = 0; index < tagCategories.Length; index++)
@@ -282,10 +283,17 @@ internal sealed partial class VelvetShell
             width, scale);
         if (removed >= 0)
         {
-            RemoveActiveFilter(include, exclude, activeFilterKinds[removed], activeFilterFlags[removed],
-                activeFilterTokens[removed], activeFilterExcluded[removed]);
+            var mutedChanged = RemoveActiveFilter(include, exclude, activeFilterKinds[removed],
+                activeFilterFlags[removed], activeFilterTokens[removed], activeFilterExcluded[removed]);
             SyncSurface(surface);
-            ApplyFilters(surface);
+            if (mutedChanged)
+            {
+                ApplyBothFilters();
+            }
+            else
+            {
+                ApplyFilters(surface);
+            }
         }
 
         Gap(10f);
@@ -343,7 +351,8 @@ internal sealed partial class VelvetShell
     private bool RemoveActiveFilter(VelvetFilterSelection include, VelvetFilterSelection exclude, int kind, int flag,
         string token, bool excluded)
     {
-        var target = excluded ? exclude : include;
+        var muteKind = kind is GenderChipKind or KinkChipKind or LimitChipKind;
+        var target = !excluded ? include : muteKind ? mutes : exclude;
         switch (kind)
         {
             case RegionChipKind:
@@ -375,7 +384,7 @@ internal sealed partial class VelvetShell
                 break;
         }
 
-        return excluded;
+        return excluded && muteKind;
     }
 
     private Rect DrawPersonCard(VelvetProfileDto profile, VelvetPostDto[] feed)

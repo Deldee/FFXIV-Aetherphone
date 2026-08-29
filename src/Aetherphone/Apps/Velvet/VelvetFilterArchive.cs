@@ -10,6 +10,16 @@ internal sealed class StoredVelvetFilters
     public VelvetFilterPreferences DiscoverExclude { get; set; } = new();
     public VelvetFilterPreferences FeedInclude { get; set; } = new();
     public VelvetFilterPreferences FeedExclude { get; set; } = new();
+    public VelvetFilterPreferences Mutes { get; set; } = new();
+
+    public StoredVelvetFilters Clone() => new()
+    {
+        DiscoverInclude = DiscoverInclude.Clone(),
+        DiscoverExclude = DiscoverExclude.Clone(),
+        FeedInclude = FeedInclude.Clone(),
+        FeedExclude = FeedExclude.Clone(),
+        Mutes = Mutes.Clone(),
+    };
 }
 
 internal sealed class VelvetFilterArchive
@@ -48,6 +58,7 @@ internal sealed class VelvetFilterArchive
                 DiscoverExclude = stored?.DiscoverExclude ?? new VelvetFilterPreferences(),
                 FeedInclude = stored?.FeedInclude ?? new VelvetFilterPreferences(),
                 FeedExclude = stored?.FeedExclude ?? new VelvetFilterPreferences(),
+                Mutes = stored?.Mutes ?? new VelvetFilterPreferences(),
             };
         }
         catch (Exception exception)

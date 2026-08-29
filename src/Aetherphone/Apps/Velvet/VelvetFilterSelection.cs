@@ -69,25 +69,21 @@ internal sealed class VelvetFilterSelection
         stored.Gender |= Gender;
         stored.Sexuality |= Sexuality;
         stored.Relationship |= Relationship;
-        if (stored.Region.Length == 0)
-        {
-            stored.Region = Region;
-        }
-
         MergeUnique(stored.Roles, Roles);
         MergeUnique(stored.Kinks, Kinks);
         MergeUnique(stored.Limits, Limits);
         MergeUnique(stored.Tags, Tags);
     }
 
-    public static VelvetDiscoverFilter Combine(VelvetFilterSelection include, VelvetFilterSelection exclude) =>
+    public static VelvetDiscoverFilter Combine(VelvetFilterSelection include, VelvetFilterSelection exclude,
+        VelvetFilterSelection mutes) =>
         new(VelvetIntent.Sanitize(include.Intent), VelvetIntent.Sanitize(exclude.Intent),
-            VelvetGender.Sanitize(include.Gender), VelvetGender.Sanitize(exclude.Gender),
+            VelvetGender.Sanitize(include.Gender), VelvetGender.Sanitize(mutes.Gender),
             VelvetSexuality.Sanitize(include.Sexuality), VelvetSexuality.Sanitize(exclude.Sexuality),
             include.Relationship, exclude.Relationship,
             include.Roles.ToArray(), exclude.Roles.ToArray(),
-            include.Kinks.ToArray(), exclude.Kinks.ToArray(),
-            include.Limits.ToArray(), exclude.Limits.ToArray(),
+            include.Kinks.ToArray(), mutes.Kinks.ToArray(),
+            include.Limits.ToArray(), mutes.Limits.ToArray(),
             include.Tags.ToArray(), exclude.Tags.ToArray());
 
     private static void CopyInto(List<string> source, HashSet<string> target)

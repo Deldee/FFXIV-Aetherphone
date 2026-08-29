@@ -12,4 +12,17 @@ internal sealed class VelvetFilterPreferences
     public List<string> Kinks { get; set; } = new();
     public List<string> Limits { get; set; } = new();
     public List<string> Tags { get; set; } = new();
+
+    public VelvetFilterPreferences Clone() => new()
+    {
+        Intent = Intent,
+        Gender = Gender,
+        Sexuality = Sexuality,
+        Relationship = Relationship,
+        Region = Region,
+        Roles = new List<string>(Roles),
+        Kinks = new List<string>(Kinks),
+        Limits = new List<string>(Limits),
+        Tags = new List<string>(Tags),
+    };
 }

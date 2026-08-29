@@ -86,6 +86,7 @@ internal sealed partial class VelvetShell : IResumableApp
     private bool cachedLalafell;
     private bool raceKnown;
     private ulong raceContentId;
+    private readonly VelvetFilterSelection mutes = new();
     private readonly VelvetFilterSelection discoverInclude = new();
     private readonly VelvetFilterSelection discoverExclude = new();
     private readonly VelvetFilterSelection feedInclude = new();
