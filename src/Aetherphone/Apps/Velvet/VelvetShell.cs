@@ -271,6 +271,7 @@ internal sealed partial class VelvetShell : IResumableApp
         if (session.CurrentUser is null)
         {
             TourHolds.Hold(Id);
+            store.EnsureCurrentUser();
             EmptyState.Draw(context.Content, ui, FontAwesomeIcon.Spinner, Loc.T(L.Common.Loading), string.Empty);
             return;
         }
