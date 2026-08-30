@@ -5,6 +5,7 @@ internal sealed class HuntMobCatalog
     private readonly HuntJsonCatalogLoader<Dictionary<string, HuntMobDefinition>> loader;
     private Dictionary<string, HuntMobDefinition> byId = new();
     private HashSet<int>? ssRankPoiIds;
+    private HashSet<int>? landminePoiIds;
 
     public HuntMobCatalog(FileInfo source)
     {
@@ -31,12 +32,18 @@ internal sealed class HuntMobCatalog
 
     public bool IsSsRankPoi(int zonePoiId) => (ssRankPoiIds ??= BuildSsRankPoiIds()).Contains(zonePoiId);
 
-    private HashSet<int> BuildSsRankPoiIds()
+    public bool IsLandminePoi(int zonePoiId) => (landminePoiIds ??= BuildLandminePoiIds()).Contains(zonePoiId);
+
+    private HashSet<int> BuildSsRankPoiIds() => BuildPoiIdsForRanks(static rank => rank == "SS");
+
+    private HashSet<int> BuildLandminePoiIds() => BuildPoiIdsForRanks(static rank => rank is "A" or "B");
+
+    private HashSet<int> BuildPoiIdsForRanks(Func<string, bool> matchesRank)
     {
         var result = new HashSet<int>();
         foreach (var mob in ById.Values)
         {
-            if (mob.Rank != "SS")
+            if (!matchesRank(mob.Rank))
             {
                 continue;
             }

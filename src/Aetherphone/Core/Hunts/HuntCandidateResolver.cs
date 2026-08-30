@@ -4,6 +4,8 @@ internal readonly record struct HuntPoiState(HuntPoiEntry Poi, HuntsMapMarkerSta
 
 internal static class HuntCandidateResolver
 {
+    private const string MobPoiType = "mob";
+
     public static HashSet<int> ResolveCandidatePoiIds(HuntMobDefinition mob,
         (int WindowNum, int PhaseNum)? activePhase, out bool finalPhase)
     {
@@ -232,6 +234,29 @@ internal static class HuntCandidateResolver
         }
     }
 
+    public static void AppendLandmineOnlyStates(HuntMobDefinition mob, string targetZoneId,
+        HuntMobCatalog mobCatalog, HuntZoneCatalog zoneCatalog, List<HuntPoiState> results)
+    {
+        if (mob.Rank != "S" || Array.IndexOf(mob.ZoneIds, targetZoneId) < 0 ||
+            zoneCatalog.FindZone(targetZoneId) is not { } zone)
+        {
+            return;
+        }
+
+        var zonePois = zone.Pois;
+        for (var index = 0; index < zonePois.Length; index++)
+        {
+            var poi = zonePois[index];
+            if (!string.Equals(poi.Type, MobPoiType, StringComparison.Ordinal) ||
+                !mobCatalog.IsLandminePoi(poi.Id) || !results.TrueForAll(existing => existing.Poi.Id != poi.Id))
+            {
+                continue;
+            }
+
+            results.Add(new HuntPoiState(poi, HuntsMapMarkerState.Sighted));
+        }
+    }
+
     private static void ResolveFateStates(HuntMobDefinition mob, string worldId, int zoneInstance,
         string targetZoneId, HuntZoneCatalog zoneCatalog, HuntsService hunts, List<HuntPoiState> results)
     {
@@ -276,7 +301,7 @@ internal static class HuntCandidateResolver
             return;
         }
 
-        var statesByInstance = new Dictionary<int, Dictionary<int, HuntsMapMarkerState>>();
+        var statesByInstance = new Dictionary<int, Dictionary<int, (HuntsMapMarkerState State, int Priority)>>();
         var windows = hunts.Windows;
         for (var index = 0; index < windows.Length; index++)
         {
@@ -292,7 +317,8 @@ internal static class HuntCandidateResolver
                 continue;
             }
 
-            var (states, _) = candidateCache.ResolveFor(mob, window.WorldId, window.ZoneInstance, zoneId);
+            var (states, _) = candidateCache.ResolveFor(mob, window.WorldId, window.ZoneInstance, zoneId,
+                includeLandmineOnlySpots: true);
             if (states.Count == 0)
             {
                 continue;
@@ -300,17 +326,18 @@ internal static class HuntCandidateResolver
 
             if (!statesByInstance.TryGetValue(window.ZoneInstance, out var statesByPoiId))
             {
-                statesByPoiId = new Dictionary<int, HuntsMapMarkerState>();
+                statesByPoiId = new Dictionary<int, (HuntsMapMarkerState, int)>();
                 statesByInstance[window.ZoneInstance] = statesByPoiId;
             }
 
+            var rankTier = RankTier(mob.Rank);
             for (var stateIndex = 0; stateIndex < states.Count; stateIndex++)
             {
                 var (poi, state) = states[stateIndex];
-                if (!statesByPoiId.TryGetValue(poi.Id, out var existingState) ||
-                    Priority(state) > Priority(existingState))
+                var priority = rankTier * TrackedRankPriorityBoost + Priority(state);
+                if (!statesByPoiId.TryGetValue(poi.Id, out var existing) || priority > existing.Priority)
                 {
-                    statesByPoiId[poi.Id] = state;
+                    statesByPoiId[poi.Id] = (state, priority);
                 }
             }
         }
@@ -348,9 +375,13 @@ internal static class HuntCandidateResolver
             }
 
             var (rawX, rawY) = resolved.Poi.ParsedLocation();
-            results.Add(new HuntsMapMarkerPoint(rawX, rawY, entry.Value));
+            results.Add(new HuntsMapMarkerPoint(rawX, rawY, entry.Value.State));
         }
     }
+
+    private const int TrackedRankPriorityBoost = 10;
+
+    private static int RankTier(string rank) => rank is "S" or "SS" or "F" ? 1 : 0;
 
     public static int Priority(HuntsMapMarkerState state) => state switch
     {

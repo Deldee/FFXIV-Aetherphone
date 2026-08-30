@@ -193,7 +193,8 @@ internal sealed partial class HuntsApp
             }
 
             var (states, confirmedPoiId) = def is not null
-                ? candidateCache.ResolveFor(def, view.WorldId, view.ZoneInstance, detailMapZoneId)
+                ? candidateCache.ResolveFor(def, view.WorldId, view.ZoneInstance, detailMapZoneId,
+                    includeLandmineOnlySpots: false)
                 : (Array.Empty<HuntPoiState>(), null);
             if (DrawDetailZoneMap(scale, states, confirmedPoiId, view))
             {

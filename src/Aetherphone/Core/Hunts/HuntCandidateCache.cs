@@ -29,19 +29,26 @@ internal sealed class HuntCandidateCache
     }
 
     public (IReadOnlyList<HuntPoiState> States, int? ReportedPoiId) ResolveFor(HuntMobDefinition mob,
-        string worldId, int zoneInstance, string zoneId)
+        string worldId, int zoneInstance, string zoneId, bool includeLandmineOnlySpots)
     {
         var token = hunts.CandidateStateToken;
         var key = (mob.Id, worldId, zoneInstance, zoneId);
-        if (entries.TryGetValue(key, out var entry) && entry.Token.Equals(token))
+        if (!entries.TryGetValue(key, out var entry) || !entry.Token.Equals(token))
+        {
+            var states = new List<HuntPoiState>();
+            HuntCandidateResolver.ResolveMobZoneStates(mob, worldId, zoneInstance, zoneId, mobCatalog, zoneCatalog,
+                hunts, states, out var reportedPoiId);
+            entry = new Entry(token, states, reportedPoiId);
+            entries[key] = entry;
+        }
+
+        if (!includeLandmineOnlySpots)
         {
             return (entry.States, entry.ReportedPoiId);
         }
 
-        var states = new List<HuntPoiState>();
-        HuntCandidateResolver.ResolveMobZoneStates(mob, worldId, zoneInstance, zoneId, mobCatalog, zoneCatalog,
-            hunts, states, out var reportedPoiId);
-        entries[key] = new Entry(token, states, reportedPoiId);
-        return (states, reportedPoiId);
+        var withLandmines = new List<HuntPoiState>(entry.States);
+        HuntCandidateResolver.AppendLandmineOnlyStates(mob, zoneId, mobCatalog, zoneCatalog, withLandmines);
+        return (withLandmines, entry.ReportedPoiId);
     }
 }
