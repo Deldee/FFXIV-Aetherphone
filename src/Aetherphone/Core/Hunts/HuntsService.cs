@@ -36,16 +36,19 @@ internal readonly struct HuntSightingKey : IEquatable<HuntSightingKey>
 {
     public readonly string MobId;
     public readonly string WorldId;
+    public readonly int ZoneInstance;
     public readonly int ZonePoiId;
 
-    public HuntSightingKey(string mobId, string worldId, int zonePoiId)
+    public HuntSightingKey(string mobId, string worldId, int zoneInstance, int zonePoiId)
     {
         MobId = mobId;
         WorldId = worldId;
+        ZoneInstance = zoneInstance;
         ZonePoiId = zonePoiId;
     }
 
     public bool Equals(HuntSightingKey other) =>
+        ZoneInstance == other.ZoneInstance &&
         ZonePoiId == other.ZonePoiId &&
         string.Equals(MobId, other.MobId, StringComparison.Ordinal) &&
         string.Equals(WorldId, other.WorldId, StringComparison.OrdinalIgnoreCase);
@@ -53,36 +56,42 @@ internal readonly struct HuntSightingKey : IEquatable<HuntSightingKey>
     public override bool Equals(object? obj) => obj is HuntSightingKey other && Equals(other);
 
     public override int GetHashCode() =>
-        HashCode.Combine(MobId, StringComparer.OrdinalIgnoreCase.GetHashCode(WorldId), ZonePoiId);
+        HashCode.Combine(MobId, StringComparer.OrdinalIgnoreCase.GetHashCode(WorldId), ZoneInstance, ZonePoiId);
 }
 
 internal readonly struct HuntSightingScopeKey : IEquatable<HuntSightingScopeKey>
 {
     public readonly string MobId;
     public readonly string WorldId;
+    public readonly int ZoneInstance;
 
-    public HuntSightingScopeKey(string mobId, string worldId)
+    public HuntSightingScopeKey(string mobId, string worldId, int zoneInstance)
     {
         MobId = mobId;
         WorldId = worldId;
+        ZoneInstance = zoneInstance;
     }
 
     public bool Equals(HuntSightingScopeKey other) =>
+        ZoneInstance == other.ZoneInstance &&
         string.Equals(MobId, other.MobId, StringComparison.Ordinal) &&
         string.Equals(WorldId, other.WorldId, StringComparison.OrdinalIgnoreCase);
 
     public override bool Equals(object? obj) => obj is HuntSightingScopeKey other && Equals(other);
 
     public override int GetHashCode() =>
-        HashCode.Combine(MobId, StringComparer.OrdinalIgnoreCase.GetHashCode(WorldId));
+        HashCode.Combine(MobId, StringComparer.OrdinalIgnoreCase.GetHashCode(WorldId), ZoneInstance);
 }
+
+internal readonly record struct HuntCandidateStateToken(int ActiveSpawnVersion,
+    HashSet<HuntSightingKey> SightedPoiIds, Dictionary<HuntSpawnKey, int> Locations,
+    Dictionary<HuntSpawnKey, (int WindowNum, int PhaseNum)> Phases, Dictionary<HuntSpawnKey, string> Zones);
 
 internal enum HuntsMapMarkerState
 {
     Candidate,
     Sighted,
     Confirmed,
-    Final,
     ActiveMinion,
     FateInactive,
     FateActive,
@@ -198,6 +207,9 @@ internal sealed class HuntsService : IDisposable
     public bool RealtimeConnected => realtimeConnected;
     public int ActiveSpawnVersion => activeSpawnVersion;
 
+    public HuntCandidateStateToken CandidateStateToken =>
+        new(activeSpawnVersion, sightedPoiIds, realtimeSpawnLocations, realtimePhases, realtimeZoneIds);
+
     public int ActiveSpawnCount
     {
         get
@@ -267,8 +279,8 @@ internal sealed class HuntsService : IDisposable
             ? names
             : null;
 
-    public bool IsPoiSighted(string mobId, string worldId, int zonePoiId) =>
-        sightedPoiIds.Contains(new HuntSightingKey(mobId, worldId, zonePoiId));
+    public bool IsPoiSighted(string mobId, string worldId, int zoneInstance, int zonePoiId) =>
+        sightedPoiIds.Contains(new HuntSightingKey(mobId, worldId, zoneInstance, zonePoiId));
 
     public int ZoneInstanceCountFor(HuntMobDefinition mob)
     {
@@ -588,7 +600,7 @@ internal sealed class HuntsService : IDisposable
             return;
         }
 
-        FlushPendingSightingReplace(identity.MobId, identity.WorldId);
+        FlushPendingSightingReplace(identity.MobId, identity.WorldId, identity.ZoneInstance);
 
         if (report.Data?.Reporters is { Length: > 0 } reporters)
         {
@@ -664,55 +676,39 @@ internal sealed class HuntsService : IDisposable
         switch (report.Action)
         {
             case "sighting_set":
-                AddSighting(report.MobId, report.WorldId, report.ZonePoiId);
+                AddSighting(report.MobId, report.WorldId, report.ZoneInstance, report.ZonePoiId);
                 return;
             case "sighting_clear":
-                RemoveSighting(report.MobId, report.WorldId, report.ZonePoiId);
+                RemoveSighting(report.MobId, report.WorldId, report.ZoneInstance, report.ZonePoiId);
                 return;
             case "sighting_replace":
-                ApplyOrDeferSightingReplace(report.MobId, report.WorldId,
+                ApplyOrDeferSightingReplace(report.MobId, report.WorldId, report.ZoneInstance,
                     report.ReplaceEntries ?? Array.Empty<HuntSightingEntryDto>());
                 return;
         }
     }
 
-    private void ApplyOrDeferSightingReplace(string mobId, string worldId, HuntSightingEntryDto[] entries)
+    private void ApplyOrDeferSightingReplace(string mobId, string worldId, int zoneInstance,
+        HuntSightingEntryDto[] entries)
     {
-        if (!IsSpawnedAnyInstance(mobId, worldId))
+        if (!IsSpawned(mobId, worldId, zoneInstance))
         {
-            ReplaceSightings(mobId, worldId, entries);
+            ReplaceSightings(mobId, worldId, zoneInstance, entries);
             return;
         }
 
         lock (realtimeStateGate)
         {
-            pendingSightingReplaces[new HuntSightingScopeKey(mobId, worldId)] = entries;
+            pendingSightingReplaces[new HuntSightingScopeKey(mobId, worldId, zoneInstance)] = entries;
         }
     }
 
-    private bool IsSpawnedAnyInstance(string mobId, string worldId)
-    {
-        lock (activeSpawnGate)
-        {
-            foreach (var key in activeSpawnKeys)
-            {
-                if (string.Equals(key.MobId, mobId, StringComparison.Ordinal) &&
-                    string.Equals(key.WorldId, worldId, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private void FlushPendingSightingReplace(string mobId, string worldId)
+    private void FlushPendingSightingReplace(string mobId, string worldId, int zoneInstance)
     {
         HuntSightingEntryDto[]? entries = null;
         lock (realtimeStateGate)
         {
-            var key = new HuntSightingScopeKey(mobId, worldId);
+            var key = new HuntSightingScopeKey(mobId, worldId, zoneInstance);
             if (pendingSightingReplaces.TryGetValue(key, out var pending))
             {
                 entries = pending;
@@ -722,24 +718,27 @@ internal sealed class HuntsService : IDisposable
 
         if (entries is not null)
         {
-            ReplaceSightings(mobId, worldId, entries);
+            ReplaceSightings(mobId, worldId, zoneInstance, entries);
         }
     }
 
-    private void AddSighting(string mobId, string worldId, int zonePoiId)
+    private void AddSighting(string mobId, string worldId, int zoneInstance, int zonePoiId)
     {
         lock (realtimeStateGate)
         {
-            var next = new HashSet<HuntSightingKey>(sightedPoiIds) { new HuntSightingKey(mobId, worldId, zonePoiId) };
+            var next = new HashSet<HuntSightingKey>(sightedPoiIds)
+            {
+                new HuntSightingKey(mobId, worldId, zoneInstance, zonePoiId),
+            };
             sightedPoiIds = next;
         }
     }
 
-    private void RemoveSighting(string mobId, string worldId, int zonePoiId)
+    private void RemoveSighting(string mobId, string worldId, int zoneInstance, int zonePoiId)
     {
         lock (realtimeStateGate)
         {
-            var key = new HuntSightingKey(mobId, worldId, zonePoiId);
+            var key = new HuntSightingKey(mobId, worldId, zoneInstance, zonePoiId);
             if (!sightedPoiIds.Contains(key))
             {
                 return;
@@ -751,14 +750,15 @@ internal sealed class HuntsService : IDisposable
         }
     }
 
-    private void ReplaceSightings(string mobId, string worldId, HuntSightingEntryDto[] entries)
+    private void ReplaceSightings(string mobId, string worldId, int zoneInstance, HuntSightingEntryDto[] entries)
     {
         lock (realtimeStateGate)
         {
             var next = new HashSet<HuntSightingKey>();
             foreach (var existing in sightedPoiIds)
             {
-                if (!string.Equals(existing.MobId, mobId, StringComparison.Ordinal) ||
+                if (existing.ZoneInstance != zoneInstance ||
+                    !string.Equals(existing.MobId, mobId, StringComparison.Ordinal) ||
                     !string.Equals(existing.WorldId, worldId, StringComparison.OrdinalIgnoreCase))
                 {
                     next.Add(existing);
@@ -767,7 +767,7 @@ internal sealed class HuntsService : IDisposable
 
             for (var index = 0; index < entries.Length; index++)
             {
-                next.Add(new HuntSightingKey(mobId, worldId, entries[index].ZonePoiId));
+                next.Add(new HuntSightingKey(mobId, worldId, zoneInstance, entries[index].ZonePoiId));
             }
 
             sightedPoiIds = next;
@@ -790,7 +790,8 @@ internal sealed class HuntsService : IDisposable
                 continue;
             }
 
-            result.Add(new HuntSightingKey(sighting.MobId, sighting.WorldId, sighting.ZonePoiId));
+            result.Add(new HuntSightingKey(sighting.MobId, sighting.WorldId, sighting.ZoneInstance,
+                sighting.ZonePoiId));
         }
 
         return result;

@@ -98,6 +98,9 @@ internal sealed class HuntSightingEntryDto
     [JsonPropertyName("worldId2")]
     public string WorldId { get; set; } = string.Empty;
 
+    [JsonPropertyName("zoneInstance")]
+    public int ZoneInstance { get; set; }
+
     [JsonPropertyName("sightedAt")]
     public DateTimeOffset? SightedAt { get; set; }
 
@@ -403,6 +406,9 @@ internal sealed class HuntsSocketSightingIdentity
 
     [JsonPropertyName("worldId")]
     public string WorldId { get; set; } = string.Empty;
+
+    [JsonPropertyName("zoneInstance")]
+    public int ZoneInstance { get; set; }
 }
 
 internal sealed class HuntsSocketSightingPoi
@@ -418,6 +424,8 @@ internal sealed class HuntsSocketSightingReport
     public string MobId { get; init; } = string.Empty;
 
     public string WorldId { get; init; } = string.Empty;
+
+    public int ZoneInstance { get; init; }
 
     public int ZonePoiId { get; init; }
 

@@ -292,6 +292,7 @@ internal sealed class HuntsRealtimeClient : IDisposable
                 Action = action,
                 MobId = identity.MobId,
                 WorldId = identity.WorldId,
+                ZoneInstance = identity.ZoneInstance,
                 ReplaceEntries = entries ?? Array.Empty<HuntSightingEntryDto>(),
             });
             return;
@@ -308,6 +309,7 @@ internal sealed class HuntsRealtimeClient : IDisposable
             Action = action,
             MobId = identity.MobId,
             WorldId = identity.WorldId,
+            ZoneInstance = identity.ZoneInstance,
             ZonePoiId = poi.ZonePoiId,
         });
     }

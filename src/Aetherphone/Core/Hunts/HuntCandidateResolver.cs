@@ -1,9 +1,273 @@
 namespace Aetherphone.Core.Hunts;
 
+internal readonly record struct HuntPoiState(HuntPoiEntry Poi, HuntsMapMarkerState State);
+
 internal static class HuntCandidateResolver
 {
+    public static HashSet<int> ResolveCandidatePoiIds(HuntMobDefinition mob,
+        (int WindowNum, int PhaseNum)? activePhase, out bool finalPhase)
+    {
+        var poiIds = new HashSet<int>();
+        finalPhase = false;
+        if (activePhase is { } phase && mob.Windows.Length > 0)
+        {
+            var windowIndex = Math.Clamp(phase.WindowNum - 1, 0, mob.Windows.Length - 1);
+            var phases = mob.Windows[windowIndex].Phases;
+            if (phases.Length > 0)
+            {
+                var phaseIndex = Math.Clamp(phase.PhaseNum - 1, 0, phases.Length - 1);
+                finalPhase = phaseIndex > 0;
+                AddPoiIds(poiIds, phases[phaseIndex].ZonePoiIds);
+            }
+
+            return poiIds;
+        }
+
+        for (var windowIndex = 0; windowIndex < mob.Windows.Length; windowIndex++)
+        {
+            var phases = mob.Windows[windowIndex].Phases;
+            for (var phaseIndex = 0; phaseIndex < phases.Length; phaseIndex++)
+            {
+                if (mob.Rank == "SS" && phases.Length > 1 && phaseIndex == phases.Length - 1)
+                {
+                    continue;
+                }
+
+                AddPoiIds(poiIds, phases[phaseIndex].ZonePoiIds);
+            }
+        }
+
+        return poiIds;
+    }
+
+    public static HuntPoiEntry? ResolveFinalPhasePoint(HuntMobDefinition mob,
+        (int WindowNum, int PhaseNum)? activePhase, string zoneId, HuntZoneCatalog zoneCatalog)
+    {
+        if (mob.Rank != "SS" || zoneId.Length == 0 || mob.Windows.Length == 0)
+        {
+            return null;
+        }
+
+        var windowIndex = activePhase is { } phase
+            ? Math.Clamp(phase.WindowNum - 1, 0, mob.Windows.Length - 1)
+            : 0;
+        var phases = mob.Windows[windowIndex].Phases;
+        if (phases.Length < 2)
+        {
+            return null;
+        }
+
+        var finalPhasePoiIds = phases[^1].ZonePoiIds;
+        for (var poiIndex = 0; poiIndex < finalPhasePoiIds.Length; poiIndex++)
+        {
+            if (zoneCatalog.FindPoi(finalPhasePoiIds[poiIndex]) is { } resolved &&
+                string.Equals(resolved.ZoneId, zoneId, StringComparison.Ordinal))
+            {
+                return resolved.Poi;
+            }
+        }
+
+        return null;
+    }
+
+    public static string ResolveBestZoneId(HuntMobDefinition mob, string worldId, int zoneInstance,
+        HuntZoneCatalog zoneCatalog, HuntsService hunts, out bool zoneConfirmed)
+    {
+        var confirmedZoneId = hunts.ZoneIdFor(mob.Id, worldId, zoneInstance);
+        if (confirmedZoneId is { Length: > 0 } && Array.IndexOf(mob.ZoneIds, confirmedZoneId) >= 0)
+        {
+            zoneConfirmed = true;
+            return confirmedZoneId;
+        }
+
+        zoneConfirmed = false;
+        if (mob.ZoneIds.Length <= 1)
+        {
+            return mob.ZoneIds.Length == 1 ? mob.ZoneIds[0] : string.Empty;
+        }
+
+        var activePhase = hunts.PhaseFor(mob.Id, worldId, zoneInstance);
+        var poiIds = ResolveCandidatePoiIds(mob, activePhase, out _);
+        var bestZoneId = mob.ZoneIds[0];
+        var bestCount = -1;
+        for (var zoneIndex = 0; zoneIndex < mob.ZoneIds.Length; zoneIndex++)
+        {
+            var candidateZoneId = mob.ZoneIds[zoneIndex];
+            var count = 0;
+            foreach (var poiId in poiIds)
+            {
+                if (zoneCatalog.FindPoi(poiId) is { } resolved &&
+                    string.Equals(resolved.ZoneId, candidateZoneId, StringComparison.Ordinal))
+                {
+                    count++;
+                }
+            }
+
+            if (count > bestCount)
+            {
+                bestCount = count;
+                bestZoneId = candidateZoneId;
+            }
+        }
+
+        return bestZoneId;
+    }
+
+    public static void ResolveMobZoneStates(HuntMobDefinition mob, string worldId, int zoneInstance,
+        string targetZoneId, HuntMobCatalog mobCatalog, HuntZoneCatalog zoneCatalog, HuntsService hunts,
+        List<HuntPoiState> results, out int? reportedPoiId)
+    {
+        results.Clear();
+        reportedPoiId = null;
+        if (targetZoneId.Length == 0 || Array.IndexOf(mob.ZoneIds, targetZoneId) < 0)
+        {
+            return;
+        }
+
+        var confirmedZoneId = hunts.ZoneIdFor(mob.Id, worldId, zoneInstance);
+        var zoneConfirmed = string.Equals(confirmedZoneId, targetZoneId, StringComparison.Ordinal);
+        if (confirmedZoneId is { Length: > 0 } && !zoneConfirmed)
+        {
+            return;
+        }
+
+        if (mob.Rank == "F")
+        {
+            ResolveFateStates(mob, worldId, zoneInstance, targetZoneId, zoneCatalog, hunts, results);
+            return;
+        }
+
+        if (mob.Rank == "SS" && !zoneConfirmed)
+        {
+            return;
+        }
+
+        var activePhase = hunts.PhaseFor(mob.Id, worldId, zoneInstance);
+        var poiIds = ResolveCandidatePoiIds(mob, activePhase, out var finalPhase);
+        if (mob.Rank != "SS")
+        {
+            poiIds.RemoveWhere(mobCatalog.IsSsRankPoi);
+        }
+
+        var points = new List<HuntPoiEntry>();
+        foreach (var poiId in poiIds)
+        {
+            if (zoneCatalog.FindPoi(poiId) is { } resolved &&
+                string.Equals(resolved.ZoneId, targetZoneId, StringComparison.Ordinal))
+            {
+                points.Add(resolved.Poi);
+            }
+        }
+
+        var spawned = hunts.IsSpawned(mob.Id, worldId, zoneInstance);
+        var finalLocationResolved = spawned && finalPhase && zoneConfirmed && points.Count == 1;
+        var isActiveSsMinion = mob.Rank == "SS" && zoneConfirmed && !finalPhase;
+
+        if (spawned)
+        {
+            reportedPoiId = hunts.ConfirmedPoiIdFor(mob.Id, worldId, zoneInstance);
+            if (reportedPoiId is null && finalLocationResolved)
+            {
+                reportedPoiId = points[0].Id;
+            }
+        }
+
+        var unsightedCount = 0;
+        var soleUnsightedPoiId = 0;
+        for (var index = 0; index < points.Count; index++)
+        {
+            if (hunts.IsPoiSighted(mob.Id, worldId, zoneInstance, points[index].Id))
+            {
+                continue;
+            }
+
+            unsightedCount++;
+            soleUnsightedPoiId = points[index].Id;
+        }
+
+        var confirmedPoiId = reportedPoiId ?? (unsightedCount == 1 ? soleUnsightedPoiId : (int?)null);
+        for (var index = 0; index < points.Count; index++)
+        {
+            var poi = points[index];
+            HuntsMapMarkerState state;
+            if (confirmedPoiId is { } confirmed)
+            {
+                state = poi.Id == confirmed ? HuntsMapMarkerState.Confirmed : HuntsMapMarkerState.Sighted;
+            }
+            else if (hunts.IsPoiSighted(mob.Id, worldId, zoneInstance, poi.Id))
+            {
+                state = HuntsMapMarkerState.Sighted;
+            }
+            else if (isActiveSsMinion)
+            {
+                state = HuntsMapMarkerState.ActiveMinion;
+            }
+            else
+            {
+                state = HuntsMapMarkerState.Candidate;
+            }
+
+            results.Add(new HuntPoiState(poi, state));
+        }
+
+        if (mob.Rank == "SS" && zoneConfirmed &&
+            ResolveFinalPhasePoint(mob, activePhase, targetZoneId, zoneCatalog) is { } finalPoint &&
+            results.TrueForAll(existing => existing.Poi.Id != finalPoint.Id))
+        {
+            HuntsMapMarkerState previewState;
+            if (reportedPoiId == finalPoint.Id)
+            {
+                previewState = HuntsMapMarkerState.Confirmed;
+            }
+            else if (reportedPoiId is not null || hunts.IsPoiSighted(mob.Id, worldId, zoneInstance, finalPoint.Id))
+            {
+                previewState = HuntsMapMarkerState.Sighted;
+            }
+            else
+            {
+                previewState = HuntsMapMarkerState.Candidate;
+            }
+
+            results.Add(new HuntPoiState(finalPoint, previewState));
+        }
+    }
+
+    private static void ResolveFateStates(HuntMobDefinition mob, string worldId, int zoneInstance,
+        string targetZoneId, HuntZoneCatalog zoneCatalog, HuntsService hunts, List<HuntPoiState> results)
+    {
+        var fateState = hunts.IsSpawned(mob.Id, worldId, zoneInstance)
+            ? HuntsMapMarkerState.FateActive
+            : HuntsMapMarkerState.FateInactive;
+        for (var windowIndex = 0; windowIndex < mob.Windows.Length; windowIndex++)
+        {
+            var phases = mob.Windows[windowIndex].Phases;
+            for (var phaseIndex = 0; phaseIndex < phases.Length; phaseIndex++)
+            {
+                var zonePoiIds = phases[phaseIndex].ZonePoiIds;
+                for (var poiIndex = 0; poiIndex < zonePoiIds.Length; poiIndex++)
+                {
+                    if (zoneCatalog.FindPoi(zonePoiIds[poiIndex]) is { } resolved &&
+                        string.Equals(resolved.ZoneId, targetZoneId, StringComparison.Ordinal) &&
+                        results.TrueForAll(existing => existing.Poi.Id != resolved.Poi.Id))
+                    {
+                        results.Add(new HuntPoiState(resolved.Poi, fateState));
+                    }
+                }
+            }
+        }
+    }
+
+    private static void AddPoiIds(HashSet<int> poiIds, int[] zonePoiIds)
+    {
+        for (var index = 0; index < zonePoiIds.Length; index++)
+        {
+            poiIds.Add(zonePoiIds[index]);
+        }
+    }
+
     public static void ResolveZoneMarkers(string zoneId, string worldId, HuntMobCatalog mobCatalog,
-        HuntZoneCatalog zoneCatalog, HuntsService hunts, List<HuntsMapMarkerPoint> results)
+        HuntZoneCatalog zoneCatalog, HuntCandidateCache candidateCache, HuntsService hunts,
+        List<HuntsMapMarkerPoint> results)
     {
         results.Clear();
         if (worldId.Length == 0)
@@ -22,33 +286,26 @@ internal static class HuntCandidateResolver
             }
 
             var mob = mobCatalog.Find(window.MobId);
-            if (mob is null || mob.ZoneIds.Length == 0)
+            if (mob is null)
             {
                 continue;
             }
 
-            var confirmedZoneId = hunts.ZoneIdFor(mob.Id, window.WorldId, window.ZoneInstance);
-            if (confirmedZoneId is { Length: > 0 })
+            var (states, _) = candidateCache.ResolveFor(mob, window.WorldId, window.ZoneInstance, zoneId);
+            for (var stateIndex = 0; stateIndex < states.Count; stateIndex++)
             {
-                if (!string.Equals(confirmedZoneId, zoneId, StringComparison.Ordinal))
+                var (poi, state) = states[stateIndex];
+                if (!statesByPoiId.TryGetValue(poi.Id, out var existingState) ||
+                    Priority(state) > Priority(existingState))
                 {
-                    continue;
+                    statesByPoiId[poi.Id] = state;
                 }
             }
-            else if (mob.Rank == "SS" || Array.IndexOf(mob.ZoneIds, zoneId) < 0)
-            {
-                continue;
-            }
-
-            ResolveMobMarkers(mob, window.WorldId, window.ZoneInstance, zoneId,
-                string.Equals(confirmedZoneId, zoneId, StringComparison.Ordinal), mobCatalog, zoneCatalog, hunts,
-                statesByPoiId);
         }
 
         foreach (var entry in statesByPoiId)
         {
-            var found = zoneCatalog.FindPoi(entry.Key);
-            if (found is not { } resolved)
+            if (zoneCatalog.FindPoi(entry.Key) is not { } resolved)
             {
                 continue;
             }
@@ -58,151 +315,8 @@ internal static class HuntCandidateResolver
         }
     }
 
-    private static void ResolveMobMarkers(HuntMobDefinition mob, string worldId, int zoneInstance, string zoneId,
-        bool zoneConfirmed, HuntMobCatalog mobCatalog, HuntZoneCatalog zoneCatalog, HuntsService hunts,
-        Dictionary<int, HuntsMapMarkerState> statesByPoiId)
+    public static int Priority(HuntsMapMarkerState state) => state switch
     {
-        var activePhase = hunts.PhaseFor(mob.Id, worldId, zoneInstance);
-        var poiIds = new HashSet<int>();
-        var finalPhase = false;
-        if (activePhase is { } phase && mob.Windows.Length > 0)
-        {
-            var windowIndex = Math.Clamp(phase.WindowNum - 1, 0, mob.Windows.Length - 1);
-            var phases = mob.Windows[windowIndex].Phases;
-            if (phases.Length > 0)
-            {
-                var phaseIndex = Math.Clamp(phase.PhaseNum - 1, 0, phases.Length - 1);
-                finalPhase = phaseIndex > 0;
-                var zonePoiIds = phases[phaseIndex].ZonePoiIds;
-                for (var poiIndex = 0; poiIndex < zonePoiIds.Length; poiIndex++)
-                {
-                    poiIds.Add(zonePoiIds[poiIndex]);
-                }
-            }
-        }
-        else
-        {
-            for (var windowIndex = 0; windowIndex < mob.Windows.Length; windowIndex++)
-            {
-                var phases = mob.Windows[windowIndex].Phases;
-                for (var phaseIndex = 0; phaseIndex < phases.Length; phaseIndex++)
-                {
-                    if (mob.Rank == "SS" && phases.Length > 1 && phaseIndex == phases.Length - 1)
-                    {
-                        continue;
-                    }
-
-                    var zonePoiIds = phases[phaseIndex].ZonePoiIds;
-                    for (var poiIndex = 0; poiIndex < zonePoiIds.Length; poiIndex++)
-                    {
-                        poiIds.Add(zonePoiIds[poiIndex]);
-                    }
-                }
-            }
-        }
-
-        if (mob.Rank != "SS")
-        {
-            poiIds.RemoveWhere(mobCatalog.IsSsRankPoi);
-        }
-
-        var points = new List<HuntPoiEntry>();
-        foreach (var poiId in poiIds)
-        {
-            var found = zoneCatalog.FindPoi(poiId);
-            if (found is { } resolved && string.Equals(resolved.ZoneId, zoneId, StringComparison.Ordinal))
-            {
-                points.Add(resolved.Poi);
-            }
-        }
-
-        if (points.Count == 0)
-        {
-            return;
-        }
-
-        if (mob.Rank == "F")
-        {
-            var fateState = hunts.IsSpawned(mob.Id, worldId, zoneInstance)
-                ? HuntsMapMarkerState.FateActive
-                : HuntsMapMarkerState.FateInactive;
-            for (var index = 0; index < points.Count; index++)
-            {
-                var poiId = points[index].Id;
-                if (!statesByPoiId.TryGetValue(poiId, out var existingState) ||
-                    Priority(fateState) > Priority(existingState))
-                {
-                    statesByPoiId[poiId] = fateState;
-                }
-            }
-
-            return;
-        }
-
-        var finalLocationResolved = finalPhase && zoneConfirmed && points.Count == 1;
-        var isActiveSsMinion = mob.Rank == "SS" && zoneConfirmed && !finalPhase;
-        var confirmedPoiId = hunts.ConfirmedPoiIdFor(mob.Id, worldId, zoneInstance);
-        if (confirmedPoiId is null && finalLocationResolved)
-        {
-            confirmedPoiId = points[0].Id;
-        }
-
-        var unsightedCount = 0;
-        var soleUnsightedPoiId = 0;
-        for (var index = 0; index < points.Count; index++)
-        {
-            if (hunts.IsPoiSighted(mob.Id, worldId, points[index].Id))
-            {
-                continue;
-            }
-
-            unsightedCount++;
-            soleUnsightedPoiId = points[index].Id;
-        }
-
-        for (var index = 0; index < points.Count; index++)
-        {
-            var poi = points[index];
-            if (confirmedPoiId is { } confirmed && poi.Id != confirmed)
-            {
-                continue;
-            }
-
-            var sighted = hunts.IsPoiSighted(mob.Id, worldId, poi.Id);
-            var soleCandidate = unsightedCount == 1 && poi.Id == soleUnsightedPoiId;
-            var isConfirmed = confirmedPoiId is { } confirmedId && confirmedId == poi.Id;
-            var state = ResolveState(finalLocationResolved, isConfirmed, soleCandidate, sighted, isActiveSsMinion);
-            if (!statesByPoiId.TryGetValue(poi.Id, out var existingState) || Priority(state) > Priority(existingState))
-            {
-                statesByPoiId[poi.Id] = state;
-            }
-        }
-    }
-
-    private static HuntsMapMarkerState ResolveState(bool finalLocation, bool confirmed, bool soleUnsightedCandidate,
-        bool sighted, bool isActiveSsMinion)
-    {
-        if (finalLocation)
-        {
-            return HuntsMapMarkerState.Final;
-        }
-
-        if (confirmed || soleUnsightedCandidate)
-        {
-            return HuntsMapMarkerState.Confirmed;
-        }
-
-        if (sighted)
-        {
-            return HuntsMapMarkerState.Sighted;
-        }
-
-        return isActiveSsMinion ? HuntsMapMarkerState.ActiveMinion : HuntsMapMarkerState.Candidate;
-    }
-
-    private static int Priority(HuntsMapMarkerState state) => state switch
-    {
-        HuntsMapMarkerState.Final => 4,
         HuntsMapMarkerState.Confirmed => 3,
         HuntsMapMarkerState.Sighted => 2,
         HuntsMapMarkerState.ActiveMinion => 1,

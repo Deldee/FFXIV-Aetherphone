@@ -12,7 +12,6 @@ internal sealed class HuntsMapMarkers : IDisposable
     private const uint CandidateIconId = 60557u;
     private const uint SightedIconId = 60444u;
     private const uint ConfirmedIconId = 60403u;
-    private const uint FinalIconId = 60422u;
     private const uint ActiveMinionIconId = 60424u;
     private const uint FateInactiveIconId = 63936u;
     private const uint FateActiveIconId = 63939u;
@@ -25,6 +24,7 @@ internal sealed class HuntsMapMarkers : IDisposable
     private readonly HuntsService hunts;
     private readonly HuntMobCatalog mobCatalog;
     private readonly HuntZoneCatalog zoneCatalog;
+    private readonly HuntCandidateCache candidateCache;
     private readonly List<HuntsMapMarkerPoint> points = new();
     private readonly HashSet<HuntsMapMarkerPoint> lastPlacedPoints = new();
     private bool hasPlacedMarkers;
@@ -36,12 +36,13 @@ internal sealed class HuntsMapMarkers : IDisposable
     public bool HasActiveMarkers => hasPlacedMarkers;
 
     public HuntsMapMarkers(Configuration configuration, HuntsService hunts, HuntMobCatalog mobCatalog,
-        HuntZoneCatalog zoneCatalog)
+        HuntZoneCatalog zoneCatalog, HuntCandidateCache candidateCache)
     {
         this.configuration = configuration;
         this.hunts = hunts;
         this.mobCatalog = mobCatalog;
         this.zoneCatalog = zoneCatalog;
+        this.candidateCache = candidateCache;
         Plugin.Framework.Update += OnFrameworkUpdate;
         Plugin.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, AreaMapAddonName, OnAreaMapOpenedOrChanged);
         Plugin.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, AreaMapAddonName, OnAreaMapOpenedOrChanged);
@@ -141,7 +142,8 @@ internal sealed class HuntsMapMarkers : IDisposable
             return false;
         }
 
-        HuntCandidateResolver.ResolveZoneMarkers(zoneId, worldId, mobCatalog, zoneCatalog, hunts, points);
+        HuntCandidateResolver.ResolveZoneMarkers(zoneId, worldId, mobCatalog, zoneCatalog, candidateCache, hunts,
+            points);
         if (points.Count == 0)
         {
             return false;
@@ -174,7 +176,6 @@ internal sealed class HuntsMapMarkers : IDisposable
     {
         HuntsMapMarkerState.Sighted => SightedIconId,
         HuntsMapMarkerState.Confirmed => ConfirmedIconId,
-        HuntsMapMarkerState.Final => FinalIconId,
         HuntsMapMarkerState.ActiveMinion => ActiveMinionIconId,
         HuntsMapMarkerState.FateInactive => FateInactiveIconId,
         HuntsMapMarkerState.FateActive => FateActiveIconId,
