@@ -101,6 +101,24 @@ public sealed class HuntsRealtimeClientTests
     }
 
     [Fact]
+    public async Task SpawnFalseFrameDispatchesMobReportReceived()
+    {
+        var client = new HuntsRealtimeClient(null!);
+        HuntsSocketMobReport? received = null;
+        client.MobReportReceived += report => received = report;
+
+        var frame = "42[\"message\",{\"type\":\"mob\",\"subType\":\"report\",\"data\":{\"action\":\"spawn_false\",\"id\":{\"mobId\":\"agrippa_the_mighty\",\"worldId\":\"siren\"}}}]";
+
+        await InvokeAsync(client, frame);
+
+        Assert.NotNull(received);
+        Assert.Equal("spawn_false", received!.Action);
+        Assert.Equal("agrippa_the_mighty", received.Id!.MobId);
+        Assert.Equal("siren", received.Id!.WorldId);
+        Assert.Null(received.Data);
+    }
+
+    [Fact]
     public async Task SpawnClaimFrameWithReportersDispatches()
     {
         var client = new HuntsRealtimeClient(null!);
@@ -115,6 +133,24 @@ public sealed class HuntsRealtimeClientTests
         Assert.Equal("spawn_claim", received!.Action);
         Assert.Equal(2, received.Data!.Reporters!.Length);
         Assert.Equal("Takeru Yamato", received.Data!.Reporters![1].Name);
+    }
+
+    [Fact]
+    public async Task SpawnClaimFrameWithSingleReporterJoinDispatches()
+    {
+        var client = new HuntsRealtimeClient(null!);
+        HuntsSocketMobReport? received = null;
+        client.MobReportReceived += report => received = report;
+
+        var frame = "42[\"message\",{\"type\":\"mob\",\"subType\":\"report\",\"data\":{\"action\":\"spawn_claim\",\"id\":{\"mobId\":\"ixtab\",\"worldId\":\"mateus\"},\"data\":{\"id\":51315,\"isRemoving\":false,\"name\":\"Num Xiii\"}}}]";
+
+        await InvokeAsync(client, frame);
+
+        Assert.NotNull(received);
+        Assert.Equal("spawn_claim", received!.Action);
+        Assert.Equal("ixtab", received.Id!.MobId);
+        Assert.False(received.Data!.IsRemoving);
+        Assert.Equal("Num Xiii", received.Data!.ClaimReporterName);
     }
 
     [Fact]

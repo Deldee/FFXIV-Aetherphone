@@ -379,6 +379,12 @@ internal sealed class HuntsSocketMobData
 
     [JsonPropertyName("reporters")]
     public HuntsSocketReporter[]? Reporters { get; set; }
+
+    [JsonPropertyName("isRemoving")]
+    public bool IsRemoving { get; set; }
+
+    [JsonPropertyName("name")]
+    public string? ClaimReporterName { get; set; }
 }
 
 internal sealed class HuntsSocketReporter
