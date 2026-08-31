@@ -1,5 +1,6 @@
 using Aetherphone.Core;
 using Aetherphone.Core.Apps;
+using Aetherphone.Core.Hunts;
 using Aetherphone.Core.Localization;
 using Aetherphone.Core.Maps;
 using Aetherphone.Core.Theme;
@@ -21,13 +22,6 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
                                                ImGuiWindowFlags.NoSavedSettings;
 
     private const string AreaMapAddonName = "AreaMap";
-    private const uint CandidateIconId = 60557u;
-    private const uint SightedIconId = 60444u;
-    private const uint ConfirmedIconId = 60403u;
-    private const uint ActiveMinionIconId = 60424u;
-    private const uint SsSpawnIconId = 60422u;
-    private const uint FateInactiveIconId = 63936u;
-    private const uint FateActiveIconId = 63939u;
     private const float CornerInset = 10f;
     private const float ChipHeight = 28f;
     private const float SidePadding = 12f;
@@ -56,6 +50,8 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
     private readonly HuntsMapMarkers markers;
     private readonly ThemeProvider themes;
     private string? instanceLabel;
+    private int? cachedShownInstance;
+    private string cachedLanguageCode = string.Empty;
     private bool legendExpanded;
 
     public HuntsMapMarkersIndicatorWindow(HuntsMapMarkers markers, ThemeProvider themes)
@@ -77,9 +73,15 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
         var labelSize = Typography.Measure(label, TextScale, FontWeight.SemiBold);
         var headerRowWidth = (IconWidth + IconGap) * scale + labelSize.X;
 
-        instanceLabel = markers.ShownInstance is { } instance
-            ? string.Format(Loc.T(L.Hunts.NativeMapMarkersInstanceIndicator), instance)
-            : null;
+        if (markers.ShownInstance != cachedShownInstance ||
+            !string.Equals(cachedLanguageCode, Loc.Current.Code, StringComparison.Ordinal))
+        {
+            cachedShownInstance = markers.ShownInstance;
+            cachedLanguageCode = Loc.Current.Code;
+            instanceLabel = cachedShownInstance is { } instance
+                ? string.Format(Loc.T(L.Hunts.NativeMapMarkersInstanceIndicator), instance)
+                : null;
+        }
         var instanceSize = instanceLabel is { Length: > 0 }
             ? Typography.Measure(instanceLabel, InstanceTextScale, FontWeight.Regular)
             : Vector2.Zero;
@@ -191,19 +193,19 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
         }
 
         top += LegendTopGap * scale;
-        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, CandidateIconId,
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, HuntsMapMarkerIcons.Candidate,
             Loc.T(L.Hunts.NativeMapLegendCandidate), boosted: true);
-        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, SightedIconId, Loc.T(L.Hunts.NativeMapLegendSighted),
-            boosted: true);
-        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, ConfirmedIconId,
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, HuntsMapMarkerIcons.Sighted,
+            Loc.T(L.Hunts.NativeMapLegendSighted), boosted: true);
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, HuntsMapMarkerIcons.Confirmed,
             Loc.T(L.Hunts.NativeMapLegendConfirmed), boosted: true);
-        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, ActiveMinionIconId,
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, HuntsMapMarkerIcons.ActiveMinion,
             Loc.T(L.Hunts.NativeMapLegendActiveMinion), boosted: true);
-        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, SsSpawnIconId, Loc.T(L.Hunts.NativeMapLegendSsSpawn),
-            boosted: true);
-        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, FateInactiveIconId,
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, HuntsMapMarkerIcons.SsSpawn,
+            Loc.T(L.Hunts.NativeMapLegendSsSpawn), boosted: true);
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, HuntsMapMarkerIcons.FateInactive,
             Loc.T(L.Hunts.NativeMapLegendFateInactive), boosted: false);
-        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, FateActiveIconId,
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, HuntsMapMarkerIcons.FateActive,
             Loc.T(L.Hunts.NativeMapLegendFateActive), boosted: false);
     }
 

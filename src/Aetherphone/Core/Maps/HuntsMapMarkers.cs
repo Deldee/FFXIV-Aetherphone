@@ -10,13 +10,6 @@ namespace Aetherphone.Core.Maps;
 
 internal sealed class HuntsMapMarkers : IDisposable
 {
-    private const uint CandidateIconId = 60557u;
-    private const uint SightedIconId = 60444u;
-    private const uint ConfirmedIconId = 60403u;
-    private const uint ActiveMinionIconId = 60424u;
-    private const uint SsSpawnIconId = 60422u;
-    private const uint FateInactiveIconId = 63936u;
-    private const uint FateActiveIconId = 63939u;
     private const int MarkerScale = 600;
     private const int FateMarkerScale = 200;
     private const string AreaMapAddonName = "AreaMap";
@@ -51,11 +44,16 @@ internal sealed class HuntsMapMarkers : IDisposable
         Plugin.AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, AreaMapAddonName, OnAreaMapOpenedOrChanged);
     }
 
-    public void Dispose()
+    public unsafe void Dispose()
     {
         Plugin.Framework.Update -= OnFrameworkUpdate;
         Plugin.AddonLifecycle.UnregisterListener(AddonEvent.PostSetup, AreaMapAddonName, OnAreaMapOpenedOrChanged);
         Plugin.AddonLifecycle.UnregisterListener(AddonEvent.PostRefresh, AreaMapAddonName, OnAreaMapOpenedOrChanged);
+        var agentMap = AgentMap.Instance();
+        if (agentMap != null)
+        {
+            ClearNativeMarkersIfNeeded(agentMap);
+        }
     }
 
     private void OnAreaMapOpenedOrChanged(AddonEvent type, AddonArgs args)
@@ -191,13 +189,13 @@ internal sealed class HuntsMapMarkers : IDisposable
 
     private static uint IconFor(HuntsMapMarkerState state) => state switch
     {
-        HuntsMapMarkerState.Sighted => SightedIconId,
-        HuntsMapMarkerState.Confirmed => ConfirmedIconId,
-        HuntsMapMarkerState.ActiveMinion => ActiveMinionIconId,
-        HuntsMapMarkerState.SsSpawn => SsSpawnIconId,
-        HuntsMapMarkerState.FateInactive => FateInactiveIconId,
-        HuntsMapMarkerState.FateActive => FateActiveIconId,
-        _ => CandidateIconId,
+        HuntsMapMarkerState.Sighted => HuntsMapMarkerIcons.Sighted,
+        HuntsMapMarkerState.Confirmed => HuntsMapMarkerIcons.Confirmed,
+        HuntsMapMarkerState.ActiveMinion => HuntsMapMarkerIcons.ActiveMinion,
+        HuntsMapMarkerState.SsSpawn => HuntsMapMarkerIcons.SsSpawn,
+        HuntsMapMarkerState.FateInactive => HuntsMapMarkerIcons.FateInactive,
+        HuntsMapMarkerState.FateActive => HuntsMapMarkerIcons.FateActive,
+        _ => HuntsMapMarkerIcons.Candidate,
     };
 
     private static int ScaleFor(HuntsMapMarkerState state) => state switch

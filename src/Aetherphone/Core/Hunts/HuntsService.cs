@@ -100,6 +100,17 @@ internal enum HuntsMapMarkerState
 
 internal readonly record struct HuntsMapMarkerPoint(float RawX, float RawY, HuntsMapMarkerState State);
 
+internal static class HuntsMapMarkerIcons
+{
+    public const uint Candidate = 60557u;
+    public const uint Sighted = 60444u;
+    public const uint Confirmed = 60403u;
+    public const uint ActiveMinion = 60424u;
+    public const uint SsSpawn = 60422u;
+    public const uint FateInactive = 63936u;
+    public const uint FateActive = 63939u;
+}
+
 internal sealed class HuntsService : IDisposable
 {
     private const string AppId = "hunts";
