@@ -328,7 +328,7 @@ internal sealed partial class HuntsApp
         Typography.Draw(drawList, new Vector2(contentRight - statusSize.X, origin.Y), statusLabel, statusInk,
             TextStyles.Title3);
 
-        DrawBigProgressBar(drawList, contentLeft, contentRight, barTop, barHeight, status, percentage ?? 0d, scale);
+        DrawBigProgressBar(drawList, contentLeft, contentRight, barTop, barHeight, status, percentage, scale);
 
         var lineTop = barTop + barHeight;
         if (detailLabel.Length > 0)
@@ -359,7 +359,7 @@ internal sealed partial class HuntsApp
     }
 
     private void DrawBigProgressBar(ImDrawListPtr drawList, float left, float right, float top, float height,
-        HuntWindowStatus status, double percentage, float scale)
+        HuntWindowStatus status, double? percentage, float scale)
     {
         ProgressBar.Draw(drawList, left, right, top, height, percentage, StatusColor(status), TextStyles.Headline,
             8f * scale);
