@@ -5856,6 +5856,7 @@
   "hunts.resetTutorial": "Reset Tutorial",
   "hunts.nativeMapMarkersLabel": "Show Map Markers",
   "hunts.nativeMapMarkersHint": "Experimental: adds the candidate spawn points to FFXIV's own map and minimap while a mark's detail page is open",
+  "hunts.nativeMapMarkersIndicator": "Hunt markers on",
   "hunts.notifyModeDefault": "Default",
   "hunts.notifyModeEnabled": "Enabled",
   "hunts.notifyModeEnabledOnWorldValue": "Enabled on {0}",

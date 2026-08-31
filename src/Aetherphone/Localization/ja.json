@@ -5856,6 +5856,7 @@
   "hunts.resetTutorial": "チュートリアルをリセット",
   "hunts.nativeMapMarkersLabel": "マップにマーカーを表示",
   "hunts.nativeMapMarkersHint": "実験的機能：マークの詳細ページを開いている間、FFXIVのマップとミニマップに出現候補地点を表示します",
+  "hunts.nativeMapMarkersIndicator": "ハントマーカー表示中",
   "hunts.notifyModeDefault": "デフォルト",
   "hunts.notifyModeEnabled": "有効",
   "hunts.notifyModeEnabledOnWorldValue": "{0}で有効",

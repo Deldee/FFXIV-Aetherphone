@@ -78,6 +78,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly PopoutPresence linkpearlPresence;
     private readonly LinkpearlHotkey linkpearlHotkey;
     private readonly AppGate linkpearlGate;
+    private readonly HuntsMapMarkersIndicatorWindow huntsMapMarkersIndicatorWindow;
     private readonly PhoneEmoteController phoneEmote;
     private readonly TimerNotifier timerNotifier;
     private readonly CalendarReminderService calendarReminders;
@@ -147,9 +148,12 @@ public sealed class Plugin : IDalamudPlugin
             phoneWindow = new PhoneWindow(shell, Cfg);
             Updates = new UpdateCheckService(services.Http, PluginInterface);
             updateChipWindow = new UpdateChipWindow(phoneWindow, Updates, services.Themes);
+            huntsMapMarkersIndicatorWindow =
+                new HuntsMapMarkersIndicatorWindow(services.HuntsMapMarkers, services.Themes);
             PhotoWindow = new PhotoWindow(services.Themes);
             windowSystem.AddWindow(phoneWindow);
             windowSystem.AddWindow(updateChipWindow);
+            windowSystem.AddWindow(huntsMapMarkersIndicatorWindow);
             windowSystem.AddWindow(PhotoWindow);
             windowSystem.AddWindow(videoDebugWindow);
             windowSystem.AddWindow(screenWindow);

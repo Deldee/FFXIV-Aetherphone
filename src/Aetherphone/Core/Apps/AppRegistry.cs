@@ -115,7 +115,7 @@ internal static class AppRegistry
         apps.Add(new HousingApp(services.Housing, services.Configuration, services.Confirm));
         apps.Add(new HuntsApp(services.Hunts, services.HuntMobCatalog, services.HuntZoneCatalog,
             services.HuntZoneMapTextures, services.HuntMobRewardCatalog, services.Configuration, services.Confirm,
-            services.HuntsLauncher));
+            services.HuntsLauncher, services.HuntsMapMarkers));
 
         return new AppBundle
         {

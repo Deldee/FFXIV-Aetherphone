@@ -5856,6 +5856,7 @@
   "hunts.resetTutorial": "重置教程",
   "hunts.nativeMapMarkersLabel": "在地图上显示标记",
   "hunts.nativeMapMarkersHint": "实验性功能：在打开标记详情页面时，将候选刷新点显示在FFXIV的地图和小地图上",
+  "hunts.nativeMapMarkersIndicator": "狩猎标记已启用",
   "hunts.notifyModeDefault": "默认",
   "hunts.notifyModeEnabled": "已启用",
   "hunts.notifyModeEnabledOnWorldValue": "已在 {0} 启用",

@@ -33,6 +33,8 @@ internal sealed class HuntsMapMarkers : IDisposable
     private DateTime lastRefreshUtc = DateTime.MinValue;
     private bool forceRedraw = true;
 
+    public bool HasActiveMarkers => hasPlacedMarkers;
+
     public HuntsMapMarkers(Configuration configuration, HuntsService hunts, HuntMobCatalog mobCatalog,
         HuntZoneCatalog zoneCatalog)
     {
@@ -53,6 +55,12 @@ internal sealed class HuntsMapMarkers : IDisposable
     }
 
     private void OnAreaMapOpenedOrChanged(AddonEvent type, AddonArgs args)
+    {
+        lastRefreshUtc = DateTime.MinValue;
+        forceRedraw = true;
+    }
+
+    public void ForceRedraw()
     {
         lastRefreshUtc = DateTime.MinValue;
         forceRedraw = true;

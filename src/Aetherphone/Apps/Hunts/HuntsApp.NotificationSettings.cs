@@ -85,6 +85,10 @@ internal sealed partial class HuntsApp
             {
                 configuration.HuntsNativeMapMarkers = nativeMapMarkersValue;
                 configuration.Save();
+                if (nativeMapMarkersValue)
+                {
+                    huntsMapMarkers.ForceRedraw();
+                }
             }
 
             nativeMapMarkersCard.End();
