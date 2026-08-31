@@ -33,7 +33,7 @@ internal sealed class HuntCandidateCache
     {
         var token = hunts.CandidateStateToken;
         var key = (mob.Id, worldId, zoneInstance, zoneId);
-        if (!entries.TryGetValue(key, out var entry) || !entry.Token.Equals(token))
+        if (!entries.TryGetValue(key, out var entry) || !IsFresh(entry.Token, token, mob.Id, worldId, zoneInstance, zoneId))
         {
             var states = new List<HuntPoiState>();
             HuntCandidateResolver.ResolveMobZoneStates(mob, worldId, zoneInstance, zoneId, mobCatalog, zoneCatalog,
@@ -50,5 +50,65 @@ internal sealed class HuntCandidateCache
         var withLandmines = new List<HuntPoiState>(entry.States);
         HuntCandidateResolver.AppendLandmineOnlyStates(mob, zoneId, mobCatalog, zoneCatalog, withLandmines);
         return (withLandmines, entry.ReportedPoiId);
+    }
+
+    private bool IsFresh(HuntCandidateStateToken cached, HuntCandidateStateToken current, string mobId,
+        string worldId, int zoneInstance, string zoneId)
+    {
+        if (cached.ActiveSpawnVersion != current.ActiveSpawnVersion)
+        {
+            return false;
+        }
+
+        var spawnKey = new HuntSpawnKey(mobId, worldId, zoneInstance);
+        return ValueEqualFor(cached.Locations, current.Locations, spawnKey) &&
+            ValueEqualFor(cached.Phases, current.Phases, spawnKey) &&
+            ValueEqualFor(cached.Zones, current.Zones, spawnKey) &&
+            SightingsEqualForZone(cached.SightedPoiIds, current.SightedPoiIds, mobId, worldId, zoneInstance, zoneId);
+    }
+
+    private static bool ValueEqualFor<TValue>(Dictionary<HuntSpawnKey, TValue> cached,
+        Dictionary<HuntSpawnKey, TValue> current, HuntSpawnKey key)
+    {
+        if (ReferenceEquals(cached, current))
+        {
+            return true;
+        }
+
+        var hasCached = cached.TryGetValue(key, out var cachedValue);
+        var hasCurrent = current.TryGetValue(key, out var currentValue);
+        if (hasCached != hasCurrent)
+        {
+            return false;
+        }
+
+        return !hasCached || EqualityComparer<TValue>.Default.Equals(cachedValue, currentValue);
+    }
+
+    private bool SightingsEqualForZone(HashSet<HuntSightingKey> cached, HashSet<HuntSightingKey> current,
+        string mobId, string worldId, int zoneInstance, string zoneId)
+    {
+        if (ReferenceEquals(cached, current))
+        {
+            return true;
+        }
+
+        var zone = zoneCatalog.FindZone(zoneId);
+        if (zone is null)
+        {
+            return true;
+        }
+
+        var pois = zone.Pois;
+        for (var index = 0; index < pois.Length; index++)
+        {
+            var sightingKey = new HuntSightingKey(mobId, worldId, zoneInstance, pois[index].Id);
+            if (cached.Contains(sightingKey) != current.Contains(sightingKey))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
