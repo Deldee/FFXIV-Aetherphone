@@ -137,6 +137,8 @@ internal sealed class HuntsService : IDisposable
     private volatile Dictionary<HuntSpawnKey, string[]> realtimeReporterNames = new();
     private volatile HashSet<HuntSightingKey> sightedPoiIds = new();
     private readonly Dictionary<HuntSightingScopeKey, HuntSightingEntryDto[]> pendingSightingReplaces = new();
+    private readonly Dictionary<HuntSightingScopeKey, List<(int ZonePoiId, bool Sighted)>> pendingSightingDeltas =
+        new();
     private volatile bool loading;
     private volatile bool loaded;
     private volatile bool failed;
@@ -710,6 +712,7 @@ internal sealed class HuntsService : IDisposable
     private void FlushPendingSightingReplace(string mobId, string worldId, int zoneInstance)
     {
         HuntSightingEntryDto[]? entries = null;
+        List<(int ZonePoiId, bool Sighted)>? deltas = null;
         lock (realtimeStateGate)
         {
             var key = new HuntSightingScopeKey(mobId, worldId, zoneInstance);
@@ -718,11 +721,35 @@ internal sealed class HuntsService : IDisposable
                 entries = pending;
                 pendingSightingReplaces.Remove(key);
             }
+
+            if (pendingSightingDeltas.TryGetValue(key, out var pendingDeltas))
+            {
+                deltas = pendingDeltas;
+                pendingSightingDeltas.Remove(key);
+            }
         }
 
         if (entries is not null)
         {
             ReplaceSightings(mobId, worldId, zoneInstance, entries);
+        }
+
+        if (deltas is null)
+        {
+            return;
+        }
+
+        for (var index = 0; index < deltas.Count; index++)
+        {
+            var (zonePoiId, sighted) = deltas[index];
+            if (sighted)
+            {
+                AddSighting(mobId, worldId, zoneInstance, zonePoiId);
+            }
+            else
+            {
+                RemoveSighting(mobId, worldId, zoneInstance, zonePoiId);
+            }
         }
     }
 
@@ -730,6 +757,7 @@ internal sealed class HuntsService : IDisposable
     {
         lock (realtimeStateGate)
         {
+            RecordSightingDeltaIfReplacePending(mobId, worldId, zoneInstance, zonePoiId, sighted: true);
             var next = new HashSet<HuntSightingKey>(sightedPoiIds)
             {
                 new HuntSightingKey(mobId, worldId, zoneInstance, zonePoiId),
@@ -742,6 +770,7 @@ internal sealed class HuntsService : IDisposable
     {
         lock (realtimeStateGate)
         {
+            RecordSightingDeltaIfReplacePending(mobId, worldId, zoneInstance, zonePoiId, sighted: false);
             var key = new HuntSightingKey(mobId, worldId, zoneInstance, zonePoiId);
             if (!sightedPoiIds.Contains(key))
             {
@@ -752,6 +781,24 @@ internal sealed class HuntsService : IDisposable
             next.Remove(key);
             sightedPoiIds = next;
         }
+    }
+
+    private void RecordSightingDeltaIfReplacePending(string mobId, string worldId, int zoneInstance, int zonePoiId,
+        bool sighted)
+    {
+        var scopeKey = new HuntSightingScopeKey(mobId, worldId, zoneInstance);
+        if (!pendingSightingReplaces.ContainsKey(scopeKey))
+        {
+            return;
+        }
+
+        if (!pendingSightingDeltas.TryGetValue(scopeKey, out var deltas))
+        {
+            deltas = new List<(int, bool)>();
+            pendingSightingDeltas[scopeKey] = deltas;
+        }
+
+        deltas.Add((zonePoiId, sighted));
     }
 
     private void ReplaceSightings(string mobId, string worldId, int zoneInstance, HuntSightingEntryDto[] entries)
@@ -966,6 +1013,7 @@ internal sealed class HuntsService : IDisposable
         lock (realtimeStateGate)
         {
             pendingSightingReplaces.Clear();
+            pendingSightingDeltas.Clear();
         }
 
         lock (historyGate)
