@@ -11,6 +11,7 @@ internal static class HuntCandidateResolver
             return;
         }
 
+        var statesByPoiId = new Dictionary<int, HuntsMapMarkerState>();
         var windows = hunts.Windows;
         for (var index = 0; index < windows.Length; index++)
         {
@@ -41,13 +42,25 @@ internal static class HuntCandidateResolver
 
             ResolveMobMarkers(mob, window.WorldId, window.ZoneInstance, zoneId,
                 string.Equals(confirmedZoneId, zoneId, StringComparison.Ordinal), mobCatalog, zoneCatalog, hunts,
-                results);
+                statesByPoiId);
+        }
+
+        foreach (var entry in statesByPoiId)
+        {
+            var found = zoneCatalog.FindPoi(entry.Key);
+            if (found is not { } resolved)
+            {
+                continue;
+            }
+
+            var (rawX, rawY) = resolved.Poi.ParsedLocation();
+            results.Add(new HuntsMapMarkerPoint(rawX, rawY, entry.Value));
         }
     }
 
     private static void ResolveMobMarkers(HuntMobDefinition mob, string worldId, int zoneInstance, string zoneId,
         bool zoneConfirmed, HuntMobCatalog mobCatalog, HuntZoneCatalog zoneCatalog, HuntsService hunts,
-        List<HuntsMapMarkerPoint> results)
+        Dictionary<int, HuntsMapMarkerState> statesByPoiId)
     {
         var activePhase = hunts.PhaseFor(mob.Id, worldId, zoneInstance);
         var poiIds = new HashSet<int>();
@@ -140,8 +153,10 @@ internal static class HuntCandidateResolver
             var soleCandidate = unsightedCount == 1 && poi.Id == soleUnsightedPoiId;
             var isConfirmed = confirmedPoiId is { } confirmedId && confirmedId == poi.Id;
             var state = ResolveState(finalLocationResolved, isConfirmed, soleCandidate, sighted);
-            var (rawX, rawY) = poi.ParsedLocation();
-            results.Add(new HuntsMapMarkerPoint(rawX, rawY, state));
+            if (!statesByPoiId.TryGetValue(poi.Id, out var existingState) || Priority(state) > Priority(existingState))
+            {
+                statesByPoiId[poi.Id] = state;
+            }
         }
     }
 
@@ -160,4 +175,12 @@ internal static class HuntCandidateResolver
 
         return sighted ? HuntsMapMarkerState.Sighted : HuntsMapMarkerState.Candidate;
     }
+
+    private static int Priority(HuntsMapMarkerState state) => state switch
+    {
+        HuntsMapMarkerState.Final => 3,
+        HuntsMapMarkerState.Confirmed => 2,
+        HuntsMapMarkerState.Sighted => 1,
+        _ => 0,
+    };
 }

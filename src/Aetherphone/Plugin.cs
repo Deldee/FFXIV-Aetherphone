@@ -54,6 +54,7 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IKeyState KeyState { get; private set; } = null!;
     [PluginService] internal static IGamepadState GamepadState { get; private set; } = null!;
     [PluginService] internal static IAetheryteList AetheryteList { get; private set; } = null!;
+    [PluginService] internal static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
     internal static Plugin Instance { get; private set; } = null!;
     internal static Configuration Cfg { get; private set; } = null!;
     internal static FontService Fonts { get; private set; } = null!;
