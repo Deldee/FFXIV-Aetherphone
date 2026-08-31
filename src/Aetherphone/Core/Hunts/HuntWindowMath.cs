@@ -108,22 +108,19 @@ internal static class HuntWindowMath
 
     private static double? OvertimePercentage(double min, double cap, double hoursSinceCap)
     {
-        var cycle = Math.Ceiling(hoursSinceCap / cap);
-        var span = cap - min;
-        var previousCapEdge = cap * (cycle - 1d);
-        var minEdge = min * cycle - span;
-        var capEdge = cap * cycle;
-
-        if (minEdge < previousCapEdge)
+        var geometry = ResolveOvertimeGeometry(min, cap, hoursSinceCap);
+        if (geometry.MinEdge < geometry.PreviousCapEdge)
         {
             return null;
         }
 
-        var cycles = 2d * cycle - 2d;
-        cycles += hoursSinceCap < minEdge ? (hoursSinceCap - previousCapEdge) / (minEdge - previousCapEdge) : 1d;
-        if (hoursSinceCap > minEdge)
+        var cycles = 2d * geometry.Cycle - 2d;
+        cycles += hoursSinceCap < geometry.MinEdge
+            ? (hoursSinceCap - geometry.PreviousCapEdge) / (geometry.MinEdge - geometry.PreviousCapEdge)
+            : 1d;
+        if (hoursSinceCap > geometry.MinEdge)
         {
-            cycles += (hoursSinceCap - minEdge) / (capEdge - minEdge);
+            cycles += (hoursSinceCap - geometry.MinEdge) / (geometry.CapEdge - geometry.MinEdge);
         }
 
         return cycles * 100d;
@@ -131,30 +128,39 @@ internal static class HuntWindowMath
 
     private static double RawOvertimePercentage(double min, double cap, double hoursSinceCap)
     {
-        var cycle = Math.Ceiling(hoursSinceCap / cap);
-        var span = cap - min;
-        var previousCapEdge = cap * (cycle - 1d);
-        var minEdge = min * cycle - span;
-        var capEdge = cap * cycle;
-
-        var cycles = 2d * cycle - 2d;
-        if (minEdge >= previousCapEdge)
+        var geometry = ResolveOvertimeGeometry(min, cap, hoursSinceCap);
+        var cycles = 2d * geometry.Cycle - 2d;
+        if (geometry.MinEdge >= geometry.PreviousCapEdge)
         {
-            cycles += hoursSinceCap < minEdge ? (hoursSinceCap - previousCapEdge) / (minEdge - previousCapEdge) : 1d;
-            if (hoursSinceCap > minEdge)
+            cycles += hoursSinceCap < geometry.MinEdge
+                ? (hoursSinceCap - geometry.PreviousCapEdge) / (geometry.MinEdge - geometry.PreviousCapEdge)
+                : 1d;
+            if (hoursSinceCap > geometry.MinEdge)
             {
-                cycles += (hoursSinceCap - minEdge) / (capEdge - minEdge);
+                cycles += (hoursSinceCap - geometry.MinEdge) / (geometry.CapEdge - geometry.MinEdge);
             }
         }
         else
         {
-            cycles += Math.Clamp(2d * (hoursSinceCap - previousCapEdge) / cap, 0d, 2d);
+            cycles += Math.Clamp(2d * (hoursSinceCap - geometry.PreviousCapEdge) / cap, 0d, 2d);
         }
 
         return cycles * 100d;
     }
 
+    private static OvertimeGeometry ResolveOvertimeGeometry(double min, double cap, double hoursSinceCap)
+    {
+        var cycle = Math.Ceiling(hoursSinceCap / cap);
+        var span = cap - min;
+        var previousCapEdge = cap * (cycle - 1d);
+        var minEdge = min * cycle - span;
+        var capEdge = cap * cycle;
+        return new OvertimeGeometry(cycle, previousCapEdge, minEdge, capEdge);
+    }
+
     private readonly record struct PercentageCore(double Min, double Cap, double OpenPercentage, double? HoursSinceCap);
+
+    private readonly record struct OvertimeGeometry(double Cycle, double PreviousCapEdge, double MinEdge, double CapEdge);
 
     private static HuntMobTimingWindow? ResolveTiming(HuntWindowDto window, HuntMobDefinition? mob)
     {
