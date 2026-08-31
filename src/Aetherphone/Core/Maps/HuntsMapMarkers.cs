@@ -4,6 +4,7 @@ using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using Lumina.Excel.Sheets;
+using UIState = FFXIVClientStructs.FFXIV.Client.Game.UI.UIState;
 
 namespace Aetherphone.Core.Maps;
 
@@ -34,6 +35,7 @@ internal sealed class HuntsMapMarkers : IDisposable
     private bool forceRedraw = true;
 
     public bool HasActiveMarkers => hasPlacedMarkers;
+    public int? ShownInstance { get; private set; }
 
     public HuntsMapMarkers(Configuration configuration, HuntsService hunts, HuntMobCatalog mobCatalog,
         HuntZoneCatalog zoneCatalog, HuntCandidateCache candidateCache)
@@ -132,7 +134,7 @@ internal sealed class HuntsMapMarkers : IDisposable
         }
     }
 
-    private bool TryResolveTarget(uint territoryId, string worldId, out Map map)
+    private unsafe bool TryResolveTarget(uint territoryId, string worldId, out Map map)
     {
         map = default;
 
@@ -142,8 +144,10 @@ internal sealed class HuntsMapMarkers : IDisposable
             return false;
         }
 
-        HuntCandidateResolver.ResolveZoneMarkers(zoneId, worldId, mobCatalog, zoneCatalog, candidateCache, hunts,
-            points);
+        var explicitInstance = ResolveExplicitInstance(territoryId);
+        HuntCandidateResolver.ResolveZoneMarkers(zoneId, worldId, explicitInstance, mobCatalog, zoneCatalog,
+            candidateCache, hunts, points, out var shownInstance);
+        ShownInstance = shownInstance;
         if (points.Count == 0)
         {
             return false;
@@ -161,6 +165,7 @@ internal sealed class HuntsMapMarkers : IDisposable
 
     private unsafe void ClearNativeMarkersIfNeeded(AgentMap* agentMap)
     {
+        ShownInstance = null;
         if (!hasPlacedMarkers)
         {
             return;
@@ -170,6 +175,17 @@ internal sealed class HuntsMapMarkers : IDisposable
         agentMap->ResetMiniMapMarkers();
         hasPlacedMarkers = false;
         lastPlacedPoints.Clear();
+    }
+
+    private static unsafe int? ResolveExplicitInstance(uint territoryId)
+    {
+        if (Plugin.ClientState.TerritoryType != territoryId)
+        {
+            return null;
+        }
+
+        var uiState = UIState.Instance();
+        return uiState == null ? null : (int)uiState->PublicInstance.InstanceId;
     }
 
     private static uint IconFor(HuntsMapMarkerState state) => state switch

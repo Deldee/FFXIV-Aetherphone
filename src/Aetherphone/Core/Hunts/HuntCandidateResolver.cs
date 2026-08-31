@@ -265,17 +265,18 @@ internal static class HuntCandidateResolver
         }
     }
 
-    public static void ResolveZoneMarkers(string zoneId, string worldId, HuntMobCatalog mobCatalog,
-        HuntZoneCatalog zoneCatalog, HuntCandidateCache candidateCache, HuntsService hunts,
-        List<HuntsMapMarkerPoint> results)
+    public static void ResolveZoneMarkers(string zoneId, string worldId, int? explicitInstance,
+        HuntMobCatalog mobCatalog, HuntZoneCatalog zoneCatalog, HuntCandidateCache candidateCache, HuntsService hunts,
+        List<HuntsMapMarkerPoint> results, out int? shownInstance)
     {
         results.Clear();
+        shownInstance = null;
         if (worldId.Length == 0)
         {
             return;
         }
 
-        var statesByPoiId = new Dictionary<int, HuntsMapMarkerState>();
+        var statesByInstance = new Dictionary<int, Dictionary<int, HuntsMapMarkerState>>();
         var windows = hunts.Windows;
         for (var index = 0; index < windows.Length; index++)
         {
@@ -292,6 +293,17 @@ internal static class HuntCandidateResolver
             }
 
             var (states, _) = candidateCache.ResolveFor(mob, window.WorldId, window.ZoneInstance, zoneId);
+            if (states.Count == 0)
+            {
+                continue;
+            }
+
+            if (!statesByInstance.TryGetValue(window.ZoneInstance, out var statesByPoiId))
+            {
+                statesByPoiId = new Dictionary<int, HuntsMapMarkerState>();
+                statesByInstance[window.ZoneInstance] = statesByPoiId;
+            }
+
             for (var stateIndex = 0; stateIndex < states.Count; stateIndex++)
             {
                 var (poi, state) = states[stateIndex];
@@ -303,7 +315,32 @@ internal static class HuntCandidateResolver
             }
         }
 
-        foreach (var entry in statesByPoiId)
+        var zoneIsInstanced = hunts.ZoneInstanceCountFor(zoneId) > 1;
+        int targetInstance;
+        if (explicitInstance is { } known)
+        {
+            targetInstance = known;
+        }
+        else if (zoneIsInstanced)
+        {
+            targetInstance = 1;
+        }
+        else
+        {
+            targetInstance = 0;
+        }
+
+        if (zoneIsInstanced)
+        {
+            shownInstance = targetInstance;
+        }
+
+        if (!statesByInstance.TryGetValue(targetInstance, out var chosen))
+        {
+            return;
+        }
+
+        foreach (var entry in chosen)
         {
             if (zoneCatalog.FindPoi(entry.Key) is not { } resolved)
             {

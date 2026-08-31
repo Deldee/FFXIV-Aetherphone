@@ -1231,6 +1231,8 @@ internal static class L
             "Experimental: adds the candidate spawn points to FFXIV's own map and minimap while a mark's detail page is open");
         public static readonly LocString NativeMapMarkersIndicator =
             new("hunts.nativeMapMarkersIndicator", "Hunt markers on");
+        public static readonly LocString NativeMapMarkersInstanceIndicator = new(
+            "hunts.nativeMapMarkersInstanceIndicator", "Currently showing instance {0}");
         public static readonly LocString NotifyModeDefault = new("hunts.notifyModeDefault", "Default");
         public static readonly LocString NotifyModeEnabled = new("hunts.notifyModeEnabled", "Enabled");
         public static readonly LocString NotifyModeEnabledOnWorldValue =

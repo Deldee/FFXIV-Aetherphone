@@ -297,6 +297,9 @@ internal sealed class HuntsService : IDisposable
         return maxInstances;
     }
 
+    public int ZoneInstanceCountFor(string zoneId) =>
+        zoneInstanceCounts.TryGetValue(zoneId, out var count) ? count : 1;
+
     public void EnsureActive()
     {
         if (!configuration.HuntsAppOpened)

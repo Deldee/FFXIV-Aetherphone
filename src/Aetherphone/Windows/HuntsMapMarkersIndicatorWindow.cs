@@ -27,10 +27,13 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
     private const float IconScale = 0.66f;
     private const float IconWidth = 11f;
     private const float TextScale = 0.8f;
+    private const float InstanceTextScale = 0.7f;
+    private const float InstanceRowGap = 3f;
     private static readonly Vector4 White = new(1f, 1f, 1f, 1f);
 
     private readonly HuntsMapMarkers markers;
     private readonly ThemeProvider themes;
+    private string? instanceLabel;
 
     public HuntsMapMarkersIndicatorWindow(HuntsMapMarkers markers, ThemeProvider themes)
         : base($"{AepConstants.Name}##HuntsMapMarkersIndicator", ChipFlags)
@@ -48,9 +51,22 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
         TryGetAreaMapBounds(out var mapPosition, out var mapSize);
         var scale = UiScale.Global;
         var label = Loc.T(L.Hunts.NativeMapMarkersIndicator);
-        var textWidth = Typography.Measure(label, TextScale, FontWeight.SemiBold).X;
-        var pixelWidth = textWidth + (SidePadding * 2f + IconWidth + IconGap) * scale;
-        var pixelHeight = ChipHeight * scale;
+        var labelSize = Typography.Measure(label, TextScale, FontWeight.SemiBold);
+        var labelRowWidth = labelSize.X + (IconWidth + IconGap) * scale;
+
+        instanceLabel = markers.ShownInstance is { } instance
+            ? string.Format(Loc.T(L.Hunts.NativeMapMarkersInstanceIndicator), instance)
+            : null;
+        var instanceSize = instanceLabel is { Length: > 0 }
+            ? Typography.Measure(instanceLabel, InstanceTextScale, FontWeight.Regular)
+            : Vector2.Zero;
+
+        var contentWidth = MathF.Max(labelRowWidth, instanceSize.X);
+        var pixelWidth = contentWidth + SidePadding * 2f * scale;
+        var pixelHeight = instanceLabel is { Length: > 0 }
+            ? ChipHeight * scale + InstanceRowGap * scale + instanceSize.Y
+            : ChipHeight * scale;
+
         Size = new Vector2(pixelWidth / scale, pixelHeight / scale);
         SizeCondition = ImGuiCond.Always;
         Position = new Vector2(mapPosition.X + mapSize.X - pixelWidth - CornerInset * scale,
@@ -64,27 +80,38 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
         var theme = themes.Chrome;
         var min = ImGui.GetWindowPos();
         var max = min + ImGui.GetWindowSize();
-        DrawChip(theme, min, max, scale);
+        DrawChip(theme, min, max, scale, instanceLabel);
     }
 
-    private static void DrawChip(PhoneTheme theme, Vector2 min, Vector2 max, float scale)
+    private static void DrawChip(PhoneTheme theme, Vector2 min, Vector2 max, float scale, string? instanceLabel)
     {
         var drawList = ImGui.GetForegroundDrawList();
-        var rounding = (max.Y - min.Y) * 0.5f;
+        var rounding = ChipHeight * scale * 0.5f;
         Elevation.Floating(drawList, min, max, rounding, scale, 1f);
         var surface = IconTile.Surface(theme.Accent);
         Squircle.Fill(drawList, min, max, rounding, ImGui.GetColorU32(surface));
         Squircle.Stroke(drawList, min, max, rounding, ImGui.GetColorU32(new Vector4(1f, 1f, 1f, 0.18f)), scale);
         var ink = White;
         var label = Loc.T(L.Hunts.NativeMapMarkersIndicator);
-        var textSize = Typography.Measure(label, TextScale, FontWeight.SemiBold);
-        var contentWidth = textSize.X + (IconWidth + IconGap) * scale;
-        var left = (min.X + max.X) * 0.5f - contentWidth * 0.5f;
-        var centerY = (min.Y + max.Y) * 0.5f;
-        AppSkin.Icon(drawList, new Vector2(left + IconWidth * 0.5f * scale, centerY),
+        var labelSize = Typography.Measure(label, TextScale, FontWeight.SemiBold);
+        var labelRowWidth = labelSize.X + (IconWidth + IconGap) * scale;
+        var labelLeft = (min.X + max.X) * 0.5f - labelRowWidth * 0.5f;
+        var labelRowCenterY = min.Y + ChipHeight * scale * 0.5f;
+        AppSkin.Icon(drawList, new Vector2(labelLeft + IconWidth * 0.5f * scale, labelRowCenterY),
             FontAwesomeIcon.MapMarkerAlt.ToIconString(), ink, IconScale);
-        Typography.Draw(drawList, new Vector2(left + (IconWidth + IconGap) * scale, centerY - textSize.Y * 0.5f),
+        Typography.Draw(drawList, new Vector2(labelLeft + (IconWidth + IconGap) * scale, labelRowCenterY - labelSize.Y * 0.5f),
             label, ink, TextScale, FontWeight.SemiBold);
+
+        if (instanceLabel is not { Length: > 0 })
+        {
+            return;
+        }
+
+        var instanceSize = Typography.Measure(instanceLabel, InstanceTextScale, FontWeight.Regular);
+        var instanceLeft = (min.X + max.X) * 0.5f - instanceSize.X * 0.5f;
+        var instanceTop = min.Y + ChipHeight * scale + InstanceRowGap * scale;
+        Typography.Draw(drawList, new Vector2(instanceLeft, instanceTop), instanceLabel,
+            new Vector4(ink.X, ink.Y, ink.Z, 0.75f), InstanceTextScale, FontWeight.Regular);
     }
 
     private static bool TryGetAreaMapBounds(out Vector2 position, out Vector2 size)

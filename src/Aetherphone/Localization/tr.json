@@ -5857,6 +5857,7 @@
   "hunts.nativeMapMarkersLabel": "Haritada işaretleri göster",
   "hunts.nativeMapMarkersHint": "Deneysel: bir işaretin ayrıntı sayfası açıkken olası doğum noktalarını FFXIV'in haritasına ve mini haritasına ekler",
   "hunts.nativeMapMarkersIndicator": "Av işaretleri açık",
+  "hunts.nativeMapMarkersInstanceIndicator": "Şu anda {0}. örnek gösteriliyor",
   "hunts.notifyModeDefault": "Varsayılan",
   "hunts.notifyModeEnabled": "Etkin",
   "hunts.notifyModeEnabledOnWorldValue": "{0} üzerinde etkin",

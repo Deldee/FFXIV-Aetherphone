@@ -5857,6 +5857,7 @@
   "hunts.nativeMapMarkersLabel": "Mostrar marcadores no mapa",
   "hunts.nativeMapMarkersHint": "Experimental: adiciona os pontos de aparecimento candidatos ao mapa e minimapa do FFXIV enquanto a página de detalhes de uma marca estiver aberta",
   "hunts.nativeMapMarkersIndicator": "Marcadores de caça ativos",
+  "hunts.nativeMapMarkersInstanceIndicator": "A mostrar atualmente a instância {0}",
   "hunts.notifyModeDefault": "Padrão",
   "hunts.notifyModeEnabled": "Ativado",
   "hunts.notifyModeEnabledOnWorldValue": "Ativado em {0}",
