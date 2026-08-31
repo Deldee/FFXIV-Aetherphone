@@ -62,6 +62,9 @@ internal enum HuntsMapMarkerState
     Sighted,
     Confirmed,
     Final,
+    ActiveMinion,
+    FateInactive,
+    FateActive,
 }
 
 internal readonly record struct HuntsMapMarkerPoint(float RawX, float RawY, HuntsMapMarkerState State);

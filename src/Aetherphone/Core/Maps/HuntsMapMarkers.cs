@@ -13,7 +13,11 @@ internal sealed class HuntsMapMarkers : IDisposable
     private const uint SightedIconId = 60444u;
     private const uint ConfirmedIconId = 60403u;
     private const uint FinalIconId = 60422u;
+    private const uint ActiveMinionIconId = 60424u;
+    private const uint FateInactiveIconId = 63936u;
+    private const uint FateActiveIconId = 63939u;
     private const int MarkerScale = 600;
+    private const int FateMarkerScale = 200;
     private const string AreaMapAddonName = "AreaMap";
     private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(2);
 
@@ -56,14 +60,15 @@ internal sealed class HuntsMapMarkers : IDisposable
 
     private unsafe void OnFrameworkUpdate(IFramework framework)
     {
-        if (!configuration.HuntsNativeMapMarkers)
+        var agentMap = AgentMap.Instance();
+        if (agentMap == null)
         {
             return;
         }
 
-        var agentMap = AgentMap.Instance();
-        if (agentMap == null)
+        if (!configuration.HuntsNativeMapMarkers)
         {
+            ClearNativeMarkersIfNeeded(agentMap);
             return;
         }
 
@@ -112,8 +117,9 @@ internal sealed class HuntsMapMarkers : IDisposable
             var worldZ = MapPixelMath.ToWorldCoordinate(point.RawY, map.SizeFactor, map.OffsetY);
             var worldPosition = new Vector3(worldX, 0f, worldZ);
             var iconId = IconFor(point.State);
-            agentMap->AddMapMarker(worldPosition, iconId, MarkerScale);
-            agentMap->AddMiniMapMarker(worldPosition, iconId, MarkerScale);
+            var scale = ScaleFor(point.State);
+            agentMap->AddMapMarker(worldPosition, iconId, scale);
+            agentMap->AddMiniMapMarker(worldPosition, iconId, scale);
         }
     }
 
@@ -161,6 +167,16 @@ internal sealed class HuntsMapMarkers : IDisposable
         HuntsMapMarkerState.Sighted => SightedIconId,
         HuntsMapMarkerState.Confirmed => ConfirmedIconId,
         HuntsMapMarkerState.Final => FinalIconId,
+        HuntsMapMarkerState.ActiveMinion => ActiveMinionIconId,
+        HuntsMapMarkerState.FateInactive => FateInactiveIconId,
+        HuntsMapMarkerState.FateActive => FateActiveIconId,
         _ => CandidateIconId,
+    };
+
+    private static int ScaleFor(HuntsMapMarkerState state) => state switch
+    {
+        HuntsMapMarkerState.FateInactive => FateMarkerScale,
+        HuntsMapMarkerState.FateActive => FateMarkerScale,
+        _ => MarkerScale,
     };
 }
