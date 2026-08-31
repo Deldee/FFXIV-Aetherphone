@@ -5855,7 +5855,7 @@
   "hunts.resetToDefault": "Varsayılana sıfırla",
   "hunts.resetTutorial": "Öğreticiyi sıfırla",
   "hunts.nativeMapMarkersLabel": "Haritada işaretleri göster",
-  "hunts.nativeMapMarkersHint": "Deneysel: bir işaretin ayrıntı sayfası açıkken olası doğum noktalarını FFXIV'in haritasına ve mini haritasına ekler",
+  "hunts.nativeMapMarkersHint": "Deneysel: takip edilen bir av bulunan herhangi bir bölge için, Avlar uygulaması açık olsun ya da olmasın, olası doğum noktalarını FFXIV'in haritasına ve mini haritasına ekler",
   "hunts.nativeMapMarkersIndicator": "Av işaretleri açık",
   "hunts.nativeMapMarkersInstanceIndicator": "Şu anda {0}. örnek gösteriliyor",
   "hunts.nativeMapLegendCandidate": "Aday",

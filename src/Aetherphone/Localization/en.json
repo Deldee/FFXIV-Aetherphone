@@ -5855,7 +5855,7 @@
   "hunts.resetToDefault": "Reset to Default",
   "hunts.resetTutorial": "Reset Tutorial",
   "hunts.nativeMapMarkersLabel": "Show Map Markers",
-  "hunts.nativeMapMarkersHint": "Experimental: adds the candidate spawn points to FFXIV's own map and minimap while a mark's detail page is open",
+  "hunts.nativeMapMarkersHint": "Experimental: adds the candidate spawn points to FFXIV's own map and minimap for any zone with a tracked hunt, whether or not the Hunts app is open",
   "hunts.nativeMapMarkersIndicator": "Hunt markers on",
   "hunts.nativeMapMarkersInstanceIndicator": "Currently showing instance {0}",
   "hunts.nativeMapLegendCandidate": "Candidate",

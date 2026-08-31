@@ -5855,7 +5855,7 @@
   "hunts.resetToDefault": "恢复默认设置",
   "hunts.resetTutorial": "重置教程",
   "hunts.nativeMapMarkersLabel": "在地图上显示标记",
-  "hunts.nativeMapMarkersHint": "实验性功能：在打开标记详情页面时，将候选刷新点显示在FFXIV的地图和小地图上",
+  "hunts.nativeMapMarkersHint": "实验性功能：无论是否打开了狩猎应用，只要地图区域内有正在追踪的狩猎目标，就会在FFXIV的地图和小地图上显示候选刷新点",
   "hunts.nativeMapMarkersIndicator": "狩猎标记已启用",
   "hunts.nativeMapMarkersInstanceIndicator": "当前显示实例 {0}",
   "hunts.nativeMapLegendCandidate": "候选点",

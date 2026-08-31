@@ -5855,7 +5855,7 @@
   "hunts.resetToDefault": "Restablecer valores predeterminados",
   "hunts.resetTutorial": "Reiniciar tutorial",
   "hunts.nativeMapMarkersLabel": "Mostrar marcadores en el mapa",
-  "hunts.nativeMapMarkersHint": "Experimental: añade los puntos de aparición candidatos al mapa y minimapa de FFXIV mientras la página de detalles de una marca está abierta",
+  "hunts.nativeMapMarkersHint": "Experimental: añade los puntos de aparición candidatos al mapa y minimapa de FFXIV para cualquier zona con una caza rastreada, esté o no abierta la aplicación de Cacerías",
   "hunts.nativeMapMarkersIndicator": "Marcadores de caza activos",
   "hunts.nativeMapMarkersInstanceIndicator": "Mostrando actualmente la instancia {0}",
   "hunts.nativeMapLegendCandidate": "Candidato",

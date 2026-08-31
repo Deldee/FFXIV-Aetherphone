@@ -1228,7 +1228,7 @@ internal static class L
         public static readonly LocString NativeMapMarkersLabel =
             new("hunts.nativeMapMarkersLabel", "Show Map Markers");
         public static readonly LocString NativeMapMarkersHint = new("hunts.nativeMapMarkersHint",
-            "Experimental: adds the candidate spawn points to FFXIV's own map and minimap while a mark's detail page is open");
+            "Experimental: adds the candidate spawn points to FFXIV's own map and minimap for any zone with a tracked hunt, whether or not the Hunts app is open");
         public static readonly LocString NativeMapMarkersIndicator =
             new("hunts.nativeMapMarkersIndicator", "Hunt markers on");
         public static readonly LocString NativeMapMarkersInstanceIndicator = new(

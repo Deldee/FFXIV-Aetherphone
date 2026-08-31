@@ -5855,7 +5855,7 @@
   "hunts.resetToDefault": "Сбросить по умолчанию",
   "hunts.resetTutorial": "Сбросить обучение",
   "hunts.nativeMapMarkersLabel": "Показывать метки на карте",
-  "hunts.nativeMapMarkersHint": "Экспериментально: добавляет возможные точки появления на карту и миникарту FFXIV, пока открыта страница подробностей метки",
+  "hunts.nativeMapMarkersHint": "Экспериментально: добавляет возможные точки появления на карту и миникарту FFXIV для любой зоны с отслеживаемой охотой, независимо от того, открыто ли приложение Охот",
   "hunts.nativeMapMarkersIndicator": "Метки охоты включены",
   "hunts.nativeMapMarkersInstanceIndicator": "Сейчас отображается инстанс {0}",
   "hunts.nativeMapLegendCandidate": "Кандидат",
