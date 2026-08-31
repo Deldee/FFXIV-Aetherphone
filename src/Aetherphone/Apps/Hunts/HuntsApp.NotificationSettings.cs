@@ -76,6 +76,20 @@ internal sealed partial class HuntsApp
             markCard.End();
             Gap(20f);
 
+            var nativeMapMarkersCard = GroupCard.Begin(frameTheme, 1);
+            var nativeMapMarkersRow = nativeMapMarkersCard.NextRow();
+            var nativeMapMarkersValue = SettingsRow.Bool(nativeMapMarkersRow, Loc.T(L.Hunts.NativeMapMarkersLabel),
+                configuration.HuntsNativeMapMarkers, frameTheme, "hunts.notificationSettings.nativeMapMarkers",
+                Loc.T(L.Hunts.NativeMapMarkersHint));
+            if (nativeMapMarkersValue != configuration.HuntsNativeMapMarkers)
+            {
+                configuration.HuntsNativeMapMarkers = nativeMapMarkersValue;
+                configuration.Save();
+            }
+
+            nativeMapMarkersCard.End();
+            Gap(20f);
+
             var tutorialCard = GroupCard.Begin(frameTheme, 1);
             if (SettingsRow.Disclosure(tutorialCard.NextRow(), Loc.T(L.Hunts.ResetTutorial), string.Empty,
                     frameTheme))

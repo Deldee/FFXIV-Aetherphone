@@ -689,6 +689,7 @@ internal sealed partial class HuntsApp
         detailMapZoom.FocusOn(stage, textureSize, new Rect(min, max));
     }
 
+
     private void DrawSpawnDot(ImDrawListPtr drawList, Vector2 center, float scale, int poiId, bool confirmed,
         bool finalLocation, bool sighted, bool soleUnsightedCandidate)
     {

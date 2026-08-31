@@ -5854,6 +5854,8 @@
   "hunts.notificationSettingsRequiresLoginTooltip": "Connectez-vous à Faloop pour recevoir des notifications d'apparition en direct",
   "hunts.resetToDefault": "Réinitialiser par défaut",
   "hunts.resetTutorial": "Réinitialiser le tutoriel",
+  "hunts.nativeMapMarkersLabel": "Afficher les marqueurs sur la carte",
+  "hunts.nativeMapMarkersHint": "Expérimental : ajoute les points d'apparition possibles à la carte et à la minicarte de FFXIV pendant que la page de détail d'une marque est ouverte",
   "hunts.notifyModeDefault": "Par défaut",
   "hunts.notifyModeEnabled": "Activé",
   "hunts.notifyModeEnabledOnWorldValue": "Activé sur {0}",

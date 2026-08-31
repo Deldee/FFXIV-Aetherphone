@@ -56,6 +56,16 @@ internal readonly struct HuntSightingKey : IEquatable<HuntSightingKey>
         HashCode.Combine(MobId, StringComparer.OrdinalIgnoreCase.GetHashCode(WorldId), ZonePoiId);
 }
 
+internal enum HuntsMapMarkerState
+{
+    Candidate,
+    Sighted,
+    Confirmed,
+    Final,
+}
+
+internal readonly record struct HuntsMapMarkerPoint(float RawX, float RawY, HuntsMapMarkerState State);
+
 internal sealed class HuntsService : IDisposable
 {
     private const string AppId = "hunts";

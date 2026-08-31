@@ -5854,6 +5854,8 @@
   "hunts.notificationSettingsRequiresLoginTooltip": "Melde dich bei Faloop an, um Live-Spawn-Benachrichtigungen zu erhalten",
   "hunts.resetToDefault": "Auf Standard zurücksetzen",
   "hunts.resetTutorial": "Tutorial zurücksetzen",
+  "hunts.nativeMapMarkersLabel": "Kartenmarkierungen anzeigen",
+  "hunts.nativeMapMarkersHint": "Experimentell: Fügt der eigenen Karte und Minikarte von FFXIV die möglichen Spawnpunkte hinzu, während die Detailseite einer Marke geöffnet ist",
   "hunts.notifyModeDefault": "Standard",
   "hunts.notifyModeEnabled": "Aktiviert",
   "hunts.notifyModeEnabledOnWorldValue": "Aktiviert auf {0}",
