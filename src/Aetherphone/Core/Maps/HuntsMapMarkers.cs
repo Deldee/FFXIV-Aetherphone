@@ -14,6 +14,7 @@ internal sealed class HuntsMapMarkers : IDisposable
     private const uint SightedIconId = 60444u;
     private const uint ConfirmedIconId = 60403u;
     private const uint ActiveMinionIconId = 60424u;
+    private const uint SsSpawnIconId = 60422u;
     private const uint FateInactiveIconId = 63936u;
     private const uint FateActiveIconId = 63939u;
     private const int MarkerScale = 600;
@@ -193,6 +194,7 @@ internal sealed class HuntsMapMarkers : IDisposable
         HuntsMapMarkerState.Sighted => SightedIconId,
         HuntsMapMarkerState.Confirmed => ConfirmedIconId,
         HuntsMapMarkerState.ActiveMinion => ActiveMinionIconId,
+        HuntsMapMarkerState.SsSpawn => SsSpawnIconId,
         HuntsMapMarkerState.FateInactive => FateInactiveIconId,
         HuntsMapMarkerState.FateActive => FateActiveIconId,
         _ => CandidateIconId,

@@ -508,6 +508,7 @@ internal sealed partial class HuntsApp
             HuntsMapMarkerState.Confirmed => OpenBarColor,
             HuntsMapMarkerState.Sighted => ui.MutedInk,
             HuntsMapMarkerState.ActiveMinion => SpawnedBarColor,
+            HuntsMapMarkerState.SsSpawn => ui.Theme.Danger,
             _ => ui.Accent,
         };
         drawList.AddCircleFilled(center, MapDotRingRadius * scale, ImGui.GetColorU32(new Vector4(0f, 0f, 0f, 0.35f)),

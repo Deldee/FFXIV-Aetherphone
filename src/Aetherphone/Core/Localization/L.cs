@@ -1233,6 +1233,19 @@ internal static class L
             new("hunts.nativeMapMarkersIndicator", "Hunt markers on");
         public static readonly LocString NativeMapMarkersInstanceIndicator = new(
             "hunts.nativeMapMarkersInstanceIndicator", "Currently showing instance {0}");
+        public static readonly LocString NativeMapLegendCandidate = new("hunts.nativeMapLegendCandidate",
+            "Candidate");
+        public static readonly LocString NativeMapLegendSighted = new("hunts.nativeMapLegendSighted", "Sighted");
+        public static readonly LocString NativeMapLegendConfirmed = new("hunts.nativeMapLegendConfirmed",
+            "Confirmed");
+        public static readonly LocString NativeMapLegendActiveMinion = new("hunts.nativeMapLegendActiveMinion",
+            "SS minion");
+        public static readonly LocString NativeMapLegendSsSpawn = new("hunts.nativeMapLegendSsSpawn", "SS spawn");
+        public static readonly LocString NativeMapLegendFateInactive = new("hunts.nativeMapLegendFateInactive",
+            "FATE inactive");
+        public static readonly LocString NativeMapLegendFateActive = new("hunts.nativeMapLegendFateActive",
+            "FATE active");
+        public static readonly LocString NativeMapLegendToggle = new("hunts.nativeMapLegendToggle", "Legend");
         public static readonly LocString NotifyModeDefault = new("hunts.notifyModeDefault", "Default");
         public static readonly LocString NotifyModeEnabled = new("hunts.notifyModeEnabled", "Enabled");
         public static readonly LocString NotifyModeEnabledOnWorldValue =

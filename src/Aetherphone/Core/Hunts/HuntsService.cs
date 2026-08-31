@@ -93,6 +93,7 @@ internal enum HuntsMapMarkerState
     Sighted,
     Confirmed,
     ActiveMinion,
+    SsSpawn,
     FateInactive,
     FateActive,
 }

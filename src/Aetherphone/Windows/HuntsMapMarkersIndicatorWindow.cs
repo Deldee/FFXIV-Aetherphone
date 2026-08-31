@@ -1,4 +1,5 @@
 using Aetherphone.Core;
+using Aetherphone.Core.Apps;
 using Aetherphone.Core.Localization;
 using Aetherphone.Core.Maps;
 using Aetherphone.Core.Theme;
@@ -16,10 +17,17 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
                                                ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse |
                                                ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBackground |
                                                ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoFocusOnAppearing |
-                                               ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoSavedSettings |
-                                               ImGuiWindowFlags.NoInputs;
+                                               ImGuiWindowFlags.NoNavInputs | ImGuiWindowFlags.NoNavFocus |
+                                               ImGuiWindowFlags.NoSavedSettings;
 
     private const string AreaMapAddonName = "AreaMap";
+    private const uint CandidateIconId = 60557u;
+    private const uint SightedIconId = 60444u;
+    private const uint ConfirmedIconId = 60403u;
+    private const uint ActiveMinionIconId = 60424u;
+    private const uint SsSpawnIconId = 60422u;
+    private const uint FateInactiveIconId = 63936u;
+    private const uint FateActiveIconId = 63939u;
     private const float CornerInset = 10f;
     private const float ChipHeight = 28f;
     private const float SidePadding = 12f;
@@ -29,11 +37,26 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
     private const float TextScale = 0.8f;
     private const float InstanceTextScale = 0.7f;
     private const float InstanceRowGap = 3f;
+    private const float ToggleRowHeight = 20f;
+    private const float ToggleGap = 8f;
+    private const float ToggleTextScale = 0.72f;
+    private const float ToggleChevronWidth = 9f;
+    private const float ToggleChevronGap = 6f;
+    private const float ToggleChevronScale = 0.5f;
+    private const float LegendTopGap = 6f;
+    private const float LegendRowHeight = 30f;
+    private const float LegendIconSize = 25f;
+    private const float LegendIconBoost = 1.3f;
+    private const float LegendIconGap = 6f;
+    private const float LegendTextScale = 0.9f;
+    private const int LegendCount = 7;
+    private const float YOffset = 18f;
     private static readonly Vector4 White = new(1f, 1f, 1f, 1f);
 
     private readonly HuntsMapMarkers markers;
     private readonly ThemeProvider themes;
     private string? instanceLabel;
+    private bool legendExpanded;
 
     public HuntsMapMarkersIndicatorWindow(HuntsMapMarkers markers, ThemeProvider themes)
         : base($"{AepConstants.Name}##HuntsMapMarkersIndicator", ChipFlags)
@@ -52,7 +75,7 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
         var scale = UiScale.Global;
         var label = Loc.T(L.Hunts.NativeMapMarkersIndicator);
         var labelSize = Typography.Measure(label, TextScale, FontWeight.SemiBold);
-        var labelRowWidth = labelSize.X + (IconWidth + IconGap) * scale;
+        var headerRowWidth = (IconWidth + IconGap) * scale + labelSize.X;
 
         instanceLabel = markers.ShownInstance is { } instance
             ? string.Format(Loc.T(L.Hunts.NativeMapMarkersInstanceIndicator), instance)
@@ -61,18 +84,48 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
             ? Typography.Measure(instanceLabel, InstanceTextScale, FontWeight.Regular)
             : Vector2.Zero;
 
-        var contentWidth = MathF.Max(labelRowWidth, instanceSize.X);
+        var toggleLabel = Loc.T(L.Hunts.NativeMapLegendToggle);
+        var toggleTextSize = Typography.Measure(toggleLabel, ToggleTextScale, FontWeight.SemiBold);
+        var toggleRowWidth = toggleTextSize.X + (ToggleChevronGap + ToggleChevronWidth) * scale;
+
+        var legendRowWidth = 0f;
+        if (legendExpanded)
+        {
+            legendRowWidth = MathF.Max(legendRowWidth, LegendRowWidth(Loc.T(L.Hunts.NativeMapLegendCandidate), scale));
+            legendRowWidth = MathF.Max(legendRowWidth, LegendRowWidth(Loc.T(L.Hunts.NativeMapLegendSighted), scale));
+            legendRowWidth = MathF.Max(legendRowWidth, LegendRowWidth(Loc.T(L.Hunts.NativeMapLegendConfirmed), scale));
+            legendRowWidth =
+                MathF.Max(legendRowWidth, LegendRowWidth(Loc.T(L.Hunts.NativeMapLegendActiveMinion), scale));
+            legendRowWidth = MathF.Max(legendRowWidth, LegendRowWidth(Loc.T(L.Hunts.NativeMapLegendSsSpawn), scale));
+            legendRowWidth =
+                MathF.Max(legendRowWidth, LegendRowWidth(Loc.T(L.Hunts.NativeMapLegendFateInactive), scale));
+            legendRowWidth = MathF.Max(legendRowWidth, LegendRowWidth(Loc.T(L.Hunts.NativeMapLegendFateActive), scale));
+        }
+
+        var contentWidth = MathF.Max(headerRowWidth, MathF.Max(instanceSize.X, MathF.Max(toggleRowWidth, legendRowWidth)));
         var pixelWidth = contentWidth + SidePadding * 2f * scale;
-        var pixelHeight = instanceLabel is { Length: > 0 }
-            ? ChipHeight * scale + InstanceRowGap * scale + instanceSize.Y
-            : ChipHeight * scale;
+        var pixelHeight = ChipHeight * scale;
+        if (instanceLabel is { Length: > 0 })
+        {
+            pixelHeight += InstanceRowGap * scale + instanceSize.Y;
+        }
+
+        pixelHeight += ToggleGap * scale + ToggleRowHeight * scale;
+
+        if (legendExpanded)
+        {
+            pixelHeight += LegendTopGap * scale + LegendRowHeight * scale * LegendCount;
+        }
 
         Size = new Vector2(pixelWidth / scale, pixelHeight / scale);
         SizeCondition = ImGuiCond.Always;
         Position = new Vector2(mapPosition.X + mapSize.X - pixelWidth - CornerInset * scale,
-            mapPosition.Y + CornerInset * scale);
+            mapPosition.Y + (CornerInset + YOffset) * scale);
         PositionCondition = ImGuiCond.Always;
     }
+
+    private static float LegendRowWidth(string label, float scale) =>
+        (LegendIconSize + LegendIconGap) * scale + Typography.Measure(label, LegendTextScale, FontWeight.Regular).X;
 
     public override void Draw()
     {
@@ -80,10 +133,10 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
         var theme = themes.Chrome;
         var min = ImGui.GetWindowPos();
         var max = min + ImGui.GetWindowSize();
-        DrawChip(theme, min, max, scale, instanceLabel);
+        DrawChip(theme, min, max, scale);
     }
 
-    private static void DrawChip(PhoneTheme theme, Vector2 min, Vector2 max, float scale, string? instanceLabel)
+    private void DrawChip(PhoneTheme theme, Vector2 min, Vector2 max, float scale)
     {
         var drawList = ImGui.GetForegroundDrawList();
         var rounding = ChipHeight * scale * 0.5f;
@@ -92,26 +145,99 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
         Squircle.Fill(drawList, min, max, rounding, ImGui.GetColorU32(surface));
         Squircle.Stroke(drawList, min, max, rounding, ImGui.GetColorU32(new Vector4(1f, 1f, 1f, 0.18f)), scale);
         var ink = White;
+
+        var headerMin = min;
+        var headerMax = new Vector2(max.X, min.Y + ChipHeight * scale);
         var label = Loc.T(L.Hunts.NativeMapMarkersIndicator);
         var labelSize = Typography.Measure(label, TextScale, FontWeight.SemiBold);
-        var labelRowWidth = labelSize.X + (IconWidth + IconGap) * scale;
-        var labelLeft = (min.X + max.X) * 0.5f - labelRowWidth * 0.5f;
-        var labelRowCenterY = min.Y + ChipHeight * scale * 0.5f;
-        AppSkin.Icon(drawList, new Vector2(labelLeft + IconWidth * 0.5f * scale, labelRowCenterY),
+        var contentLeft = min.X + SidePadding * scale;
+        var headerCenterY = (headerMin.Y + headerMax.Y) * 0.5f;
+        AppSkin.Icon(drawList, new Vector2(contentLeft + IconWidth * 0.5f * scale, headerCenterY),
             FontAwesomeIcon.MapMarkerAlt.ToIconString(), ink, IconScale);
-        Typography.Draw(drawList, new Vector2(labelLeft + (IconWidth + IconGap) * scale, labelRowCenterY - labelSize.Y * 0.5f),
-            label, ink, TextScale, FontWeight.SemiBold);
+        Typography.Draw(drawList,
+            new Vector2(contentLeft + (IconWidth + IconGap) * scale, headerCenterY - labelSize.Y * 0.5f), label, ink,
+            TextScale, FontWeight.SemiBold);
 
-        if (instanceLabel is not { Length: > 0 })
+        var top = headerMax.Y;
+        if (instanceLabel is { Length: > 0 })
+        {
+            var instanceSize = Typography.Measure(instanceLabel, InstanceTextScale, FontWeight.Regular);
+            var instanceLeft = (min.X + max.X) * 0.5f - instanceSize.X * 0.5f;
+            top += InstanceRowGap * scale;
+            Typography.Draw(drawList, new Vector2(instanceLeft, top), instanceLabel,
+                new Vector4(ink.X, ink.Y, ink.Z, 0.75f), InstanceTextScale, FontWeight.Regular);
+            top += instanceSize.Y;
+        }
+
+        top += ToggleGap * scale;
+        var toggleMin = new Vector2(min.X, top);
+        var toggleMax = new Vector2(max.X, top + ToggleRowHeight * scale);
+        var toggleHovered = ImGui.IsMouseHoveringRect(toggleMin, toggleMax);
+        if (toggleHovered)
+        {
+            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+            {
+                legendExpanded = !legendExpanded;
+            }
+        }
+
+        DrawToggleRow(drawList, toggleMin, toggleMax, scale, ink, legendExpanded);
+        top = toggleMax.Y;
+
+        if (!legendExpanded)
         {
             return;
         }
 
-        var instanceSize = Typography.Measure(instanceLabel, InstanceTextScale, FontWeight.Regular);
-        var instanceLeft = (min.X + max.X) * 0.5f - instanceSize.X * 0.5f;
-        var instanceTop = min.Y + ChipHeight * scale + InstanceRowGap * scale;
-        Typography.Draw(drawList, new Vector2(instanceLeft, instanceTop), instanceLabel,
-            new Vector4(ink.X, ink.Y, ink.Z, 0.75f), InstanceTextScale, FontWeight.Regular);
+        top += LegendTopGap * scale;
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, CandidateIconId,
+            Loc.T(L.Hunts.NativeMapLegendCandidate), boosted: true);
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, SightedIconId, Loc.T(L.Hunts.NativeMapLegendSighted),
+            boosted: true);
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, ConfirmedIconId,
+            Loc.T(L.Hunts.NativeMapLegendConfirmed), boosted: true);
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, ActiveMinionIconId,
+            Loc.T(L.Hunts.NativeMapLegendActiveMinion), boosted: true);
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, SsSpawnIconId, Loc.T(L.Hunts.NativeMapLegendSsSpawn),
+            boosted: true);
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, FateInactiveIconId,
+            Loc.T(L.Hunts.NativeMapLegendFateInactive), boosted: false);
+        DrawLegendRow(drawList, contentLeft, ref top, scale, ink, FateActiveIconId,
+            Loc.T(L.Hunts.NativeMapLegendFateActive), boosted: false);
+    }
+
+    private static void DrawToggleRow(ImDrawListPtr drawList, Vector2 min, Vector2 max, float scale, Vector4 ink,
+        bool expanded)
+    {
+        var label = Loc.T(L.Hunts.NativeMapLegendToggle);
+        var labelSize = Typography.Measure(label, ToggleTextScale, FontWeight.SemiBold);
+        var rowWidth = labelSize.X + (ToggleChevronGap + ToggleChevronWidth) * scale;
+        var rowLeft = (min.X + max.X) * 0.5f - rowWidth * 0.5f;
+        var rowCenterY = (min.Y + max.Y) * 0.5f;
+        var toggleInk = new Vector4(ink.X, ink.Y, ink.Z, 0.85f);
+        Typography.Draw(drawList, new Vector2(rowLeft, rowCenterY - labelSize.Y * 0.5f), label, toggleInk,
+            ToggleTextScale, FontWeight.SemiBold);
+        var chevronIcon = expanded ? FontAwesomeIcon.ChevronUp : FontAwesomeIcon.ChevronDown;
+        var chevronCenterX = rowLeft + labelSize.X + ToggleChevronGap * scale + ToggleChevronWidth * 0.5f * scale;
+        AppSkin.Icon(drawList, new Vector2(chevronCenterX, rowCenterY), chevronIcon.ToIconString(), toggleInk,
+            ToggleChevronScale);
+    }
+
+    private static void DrawLegendRow(ImDrawListPtr drawList, float contentLeft, ref float top, float scale,
+        Vector4 ink, uint iconId, string label, bool boosted)
+    {
+        var rowCenterY = top + LegendRowHeight * scale * 0.5f;
+        var slotCenterX = contentLeft + LegendIconSize * 0.5f * scale;
+        var drawnSize = boosted ? LegendIconSize * LegendIconBoost : LegendIconSize;
+        var iconMin = new Vector2(slotCenterX - drawnSize * 0.5f * scale, rowCenterY - drawnSize * 0.5f * scale);
+        var iconMax = iconMin + new Vector2(drawnSize * scale, drawnSize * scale);
+        GameIconTile.Draw(drawList, Plugin.TextureProvider, iconId, iconMin, iconMax, 3f * scale, scale);
+        var labelSize = Typography.Measure(label, LegendTextScale, FontWeight.Regular);
+        Typography.Draw(drawList,
+            new Vector2(contentLeft + (LegendIconSize + LegendIconGap) * scale, rowCenterY - labelSize.Y * 0.5f),
+            label, new Vector4(ink.X, ink.Y, ink.Z, 0.9f), LegendTextScale, FontWeight.Regular);
+        top += LegendRowHeight * scale;
     }
 
     private static bool TryGetAreaMapBounds(out Vector2 position, out Vector2 size)

@@ -164,6 +164,7 @@ internal static class HuntCandidateResolver
         var spawned = hunts.IsSpawned(mob.Id, worldId, zoneInstance);
         var finalLocationResolved = spawned && finalPhase && zoneConfirmed && points.Count == 1;
         var isActiveSsMinion = mob.Rank == "SS" && zoneConfirmed && !finalPhase;
+        var isActiveSsSpawn = mob.Rank == "SS" && zoneConfirmed && finalPhase;
 
         if (spawned)
         {
@@ -204,6 +205,10 @@ internal static class HuntCandidateResolver
             {
                 state = HuntsMapMarkerState.ActiveMinion;
             }
+            else if (isActiveSsSpawn)
+            {
+                state = HuntsMapMarkerState.SsSpawn;
+            }
             else
             {
                 state = HuntsMapMarkerState.Candidate;
@@ -227,7 +232,7 @@ internal static class HuntCandidateResolver
             }
             else
             {
-                previewState = HuntsMapMarkerState.Candidate;
+                previewState = HuntsMapMarkerState.SsSpawn;
             }
 
             results.Add(new HuntPoiState(finalPoint, previewState));
@@ -388,6 +393,7 @@ internal static class HuntCandidateResolver
         HuntsMapMarkerState.Confirmed => 3,
         HuntsMapMarkerState.Sighted => 2,
         HuntsMapMarkerState.ActiveMinion => 1,
+        HuntsMapMarkerState.SsSpawn => 1,
         HuntsMapMarkerState.FateActive => 1,
         _ => 0,
     };
