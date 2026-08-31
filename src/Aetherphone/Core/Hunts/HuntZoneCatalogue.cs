@@ -74,7 +74,7 @@ internal sealed class HuntZoneCatalog
         foreach (var zone in byId.Values)
         {
             var territoryId = ResolveTerritoryId(zone.Id);
-            if (territoryId != 0)
+            if (territoryId != 0 && !lookup.ContainsKey(territoryId))
             {
                 lookup[territoryId] = zone.Id;
             }
