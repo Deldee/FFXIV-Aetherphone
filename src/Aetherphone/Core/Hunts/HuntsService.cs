@@ -1344,6 +1344,11 @@ internal sealed class HuntsService : IDisposable
                 return;
             }
         }
+        else if (startedAtSniped is null && startedAtNormal is { } unshiftedStartedAt &&
+                 data.SnipedNum is { } snipes && snipes > 0)
+        {
+            startedAtSniped = ShiftStartedAtBySnipes(identity, num, unshiftedStartedAt, snipes);
+        }
 
         var window = new HuntWindowDto
         {
@@ -1491,6 +1496,22 @@ internal sealed class HuntsService : IDisposable
         var shiftHours = maintenanceMin + normal.Min * (snipes - 1);
         startedAtSniped = worldMaintenanceStart + TimeSpan.FromHours(shiftHours);
         return true;
+    }
+
+    private DateTimeOffset? ShiftStartedAtBySnipes(HuntsSocketMobIdentity identity, int num,
+        DateTimeOffset unshiftedStartedAt, int snipes)
+    {
+        var mob = mobCatalog.Find(identity.MobId);
+        var index = num - 1;
+        var windowDef = mob is { Windows.Length: > 0 }
+            ? (index >= 0 && index < mob.Windows.Length ? mob.Windows[index] : mob.Windows[0])
+            : null;
+        if (windowDef?.Timing?.Normal is not { } normal)
+        {
+            return null;
+        }
+
+        return unshiftedStartedAt + TimeSpan.FromHours(normal.Min * snipes);
     }
 
     private static bool ContainsWorld(string[] worlds, string worldId)
