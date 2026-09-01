@@ -25,6 +25,11 @@ internal sealed class WalletApp : IPhoneApp
     {
         get
         {
+            if (!configuration.IsAppBadgeEnabled(Id))
+            {
+                return 0;
+            }
+
             var now = Environment.TickCount64;
             if (now >= nextBadgeTick)
             {

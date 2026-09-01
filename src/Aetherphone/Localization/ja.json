@@ -3582,8 +3582,6 @@
   "onboarding.timersRemindersBody": "トグルをオンにすると、リセットが来たときやリテイナーベンチャーが完了したときに電話が知らせてくれます。",
   "onboarding.dailiesCadenceTitle": "2つのリズム",
   "onboarding.dailiesCadenceBody": "日課と週課に分かれています。ここをタップすると週課のリストに切り替わります。",
-  "onboarding.dailiesBadgeTitle": "バッジを静かに",
-  "onboarding.dailiesBadgeBody": "ホーム画面のアイコンには残りのタスク数が表示されます。オフにすれば、アプリを開くまで静かなままです。",
   "onboarding.fishingHeroTitle": "次の航海",
   "onboarding.fishingHeroBody": "このカードには次の乗船受付が表示され、航路と時間帯、出港までのカウントダウンを確認できます。",
   "onboarding.fishingBlueTitle": "この航路の伝説魚",

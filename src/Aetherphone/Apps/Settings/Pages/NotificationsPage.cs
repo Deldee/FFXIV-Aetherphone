@@ -144,11 +144,16 @@ internal sealed class NotificationsPage : ISettingsPage
 
     private string Summarize(AppSettingsEntry entry)
     {
-        if (entry.HasChannel)
+        if (entry.HasChannel && !configuration.IsAppNotificationEnabled(entry.AppId))
         {
-            return configuration.IsAppNotificationEnabled(entry.AppId) ? string.Empty : Loc.T(L.Settings.NotificationsOff);
+            return Loc.T(L.Settings.NotificationsOff);
         }
 
-        return configuration.IsAppBadgeEnabled(entry.AppId) ? string.Empty : Loc.T(L.Settings.NotificationsOff);
+        if (entry.HasBadge && !configuration.IsAppBadgeEnabled(entry.AppId))
+        {
+            return Loc.T(L.Settings.NotificationsOff);
+        }
+
+        return string.Empty;
     }
 }

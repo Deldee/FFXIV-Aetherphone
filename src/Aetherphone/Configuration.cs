@@ -27,6 +27,7 @@ using Aetherphone.Core.Venues;
 using Aetherphone.Core.Video;
 using Aetherphone.Core.Wallpapers;
 using Dalamud.Configuration;
+using Newtonsoft.Json;
 
 namespace Aetherphone;
 
@@ -96,9 +97,9 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public bool NotifyWeeklyReset { get; set; }
     public bool NotifyGrandCompanyReset { get; set; }
     public bool NotifyRetainerVentures { get; set; }
-    public bool LegacyShowWalletBadge { get; set; } = true;
-    public bool LegacyShowDailiesBadge { get; set; } = true;
-    public bool LegacyShowActivityBadge { get; set; } = true;
+    [JsonProperty("ShowWalletBadge")] public bool LegacyShowWalletBadge { get; set; } = true;
+    [JsonProperty("ShowDailiesBadge")] public bool LegacyShowDailiesBadge { get; set; } = true;
+    [JsonProperty("ShowActivityBadge")] public bool LegacyShowActivityBadge { get; set; } = true;
     public Dictionary<string, bool> BadgeSettings { get; set; } = new();
     public bool BadgeSettingsMigrated { get; set; }
     public List<DailyCheckRecord> DailyChecks { get; set; } = new();
