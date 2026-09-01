@@ -1530,6 +1530,7 @@ internal static class L
         public static readonly LocString NotificationApps = new("settings.notificationApps", "Apps");
         public static readonly LocString AllowNotifications = new("settings.allowNotifications", "Allow Notifications");
         public static readonly LocString NotificationsOff = new("settings.notificationsOff", "Off");
+        public static readonly LocString ShowBadge = new("settings.showBadge", "Show badge");
         public static readonly LocString SoundDefault = new("settings.soundDefault", "Default");
         public static readonly LocString General = new("settings.general", "General");
         public static readonly LocString Startup = new("settings.startup", "Startup");
@@ -3770,8 +3771,6 @@ internal static class L
         public static readonly LocString RingClosedBody = new("character.ringClosedBody", "You reached today's goal.");
         public static readonly LocString AllRingsTitle = new("character.allRingsTitle", "All rings closed");
         public static readonly LocString AllRingsBody = new("character.allRingsBody", "You hit all three goals today. Perfect day!");
-        public static readonly LocString ShowBadge = new("character.showBadge", "Show retainer ventures badge");
-        public static readonly LocString HideBadge = new("character.hideBadge", "Hide retainer ventures badge");
     }
 
     internal static class Camera
@@ -4676,8 +4675,6 @@ internal static class L
         public static readonly LocString NothingLeft = new("dailies.nothingLeft", "Nothing left to do");
         public static readonly LocString Remaining = new("dailies.remaining", "{0} remaining");
         public static readonly LocString Resets = new("dailies.resets", "Resets {0}");
-        public static readonly LocString ShowBadge = new("dailies.showBadge", "Show badge");
-        public static readonly LocString ShowBadgeNote = new("dailies.showBadgeNote", "Count unfinished tasks on the Home icon");
         public static readonly LocString AutoTracked = new("dailies.autoTracked", "Auto");
         public static readonly LocString DutyRoulettes = new("dailies.dutyRoulettes", "Duty Roulettes");
         public static readonly LocString BeastTribe = new("dailies.beastTribe", "Tribal Quests");
@@ -4841,8 +4838,6 @@ internal static class L
         public static readonly LocString SectionPvp = new("wallet.sectionPvp", "PvP");
         public static readonly LocString SectionCrafting = new("wallet.sectionCrafting", "Crafting & Gathering");
         public static readonly LocString SectionOther = new("wallet.sectionOther", "Other");
-        public static readonly LocString ShowBadge = new("wallet.showBadge", "Show badge");
-        public static readonly LocString HideBadge = new("wallet.hideBadge", "Hide badge");
     }
 
     internal static class Jobs

@@ -31,11 +31,13 @@ internal static class HomeTileView
         }
 
         DrawLabel(center, size, app.DisplayName, theme, scale, labelAlpha, showLabels, labelWidth, zoom);
-        if (app.BadgeCount > 0)
+        if (app.BadgeCount > 0 && IsBadgeVisible(app))
         {
             DrawBadge(center, size, app.BadgeCount, app.BadgeAsDot, theme, scale);
         }
     }
+
+    private static bool IsBadgeVisible(IPhoneApp app) => !app.HasBadge || Plugin.Cfg.IsAppBadgeEnabled(app.Id);
 
     public static void DrawShortcut(Vector2 center, float size, ShortcutEntry shortcut, IDalamudTextureWrap? icon,
         PhoneTheme theme, float drawScale, float labelAlpha, bool showLabels, float labelWidth, float zoom = 1f)
@@ -91,7 +93,7 @@ internal static class HomeTileView
         for (var memberIndex = 0; memberIndex < folder.Members.Count; memberIndex++)
         {
             var folderApp = folder.Members[memberIndex].App;
-            if (folderApp is null || folderApp.BadgeCount <= 0)
+            if (folderApp is null || folderApp.BadgeCount <= 0 || !IsBadgeVisible(folderApp))
             {
                 continue;
             }

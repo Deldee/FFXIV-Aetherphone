@@ -96,9 +96,11 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public bool NotifyWeeklyReset { get; set; }
     public bool NotifyGrandCompanyReset { get; set; }
     public bool NotifyRetainerVentures { get; set; }
-    public bool ShowWalletBadge { get; set; } = true;
-    public bool ShowDailiesBadge { get; set; } = true;
-    public bool ShowActivityBadge { get; set; } = true;
+    public bool LegacyShowWalletBadge { get; set; } = true;
+    public bool LegacyShowDailiesBadge { get; set; } = true;
+    public bool LegacyShowActivityBadge { get; set; } = true;
+    public Dictionary<string, bool> BadgeSettings { get; set; } = new();
+    public bool BadgeSettingsMigrated { get; set; }
     public List<DailyCheckRecord> DailyChecks { get; set; } = new();
     public float ActivityGoalLevels { get; set; } = 1f;
     public int ActivityGoalDuties { get; set; } = 3;
@@ -721,6 +723,40 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
             : null;
 
     public string ResolveNotificationToken(string appId) => AppSoundOverride(appId) ?? NotificationSound;
+
+    public bool IsAppBadgeEnabled(string appId) =>
+        !BadgeSettings.TryGetValue(appId, out var enabled) || enabled;
+
+    public void SetAppBadgeEnabled(string appId, bool enabled)
+    {
+        BadgeSettings[appId] = enabled;
+    }
+
+    public void MigrateBadgeSettings()
+    {
+        if (BadgeSettingsMigrated)
+        {
+            return;
+        }
+
+        if (!LegacyShowWalletBadge)
+        {
+            BadgeSettings["wallet"] = false;
+        }
+
+        if (!LegacyShowDailiesBadge)
+        {
+            BadgeSettings["dailies"] = false;
+        }
+
+        if (!LegacyShowActivityBadge)
+        {
+            BadgeSettings["character"] = false;
+        }
+
+        BadgeSettingsMigrated = true;
+        Save();
+    }
 
     public void MigrateSoundSettings()
     {

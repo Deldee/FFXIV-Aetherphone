@@ -182,9 +182,9 @@ Because `OnOpened` re-fires, treat it as re-entrant: reset first, then consume. 
 
 ## Badges
 
-Badges on home screen tiles come from `IPhoneApp.BadgeCount` (src/Aetherphone/Core/Apps/IPhoneApp.cs), drawn by `HomeTileView` (src/Aetherphone/Windows/Components/HomeTileView.cs). `BadgeAsDot` swaps the number for a dot (Settings uses it for the unseen changelog marker). Folder tiles combine the badges of the apps inside.
+Badges on home screen tiles come from `IPhoneApp.BadgeCount` (src/Aetherphone/Core/Apps/IPhoneApp.cs), drawn by `HomeTileView` (src/Aetherphone/Windows/Components/Chrome/HomeTileView.cs). `BadgeAsDot` swaps the number for a dot (Settings uses it for the unseen changelog marker). Folder tiles combine the badges of the apps inside.
 
-Badges are **not** driven by the notification center. Each app computes its own unread state:
+Badges are **not** driven by the notification center. Each app still computes its own unread number:
 
 | App | BadgeCount source |
 | --- | --- |
@@ -195,6 +195,12 @@ Badges are **not** driven by the notification center. Each app computes its own 
 | AnnouncementsApp | `store.UnreadCount` |
 
 For social apps, `SocialNotificationService.UnseenCount` prefers the server's `UnreadByApp` counts from the notification poll, with one override: while an acknowledgement is still queued for flush, the pending ack watermark wins over the server count, so the badge does not bounce back up between the ack and the next poll. With no server counts at all it falls back to counting items newer than the per-account watermark stored in `Configuration.SocialActivitySeenUnix`. Opening an app's activity screen calls `MarkSeen(appId)`, which clears the local count, removes that app's social notifications from the center, and sends a read acknowledgement to the backend when the watermark actually advanced, or, when the server still reported unread for that app, an acknowledgement up to the current time even though the local watermark stayed put. Tapping a single notification acknowledges only up to that item (`AcknowledgeUpTo`).
+
+### Hiding a badge
+
+Whether the count actually reaches the tile is a separate, generic on/off switch: `IPhoneApp.HasBadge` (default `false`) opts an app into it, and the enabled state lives in `Configuration.BadgeSettings`, a `Dictionary<string, bool>` keyed by app id with the same missing-entry-means-on default as `NotificationSettings` (`Configuration.IsAppBadgeEnabled`/`SetAppBadgeEnabled`). `HomeTileView` checks it centrally before drawing, so an app with `HasBadge` never needs to gate its own `BadgeCount` getter.
+
+The toggle is not a separate screen: Settings > Notifications (`NotificationsPage`) builds one row per app from the live app list (`AppBundle.Apps`, threaded into `SettingsApp`/`NotificationsPage` the same way it already reaches `AppStoreApp`), showing any app that either has a notification channel (`NotificationChannels.Contains`) or `HasBadge`. `AppNotificationPage` then draws whichever sections apply to that app: the alerts/sound sections only when it has a channel, a "Show badge" row under Home Screen only when `HasBadge` is true. An app can have either, both, or (for most apps, which set neither) no row at all.
 
 The minimized phone also shows `NotificationService.UnreadCount` as a badge (`MinimizedPhone.DrawBadge` in src/Aetherphone/Windows/Components/MinimizedPhone.cs).
 

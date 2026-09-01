@@ -101,6 +101,7 @@ public sealed class Plugin : IDalamudPlugin
             Cfg.MigrateSoundSettings();
             Cfg.MigrateUiSoundDefaults(freshInstall);
             Cfg.MigrateChangelogSeen();
+            Cfg.MigrateBadgeSettings();
             Cfg.MigrateMessage();
             Cfg.MigrateMessagesMerge();
             Cfg.MigrateSetupCompleted();
