@@ -689,7 +689,7 @@
   "settings.phoneSize": "手机尺寸",
   "settings.clockFormat": "时钟",
   "settings.use24HourClock": "24 小时制",
-  "settings.notifications": "通知",
+  "settings.notifications": "通知和角标",
   "settings.doNotDisturb": "免打扰",
   "settings.vibration": "振动",
   "settings.vibrationHint": "收到通知时，手机会短暂振动。",

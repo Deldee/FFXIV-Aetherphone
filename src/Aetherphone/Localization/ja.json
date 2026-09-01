@@ -689,7 +689,7 @@
   "settings.phoneSize": "電話のサイズ",
   "settings.clockFormat": "時計",
   "settings.use24HourClock": "24時間表示",
-  "settings.notifications": "通知",
+  "settings.notifications": "通知とバッジ",
   "settings.doNotDisturb": "おやすみモード",
   "settings.vibration": "バイブレーション",
   "settings.vibrationHint": "通知が届くと電話が少し振動します。",

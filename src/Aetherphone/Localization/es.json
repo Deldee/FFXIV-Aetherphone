@@ -689,7 +689,7 @@
   "settings.phoneSize": "Tamaño del teléfono",
   "settings.clockFormat": "Reloj",
   "settings.use24HourClock": "Formato de 24 horas",
-  "settings.notifications": "Notificaciones",
+  "settings.notifications": "Notificaciones y globos",
   "settings.doNotDisturb": "No molestar",
   "settings.vibration": "Vibración",
   "settings.vibrationHint": "El teléfono vibra brevemente cuando llega una notificación.",

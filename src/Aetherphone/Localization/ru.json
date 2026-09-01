@@ -689,7 +689,7 @@
   "settings.phoneSize": "Размер телефона",
   "settings.clockFormat": "Часы",
   "settings.use24HourClock": "24-часовой формат",
-  "settings.notifications": "Уведомления",
+  "settings.notifications": "Уведомления и значки",
   "settings.doNotDisturb": "Не беспокоить",
   "settings.vibration": "Вибрация",
   "settings.vibrationHint": "Телефон коротко вздрагивает при поступлении уведомления.",

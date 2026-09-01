@@ -689,7 +689,7 @@
   "settings.phoneSize": "Phone Size",
   "settings.clockFormat": "Clock",
   "settings.use24HourClock": "24-hour time",
-  "settings.notifications": "Notifications",
+  "settings.notifications": "Notifications and Badges",
   "settings.doNotDisturb": "Do Not Disturb",
   "settings.vibration": "Vibration",
   "settings.vibrationHint": "The phone shakes briefly when a notification arrives.",

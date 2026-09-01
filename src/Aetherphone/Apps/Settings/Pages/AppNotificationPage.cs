@@ -34,31 +34,43 @@ internal sealed class AppNotificationPage : ISettingsPage
         var scale = UiScale.Current;
         using (AppSurface.Begin(body))
         {
-            var drewAlerts = DrawAlertsSection(theme, scale);
-            if (!entry.HasBadge)
+            var wasEnabled = entry.HasChannel && configuration.IsAppNotificationEnabled(entry.AppId);
+            var drewPrevious = false;
+            if (entry.HasChannel)
             {
-                return;
+                DrawAlertsSection(theme, wasEnabled);
+                drewPrevious = true;
             }
 
-            if (drewAlerts)
+            if (entry.HasBadge)
             {
-                ImGui.Dummy(new Vector2(0f, Metrics.Space.Lg * scale));
+                if (drewPrevious)
+                {
+                    ImGui.Dummy(new Vector2(0f, Metrics.Space.Lg * scale));
+                }
+
+                DrawBadgeSection(theme);
+                drewPrevious = true;
             }
 
-            DrawBadgeSection(theme);
+            if (wasEnabled)
+            {
+                if (drewPrevious)
+                {
+                    ImGui.Dummy(new Vector2(0f, Metrics.Space.Lg * scale));
+                }
+
+                SettingsSection.Header(Loc.T(L.Settings.Sound), theme);
+                SoundOptionList.Draw(theme, sound, SoundKind.Notification, configuration.AppSoundOverride(entry.AppId),
+                    true, Select);
+            }
         }
     }
 
-    private bool DrawAlertsSection(PhoneTheme theme, float scale)
+    private void DrawAlertsSection(PhoneTheme theme, bool wasEnabled)
     {
-        if (!entry.HasChannel)
-        {
-            return false;
-        }
-
         SettingsSection.Header(Loc.T(L.Common.Alerts), theme);
         var appSetting = configuration.NotificationSettingFor(entry.AppId);
-        var wasEnabled = configuration.IsAppNotificationEnabled(entry.AppId);
         var card = GroupCard.Begin(theme, wasEnabled ? 2 : 1);
         var enabled = SettingsRow.Bool(card.NextRow(), Loc.T(L.Settings.AllowNotifications), wasEnabled, theme);
 
@@ -79,17 +91,6 @@ internal sealed class AppNotificationPage : ISettingsPage
             appSetting.Enabled = enabled;
             configuration.Save();
         }
-
-        if (!wasEnabled)
-        {
-            return true;
-        }
-
-        ImGui.Dummy(new Vector2(0f, Metrics.Space.Lg * scale));
-        SettingsSection.Header(Loc.T(L.Settings.Sound), theme);
-        SoundOptionList.Draw(theme, sound, SoundKind.Notification, configuration.AppSoundOverride(entry.AppId),
-            true, Select);
-        return true;
     }
 
     private void DrawBadgeSection(PhoneTheme theme)
