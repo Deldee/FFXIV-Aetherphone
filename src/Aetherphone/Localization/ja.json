@@ -700,6 +700,8 @@
   "settings.notificationApps": "アプリ",
   "settings.allowNotifications": "通知を許可",
   "settings.notificationsOff": "オフ",
+  "settings.notificationOnly": "通知のみ",
+  "settings.badgeOnly": "バッジのみ",
   "settings.showBadge": "バッジを表示",
   "settings.soundDefault": "デフォルト",
   "settings.general": "一般",

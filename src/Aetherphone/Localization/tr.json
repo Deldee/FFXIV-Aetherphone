@@ -700,6 +700,8 @@
   "settings.notificationApps": "Uygulamalar",
   "settings.allowNotifications": "Bildirimlere İzin Ver",
   "settings.notificationsOff": "Kapalı",
+  "settings.notificationOnly": "Sadece bildirim",
+  "settings.badgeOnly": "Sadece rozet",
   "settings.showBadge": "Rozeti göster",
   "settings.soundDefault": "Varsayılan",
   "settings.general": "Genel",

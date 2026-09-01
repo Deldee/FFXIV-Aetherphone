@@ -700,6 +700,8 @@
   "settings.notificationApps": "Applications",
   "settings.allowNotifications": "Autoriser les notifications",
   "settings.notificationsOff": "Désactivé",
+  "settings.notificationOnly": "Notification seulement",
+  "settings.badgeOnly": "Pastille seulement",
   "settings.showBadge": "Afficher la pastille",
   "settings.soundDefault": "Par défaut",
   "settings.general": "Général",

@@ -1530,6 +1530,8 @@ internal static class L
         public static readonly LocString NotificationApps = new("settings.notificationApps", "Apps");
         public static readonly LocString AllowNotifications = new("settings.allowNotifications", "Allow Notifications");
         public static readonly LocString NotificationsOff = new("settings.notificationsOff", "Off");
+        public static readonly LocString NotificationOnly = new("settings.notificationOnly", "Notification only");
+        public static readonly LocString BadgeOnly = new("settings.badgeOnly", "Badge only");
         public static readonly LocString ShowBadge = new("settings.showBadge", "Show badge");
         public static readonly LocString SoundDefault = new("settings.soundDefault", "Default");
         public static readonly LocString General = new("settings.general", "General");

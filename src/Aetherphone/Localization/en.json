@@ -700,6 +700,8 @@
   "settings.notificationApps": "Apps",
   "settings.allowNotifications": "Allow Notifications",
   "settings.notificationsOff": "Off",
+  "settings.notificationOnly": "Notification only",
+  "settings.badgeOnly": "Badge only",
   "settings.showBadge": "Show badge",
   "settings.soundDefault": "Default",
   "settings.general": "General",

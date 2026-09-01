@@ -700,6 +700,8 @@
   "settings.notificationApps": "Apps",
   "settings.allowNotifications": "Permitir notificações",
   "settings.notificationsOff": "Desativado",
+  "settings.notificationOnly": "Apenas notificação",
+  "settings.badgeOnly": "Apenas contador",
   "settings.showBadge": "Mostrar contador",
   "settings.soundDefault": "Padrão",
   "settings.general": "Geral",

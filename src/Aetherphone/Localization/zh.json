@@ -700,6 +700,8 @@
   "settings.notificationApps": "应用",
   "settings.allowNotifications": "允许通知",
   "settings.notificationsOff": "关闭",
+  "settings.notificationOnly": "仅通知",
+  "settings.badgeOnly": "仅角标",
   "settings.showBadge": "显示角标",
   "settings.soundDefault": "默认",
   "settings.general": "通用",

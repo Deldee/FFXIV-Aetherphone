@@ -700,6 +700,8 @@
   "settings.notificationApps": "Apps",
   "settings.allowNotifications": "Permitir notificaciones",
   "settings.notificationsOff": "Desactivado",
+  "settings.notificationOnly": "Solo notificación",
+  "settings.badgeOnly": "Solo globo",
   "settings.showBadge": "Mostrar globo",
   "settings.soundDefault": "Predeterminado",
   "settings.general": "General",

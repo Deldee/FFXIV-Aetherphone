@@ -700,6 +700,8 @@
   "settings.notificationApps": "Apps",
   "settings.allowNotifications": "Mitteilungen erlauben",
   "settings.notificationsOff": "Aus",
+  "settings.notificationOnly": "Nur Mitteilung",
+  "settings.badgeOnly": "Nur Kennzeichen",
   "settings.showBadge": "Kennzeichen anzeigen",
   "settings.soundDefault": "Standard",
   "settings.general": "Allgemein",

@@ -700,6 +700,8 @@
   "settings.notificationApps": "Приложения",
   "settings.allowNotifications": "Разрешить уведомления",
   "settings.notificationsOff": "Выкл.",
+  "settings.notificationOnly": "Только уведомление",
+  "settings.badgeOnly": "Только значок",
   "settings.showBadge": "Показать значок",
   "settings.soundDefault": "По умолчанию",
   "settings.general": "Основные",
