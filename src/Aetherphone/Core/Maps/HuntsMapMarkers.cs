@@ -34,6 +34,8 @@ internal sealed class HuntsMapMarkers : IDisposable
     private byte ownMiniMapMarkerCount;
     private uint cachedTerritoryId;
     private string cachedWorldId = string.Empty;
+    private uint cachedWorldRowId;
+    private string cachedWorldSlug = string.Empty;
     private DateTime lastRefreshUtc = DateTime.MinValue;
     private bool forceRedraw = true;
 
@@ -93,7 +95,14 @@ internal sealed class HuntsMapMarkers : IDisposable
         }
 
         var territoryId = agentMap->SelectedTerritoryId;
-        var worldId = HuntDataCenterWorlds.SlugFor(LocationShare.CurrentWorldId());
+        var worldRowId = LocationShare.CurrentWorldId();
+        if (worldRowId != cachedWorldRowId)
+        {
+            cachedWorldRowId = worldRowId;
+            cachedWorldSlug = HuntDataCenterWorlds.SlugFor(worldRowId);
+        }
+
+        var worldId = cachedWorldSlug;
         var contextChanged = territoryId != cachedTerritoryId ||
             !string.Equals(worldId, cachedWorldId, StringComparison.OrdinalIgnoreCase);
         if (contextChanged)
