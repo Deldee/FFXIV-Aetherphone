@@ -25,11 +25,6 @@ internal sealed class WalletApp : IPhoneApp
     {
         get
         {
-            if (!configuration.IsAppBadgeEnabled(Id))
-            {
-                return 0;
-            }
-
             var now = Environment.TickCount64;
             if (now >= nextBadgeTick)
             {
@@ -45,7 +40,6 @@ internal sealed class WalletApp : IPhoneApp
 
     private readonly GameData gameData;
     private readonly ITextureProvider textures;
-    private readonly Configuration configuration;
     private readonly AppSkin ui = new(AppPalettes.Wallet);
     private WalletEntry? gil;
     private WalletSection[] sections = Array.Empty<WalletSection>();
@@ -53,11 +47,10 @@ internal sealed class WalletApp : IPhoneApp
     private int cappedBadge;
     private long nextBadgeTick;
 
-    public WalletApp(GameData gameData, ITextureProvider textures, Configuration configuration)
+    public WalletApp(GameData gameData, ITextureProvider textures)
     {
         this.gameData = gameData;
         this.textures = textures;
-        this.configuration = configuration;
     }
 
     public void OnOpened() => Rebuild();
