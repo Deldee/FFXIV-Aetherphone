@@ -56,6 +56,8 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
     private readonly HuntsMapMarkers markers;
     private readonly ThemeProvider themes;
     private string? instanceLabel;
+    private int? cachedInstance;
+    private string cachedInstanceLanguage = string.Empty;
     private bool legendExpanded;
 
     public HuntsMapMarkersIndicatorWindow(HuntsMapMarkers markers, ThemeProvider themes)
@@ -77,9 +79,17 @@ internal sealed unsafe class HuntsMapMarkersIndicatorWindow : Window
         var labelSize = Typography.Measure(label, TextScale, FontWeight.SemiBold);
         var headerRowWidth = (IconWidth + IconGap) * scale + labelSize.X;
 
-        instanceLabel = markers.ShownInstance is { } instance
-            ? string.Format(Loc.T(L.Hunts.NativeMapMarkersInstanceIndicator), instance)
-            : null;
+        var shownInstance = markers.ShownInstance;
+        if (shownInstance != cachedInstance || !string.Equals(Loc.Current.Code, cachedInstanceLanguage,
+                StringComparison.Ordinal))
+        {
+            cachedInstance = shownInstance;
+            cachedInstanceLanguage = Loc.Current.Code;
+            instanceLabel = shownInstance is { } instance
+                ? string.Format(Loc.T(L.Hunts.NativeMapMarkersInstanceIndicator), instance)
+                : null;
+        }
+
         var instanceSize = instanceLabel is { Length: > 0 }
             ? Typography.Measure(instanceLabel, InstanceTextScale, FontWeight.Regular)
             : Vector2.Zero;
