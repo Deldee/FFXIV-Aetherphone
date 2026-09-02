@@ -97,9 +97,12 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public bool NotifyWeeklyReset { get; set; }
     public bool NotifyGrandCompanyReset { get; set; }
     public bool NotifyRetainerVentures { get; set; }
-    [JsonProperty("ShowWalletBadge")] public bool LegacyShowWalletBadge { get; set; } = true;
-    [JsonProperty("ShowDailiesBadge")] public bool LegacyShowDailiesBadge { get; set; } = true;
-    [JsonProperty("ShowActivityBadge")] public bool LegacyShowActivityBadge { get; set; } = true;
+    [JsonProperty("ShowWalletBadge")]
+    public bool LegacyShowWalletBadge { get; set; } = true;
+    [JsonProperty("ShowDailiesBadge")]
+    public bool LegacyShowDailiesBadge { get; set; } = true;
+    [JsonProperty("ShowActivityBadge")]
+    public bool LegacyShowActivityBadge { get; set; } = true;
     public Dictionary<string, bool> BadgeSettings { get; set; } = new();
     public bool BadgeSettingsMigrated { get; set; }
     public List<DailyCheckRecord> DailyChecks { get; set; } = new();
