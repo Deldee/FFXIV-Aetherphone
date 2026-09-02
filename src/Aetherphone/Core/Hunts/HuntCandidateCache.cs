@@ -5,6 +5,7 @@ internal sealed class HuntCandidateCache
     private readonly HuntMobCatalog mobCatalog;
     private readonly HuntZoneCatalog zoneCatalog;
     private readonly HuntsService hunts;
+    private readonly object entriesGate = new();
     private readonly Dictionary<(string MobId, string WorldId, int ZoneInstance, string ZoneId), Entry> entries = new();
 
     private readonly struct Entry
@@ -33,13 +34,17 @@ internal sealed class HuntCandidateCache
     {
         var token = hunts.CandidateStateToken;
         var key = (mob.Id, worldId, zoneInstance, zoneId);
-        if (!entries.TryGetValue(key, out var entry) || !entry.Token.Equals(token))
+        Entry entry;
+        lock (entriesGate)
         {
-            var states = new List<HuntPoiState>();
-            HuntCandidateResolver.ResolveMobZoneStates(mob, worldId, zoneInstance, zoneId, mobCatalog, zoneCatalog,
-                hunts, states, out var reportedPoiId);
-            entry = new Entry(token, states, reportedPoiId);
-            entries[key] = entry;
+            if (!entries.TryGetValue(key, out entry) || !entry.Token.Equals(token))
+            {
+                var states = new List<HuntPoiState>();
+                HuntCandidateResolver.ResolveMobZoneStates(mob, worldId, zoneInstance, zoneId, mobCatalog,
+                    zoneCatalog, hunts, states, out var reportedPoiId);
+                entry = new Entry(token, states, reportedPoiId);
+                entries[key] = entry;
+            }
         }
 
         if (!includeLandmineOnlySpots)
