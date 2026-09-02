@@ -113,7 +113,7 @@ internal sealed class NotificationsPage : ISettingsPage
             }
 
             built[writeIndex++] = new AppSettingsEntry(app.Id, app.DisplayName, app.Accent,
-                NotificationChannels.Contains(app.Id), app.HasBadge);
+                NotificationChannels.Contains(app.Id), app.HasBadge, app);
         }
 
         Array.Sort(built, static (left, right) =>

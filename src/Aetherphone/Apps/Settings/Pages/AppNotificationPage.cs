@@ -12,10 +12,10 @@ namespace Aetherphone.Apps.Settings.Pages;
 
 internal sealed class AppNotificationPage : ISettingsPage
 {
-    public string Title => entry.Name;
+    public string Title => entry.App?.DisplayName ?? entry.Name;
     public string Summary => string.Empty;
     public FontAwesomeIcon Icon => FontAwesomeIcon.Bell;
-    public Vector4 Tint => entry.Accent;
+    public Vector4 Tint => entry.App?.Accent ?? entry.Accent;
     private readonly Configuration configuration;
     private readonly SoundService sound;
     private AppSettingsEntry entry = new(string.Empty, string.Empty, default, false, false);
