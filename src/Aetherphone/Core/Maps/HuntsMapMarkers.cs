@@ -23,10 +23,6 @@ internal sealed class HuntsMapMarkers : IDisposable
     private readonly List<HuntsMapMarkerPoint> points = new();
     private readonly HashSet<HuntsMapMarkerPoint> lastPlacedPoints = new();
     private bool hasPlacedMarkers;
-    private byte ownMapMarkerCount;
-    private byte ownMiniMapMarkerCount;
-    private byte expectedMapMarkerCount;
-    private byte expectedMiniMapMarkerCount;
     private uint cachedTerritoryId;
     private string cachedWorldId = string.Empty;
     private uint cachedWorldRowId;
@@ -57,9 +53,10 @@ internal sealed class HuntsMapMarkers : IDisposable
         Plugin.AddonLifecycle.UnregisterListener(AddonEvent.PostRefresh, AreaMapAddonName, OnAreaMapOpenedOrChanged);
 
         var agentMap = AgentMap.Instance();
-        if (agentMap != null)
+        if (agentMap != null && hasPlacedMarkers)
         {
-            RemoveOwnMarkers(agentMap);
+            agentMap->ResetMapMarkers();
+            agentMap->ResetMiniMapMarkers();
         }
     }
 
@@ -123,18 +120,16 @@ internal sealed class HuntsMapMarkers : IDisposable
         }
 
         if (!mustRedraw && hasPlacedMarkers && points.Count == lastPlacedPoints.Count &&
-            lastPlacedPoints.SetEquals(points) && agentMap->MapMarkerCount == expectedMapMarkerCount &&
-            agentMap->MiniMapMarkerCount == expectedMiniMapMarkerCount)
+            lastPlacedPoints.SetEquals(points))
         {
             return;
         }
 
-        RemoveOwnMarkers(agentMap);
+        agentMap->ResetMapMarkers();
+        agentMap->ResetMiniMapMarkers();
         hasPlacedMarkers = true;
         lastPlacedPoints.Clear();
 
-        var mapMarkerCountBefore = agentMap->MapMarkerCount;
-        var miniMapMarkerCountBefore = agentMap->MiniMapMarkerCount;
         for (var index = 0; index < points.Count; index++)
         {
             var point = points[index];
@@ -147,21 +142,6 @@ internal sealed class HuntsMapMarkers : IDisposable
             agentMap->AddMapMarker(worldPosition, iconId, scale);
             agentMap->AddMiniMapMarker(worldPosition, iconId, scale);
         }
-
-        ownMapMarkerCount = (byte)(agentMap->MapMarkerCount - mapMarkerCountBefore);
-        ownMiniMapMarkerCount = (byte)(agentMap->MiniMapMarkerCount - miniMapMarkerCountBefore);
-        expectedMapMarkerCount = agentMap->MapMarkerCount;
-        expectedMiniMapMarkerCount = agentMap->MiniMapMarkerCount;
-    }
-
-    private unsafe void RemoveOwnMarkers(AgentMap* agentMap)
-    {
-        agentMap->MapMarkerCount = (byte)Math.Max(0, agentMap->MapMarkerCount - ownMapMarkerCount);
-        agentMap->MiniMapMarkerCount = (byte)Math.Max(0, agentMap->MiniMapMarkerCount - ownMiniMapMarkerCount);
-        ownMapMarkerCount = 0;
-        ownMiniMapMarkerCount = 0;
-        expectedMapMarkerCount = agentMap->MapMarkerCount;
-        expectedMiniMapMarkerCount = agentMap->MiniMapMarkerCount;
     }
 
     private unsafe bool TryResolveTarget(uint territoryId, string worldId, out Map map)
@@ -201,7 +181,8 @@ internal sealed class HuntsMapMarkers : IDisposable
             return;
         }
 
-        RemoveOwnMarkers(agentMap);
+        agentMap->ResetMapMarkers();
+        agentMap->ResetMiniMapMarkers();
         hasPlacedMarkers = false;
         lastPlacedPoints.Clear();
     }
