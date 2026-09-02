@@ -1225,6 +1225,27 @@ internal static class L
                 "Log in to Faloop to receive live spawn notifications");
         public static readonly LocString ResetToDefault = new("hunts.resetToDefault", "Reset to Default");
         public static readonly LocString ResetTutorial = new("hunts.resetTutorial", "Reset Tutorial");
+        public static readonly LocString NativeMapMarkersLabel =
+            new("hunts.nativeMapMarkersLabel", "Show Map Markers");
+        public static readonly LocString NativeMapMarkersHint = new("hunts.nativeMapMarkersHint",
+            "Experimental: adds the candidate spawn points to FFXIV's own map and minimap while a mark's detail page is open");
+        public static readonly LocString NativeMapMarkersIndicator =
+            new("hunts.nativeMapMarkersIndicator", "Hunt markers on");
+        public static readonly LocString NativeMapMarkersInstanceIndicator = new(
+            "hunts.nativeMapMarkersInstanceIndicator", "Currently showing instance {0}");
+        public static readonly LocString NativeMapLegendCandidate = new("hunts.nativeMapLegendCandidate",
+            "Candidate");
+        public static readonly LocString NativeMapLegendSighted = new("hunts.nativeMapLegendSighted", "Sighted");
+        public static readonly LocString NativeMapLegendConfirmed = new("hunts.nativeMapLegendConfirmed",
+            "Confirmed");
+        public static readonly LocString NativeMapLegendActiveMinion = new("hunts.nativeMapLegendActiveMinion",
+            "SS minion");
+        public static readonly LocString NativeMapLegendSsSpawn = new("hunts.nativeMapLegendSsSpawn", "SS spawn");
+        public static readonly LocString NativeMapLegendFateInactive = new("hunts.nativeMapLegendFateInactive",
+            "FATE inactive");
+        public static readonly LocString NativeMapLegendFateActive = new("hunts.nativeMapLegendFateActive",
+            "FATE active");
+        public static readonly LocString NativeMapLegendToggle = new("hunts.nativeMapLegendToggle", "Legend");
         public static readonly LocString NotifyModeDefault = new("hunts.notifyModeDefault", "Default");
         public static readonly LocString NotifyModeEnabled = new("hunts.notifyModeEnabled", "Enabled");
         public static readonly LocString NotifyModeEnabledOnWorldValue =

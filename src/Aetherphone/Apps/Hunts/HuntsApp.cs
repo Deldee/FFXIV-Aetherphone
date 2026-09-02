@@ -4,6 +4,7 @@ using Aetherphone.Core.Config;
 using Aetherphone.Core.Confirm;
 using Aetherphone.Core.Hunts;
 using Aetherphone.Core.Localization;
+using Aetherphone.Core.Maps;
 using Aetherphone.Core.Onboarding;
 using Aetherphone.Core.Runtime;
 using Aetherphone.Core.Theme;
@@ -41,9 +42,11 @@ internal sealed partial class HuntsApp : IPhoneApp
     private readonly HuntZoneCatalog zoneCatalog;
     private readonly HuntZoneMapTextures zoneMapTextures;
     private readonly HuntMobRewardCatalog rewardCatalog;
+    private readonly HuntCandidateCache candidateCache;
     private readonly Configuration configuration;
     private readonly ConfirmService confirm;
     private readonly HuntsLauncher launcher;
+    private readonly HuntsMapMarkers huntsMapMarkers;
     private const float ToolbarHeight = 44f;
     private const float ToolbarButtonSize = 34f;
 
@@ -65,17 +68,19 @@ internal sealed partial class HuntsApp : IPhoneApp
     private readonly Comparison<HuntWindowDto> compareByPercentageDescending;
 
     public HuntsApp(HuntsService hunts, HuntMobCatalog mobCatalog, HuntZoneCatalog zoneCatalog,
-        HuntZoneMapTextures zoneMapTextures, HuntMobRewardCatalog rewardCatalog, Configuration configuration,
-        ConfirmService confirm, HuntsLauncher launcher)
+        HuntZoneMapTextures zoneMapTextures, HuntMobRewardCatalog rewardCatalog, HuntCandidateCache candidateCache,
+        Configuration configuration, ConfirmService confirm, HuntsLauncher launcher, HuntsMapMarkers huntsMapMarkers)
     {
         this.hunts = hunts;
         this.mobCatalog = mobCatalog;
         this.zoneCatalog = zoneCatalog;
         this.zoneMapTextures = zoneMapTextures;
         this.rewardCatalog = rewardCatalog;
+        this.candidateCache = candidateCache;
         this.configuration = configuration;
         this.confirm = confirm;
         this.launcher = launcher;
+        this.huntsMapMarkers = huntsMapMarkers;
         compareByPercentageDescending = CompareByPercentageDescending;
         router = new ViewRouter<HuntsView>(new HuntsView(HuntsRoute.List));
         drawView = DrawView;
