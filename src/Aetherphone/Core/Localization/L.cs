@@ -1230,10 +1230,11 @@ internal static class L
         public static readonly LocString NativeMapMarkersInstanceIndicator = new(
             "hunts.nativeMapMarkersInstanceIndicator", "Currently showing instance {0}");
         public static readonly LocString NativeMapLegendCandidate = new("hunts.nativeMapLegendCandidate",
-            "Candidate");
-        public static readonly LocString NativeMapLegendSighted = new("hunts.nativeMapLegendSighted", "Sighted");
+            "Potential");
+        public static readonly LocString NativeMapLegendSighted = new("hunts.nativeMapLegendSighted",
+            "Unclaimed by S Rank");
         public static readonly LocString NativeMapLegendConfirmed = new("hunts.nativeMapLegendConfirmed",
-            "Confirmed");
+            "Claimed by S Rank");
         public static readonly LocString NativeMapLegendActiveMinion = new("hunts.nativeMapLegendActiveMinion",
             "SS minion");
         public static readonly LocString NativeMapLegendSsSpawn = new("hunts.nativeMapLegendSsSpawn", "SS spawn");
