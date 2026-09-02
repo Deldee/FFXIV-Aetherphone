@@ -214,7 +214,13 @@ internal sealed class HuntsMapMarkers : IDisposable
         }
 
         var uiState = UIState.Instance();
-        return uiState == null ? null : (int)uiState->PublicInstance.InstanceId;
+        if (uiState == null)
+        {
+            return null;
+        }
+
+        var instanceId = (int)uiState->PublicInstance.InstanceId;
+        return instanceId == 0 ? null : instanceId;
     }
 
     private static uint IconFor(HuntsMapMarkerState state) => state switch
