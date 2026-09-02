@@ -21,7 +21,7 @@ internal sealed class NotificationsPage : ISettingsPage
     private readonly AppNotificationPage appPage;
     private readonly AppInstaller installer;
     private readonly IReadOnlyList<IPhoneApp> apps;
-    private AppSettingsEntry[] entries = Array.Empty<AppSettingsEntry>();
+    private readonly List<AppSettingsEntry> entries = new();
     private LanguageInfo? entriesLanguage;
 
     public NotificationsPage(Configuration configuration, ISettingsNavigator navigator, AppNotificationPage appPage,
@@ -66,7 +66,7 @@ internal sealed class NotificationsPage : ISettingsPage
             SettingsSection.Header(Loc.T(L.Settings.NotificationApps), theme);
             var installedCount = CountInstalled(entries);
             var rows = GroupCard.Begin(theme, installedCount);
-            for (var index = 0; index < entries.Length; index++)
+            for (var index = 0; index < entries.Count; index++)
             {
                 var entry = entries[index];
                 if (!installer.IsInstalled(entry.AppId))
@@ -93,45 +93,32 @@ internal sealed class NotificationsPage : ISettingsPage
             return;
         }
 
-        var count = 0;
-        for (var index = 0; index < apps.Count; index++)
-        {
-            if (Qualifies(apps[index]))
-            {
-                count++;
-            }
-        }
-
-        var built = new AppSettingsEntry[count];
-        var writeIndex = 0;
+        entries.Clear();
         for (var index = 0; index < apps.Count; index++)
         {
             var app = apps[index];
-            if (!Qualifies(app))
+            var hasChannel = NotificationChannels.Contains(app.Id);
+            if (!app.HasBadge && !hasChannel)
             {
                 continue;
             }
 
-            built[writeIndex++] = new AppSettingsEntry(app.Id, app.DisplayName, app.Accent,
-                NotificationChannels.Contains(app.Id), app.HasBadge, app);
+            entries.Add(new AppSettingsEntry(app.Id, app.DisplayName, app.Accent, hasChannel, app.HasBadge, app));
         }
 
-        Array.Sort(built, static (left, right) =>
+        entries.Sort(static (left, right) =>
         {
             var primary = Loc.Culture.CompareInfo.Compare(left.Name, right.Name, CompareOptions.IgnoreCase);
             return primary != 0 ? primary : string.CompareOrdinal(left.AppId, right.AppId);
         });
 
-        entries = built;
         entriesLanguage = Loc.Current;
     }
 
-    private static bool Qualifies(IPhoneApp app) => app.HasBadge || NotificationChannels.Contains(app.Id);
-
-    private int CountInstalled(AppSettingsEntry[] source)
+    private int CountInstalled(List<AppSettingsEntry> source)
     {
         var count = 0;
-        for (var index = 0; index < source.Length; index++)
+        for (var index = 0; index < source.Count; index++)
         {
             if (installer.IsInstalled(source[index].AppId))
             {
