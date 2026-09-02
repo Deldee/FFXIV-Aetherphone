@@ -241,7 +241,7 @@ Accent colors have exactly one source: `AppAccents.For(id)` (src/Aetherphone/Cor
 
 `HomeTileView.DrawApp` (src/Aetherphone/Windows/Components/Chrome/HomeTileView.cs) reads `BadgeCount` (and `BadgeAsDot`) every frame the home screen is visible and draws `AppBadge` in the tile corner when the count is positive and the app's badge is not turned off (`HasBadge`/`Configuration.IsAppBadgeEnabled`, see [Notifications](notifications.md#hiding-a-badge)). Folder tiles sum the numeric counts of the apps inside; a dot is shown only if no numeric badge exists but some member wants a dot.
 
-Real examples: `MessageApp` returns `store.UnreadTotal + calls.UnseenMissed`, `AnnouncementsApp` returns `store.UnreadCount`, `DailiesApp` gates its count behind a configuration toggle. All of them are cheap reads of already-maintained counters; none of them query anything inside the getter.
+Real examples: `MessageApp` returns `store.UnreadTotal + calls.UnseenMissed`, `AnnouncementsApp` returns `store.UnreadCount`, `DailiesApp` returns a cached `outstandingCount` field it recomputes whenever daily state changes. All of them are cheap reads of already-maintained counters; none of them query anything inside the getter, and none of them check the user's on/off preference themselves.
 
 ## Availability and the server kill switch
 
