@@ -604,8 +604,6 @@ internal sealed class HuntsService : IDisposable
             return;
         }
 
-        FlushPendingSightingReplace(identity.MobId, identity.WorldId, identity.ZoneInstance);
-
         if (report.Data?.Reporters is { Length: > 0 } reporters)
         {
             SetRealtimeReporters(identity, reporters);
@@ -919,6 +917,8 @@ internal sealed class HuntsService : IDisposable
             wasActive = activeSpawnKeys.Remove(key);
             activeSpawnVersion++;
         }
+
+        FlushPendingSightingReplace(identity.MobId, identity.WorldId, identity.ZoneInstance);
 
         if (!wasActive)
         {
