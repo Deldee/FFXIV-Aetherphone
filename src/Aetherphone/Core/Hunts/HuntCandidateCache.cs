@@ -2,11 +2,14 @@ namespace Aetherphone.Core.Hunts;
 
 internal sealed class HuntCandidateCache
 {
+    private const int MaxEntries = 256;
+
     private readonly HuntMobCatalog mobCatalog;
     private readonly HuntZoneCatalog zoneCatalog;
     private readonly HuntsService hunts;
     private readonly object entriesGate = new();
     private readonly Dictionary<(string MobId, string WorldId, int ZoneInstance, string ZoneId), Entry> entries = new();
+    private readonly Dictionary<(string MobId, string ZoneId), List<HuntPoiState>> landmineOnlyStates = new();
 
     private readonly struct Entry
     {
@@ -39,6 +42,11 @@ internal sealed class HuntCandidateCache
         {
             if (!entries.TryGetValue(key, out entry) || !entry.Token.Equals(token))
             {
+                if (entries.Count >= MaxEntries)
+                {
+                    entries.Clear();
+                }
+
                 var states = new List<HuntPoiState>();
                 HuntCandidateResolver.ResolveMobZoneStates(mob, worldId, zoneInstance, zoneId, mobCatalog,
                     zoneCatalog, hunts, states, out var reportedPoiId);
@@ -52,8 +60,48 @@ internal sealed class HuntCandidateCache
             return (entry.States, entry.ReportedPoiId);
         }
 
+        var landmineStates = GetLandmineOnlyStates(mob, zoneId);
+        if (landmineStates.Count == 0)
+        {
+            return (entry.States, entry.ReportedPoiId);
+        }
+
         var withLandmines = new List<HuntPoiState>(entry.States);
-        HuntCandidateResolver.AppendLandmineOnlyStates(mob, zoneId, mobCatalog, zoneCatalog, withLandmines);
+        for (var landmineIndex = 0; landmineIndex < landmineStates.Count; landmineIndex++)
+        {
+            var landmine = landmineStates[landmineIndex];
+            var alreadyPresent = false;
+            for (var existingIndex = 0; existingIndex < withLandmines.Count; existingIndex++)
+            {
+                if (withLandmines[existingIndex].Poi.Id == landmine.Poi.Id)
+                {
+                    alreadyPresent = true;
+                    break;
+                }
+            }
+
+            if (!alreadyPresent)
+            {
+                withLandmines.Add(landmine);
+            }
+        }
+
         return (withLandmines, entry.ReportedPoiId);
+    }
+
+    private List<HuntPoiState> GetLandmineOnlyStates(HuntMobDefinition mob, string zoneId)
+    {
+        var key = (mob.Id, zoneId);
+        lock (entriesGate)
+        {
+            if (landmineOnlyStates.TryGetValue(key, out var cached))
+            {
+                return cached;
+            }
+
+            var states = HuntCandidateResolver.ResolveLandmineOnlyStates(mob, zoneId, mobCatalog, zoneCatalog);
+            landmineOnlyStates[key] = states;
+            return states;
+        }
     }
 }

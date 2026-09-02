@@ -262,6 +262,14 @@ internal static class HuntCandidateResolver
         }
     }
 
+    public static List<HuntPoiState> ResolveLandmineOnlyStates(HuntMobDefinition mob, string targetZoneId,
+        HuntMobCatalog mobCatalog, HuntZoneCatalog zoneCatalog)
+    {
+        var states = new List<HuntPoiState>();
+        AppendLandmineOnlyStates(mob, targetZoneId, mobCatalog, zoneCatalog, states);
+        return states;
+    }
+
     private static void ResolveFateStates(HuntMobDefinition mob, string worldId, int zoneInstance,
         string targetZoneId, HuntZoneCatalog zoneCatalog, HuntsService hunts, List<HuntPoiState> results)
     {
