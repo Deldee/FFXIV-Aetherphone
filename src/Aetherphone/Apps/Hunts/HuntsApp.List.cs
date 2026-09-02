@@ -200,7 +200,8 @@ internal sealed partial class HuntsApp
         var statusInk = StatusColor(status);
 
         var percentage = HuntWindowMath.Percentage(window, def, now);
-        DrawProgressBar(row, status, percentage, scale);
+        var fillPercentage = HuntWindowMath.RawPercentage(window, def, now);
+        DrawProgressBar(row, status, percentage, fillPercentage, scale);
 
         var detailLabel = ResolveDetailLabel(status, window, def, now);
 
@@ -346,11 +347,12 @@ internal sealed partial class HuntsApp
         _ => ui.MutedInk,
     };
 
-    private void DrawProgressBar(Rect row, HuntWindowStatus status, double? percentage, float scale)
+    private void DrawProgressBar(Rect row, HuntWindowStatus status, double? percentage, double? fillPercentage,
+        float scale)
     {
         var barHeight = 3f * scale;
         var top = row.Max.Y - 6f * scale - barHeight;
-        ProgressBar.Draw(ImGui.GetWindowDrawList(), row.Min.X, row.Max.X, top, barHeight, percentage,
+        ProgressBar.Draw(ImGui.GetWindowDrawList(), row.Min.X, row.Max.X, top, barHeight, percentage, fillPercentage,
             StatusColor(status), TextStyles.Caption2, 6f * scale);
     }
 

@@ -7,7 +7,8 @@ namespace Aetherphone.Apps.Hunts;
 internal static class ProgressBar
 {
     public static void Draw(ImDrawListPtr drawList, float left, float right, float top, float height,
-        double? percentage, Vector4 color, TextStyle labelStyle, float labelGap, float trackAlpha = 0.18f)
+        double? percentage, double? fillPercentage, Vector4 color, TextStyle labelStyle, float labelGap,
+        float trackAlpha = 0.18f)
     {
         var percentageLabel = percentage is { } known
             ? ((int)Math.Round(known, MidpointRounding.AwayFromZero)) + "%"
@@ -18,7 +19,7 @@ internal static class ProgressBar
         var trackMin = new Vector2(left, top);
         Squircle.Fill(drawList, trackMin, trackMax, radius, ImGui.GetColorU32(Palette.WithAlpha(color, trackAlpha)));
 
-        var fraction = percentage is { } value ? (float)Math.Clamp(value / 100.0, 0.0, 1.0) : 1f;
+        var fraction = fillPercentage is { } value ? (float)Math.Clamp(value / 100.0, 0.0, 1.0) : 0f;
         if (fraction > 0f)
         {
             var fillMax = new Vector2(trackMin.X + (trackMax.X - trackMin.X) * fraction, trackMax.Y);

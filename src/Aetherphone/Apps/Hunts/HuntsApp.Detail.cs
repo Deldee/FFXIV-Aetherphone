@@ -288,6 +288,7 @@ internal sealed partial class HuntsApp
         var barTop = origin.Y + headerHeight + 10f * scale;
         var barHeight = 8f * scale;
         var percentage = HuntWindowMath.Percentage(window, def, now);
+        var fillPercentage = HuntWindowMath.RawPercentage(window, def, now);
 
         var detailLabel = ResolveDetailLabel(status, window, def, now);
         var reporterLabel = ResolveReporterLabel(window);
@@ -328,7 +329,8 @@ internal sealed partial class HuntsApp
         Typography.Draw(drawList, new Vector2(contentRight - statusSize.X, origin.Y), statusLabel, statusInk,
             TextStyles.Title3);
 
-        DrawBigProgressBar(drawList, contentLeft, contentRight, barTop, barHeight, status, percentage, scale);
+        DrawBigProgressBar(drawList, contentLeft, contentRight, barTop, barHeight, status, percentage, fillPercentage,
+            scale);
 
         var lineTop = barTop + barHeight;
         if (detailLabel.Length > 0)
@@ -359,10 +361,10 @@ internal sealed partial class HuntsApp
     }
 
     private void DrawBigProgressBar(ImDrawListPtr drawList, float left, float right, float top, float height,
-        HuntWindowStatus status, double? percentage, float scale)
+        HuntWindowStatus status, double? percentage, double? fillPercentage, float scale)
     {
-        ProgressBar.Draw(drawList, left, right, top, height, percentage, StatusColor(status), TextStyles.Headline,
-            8f * scale);
+        ProgressBar.Draw(drawList, left, right, top, height, percentage, fillPercentage, StatusColor(status),
+            TextStyles.Headline, 8f * scale);
     }
 
     private bool DrawDetailZoneMap(float scale, IReadOnlyList<HuntPoiState> states, int? confirmedPoiId,
