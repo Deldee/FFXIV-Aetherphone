@@ -25,6 +25,8 @@ internal sealed class HuntsMapMarkers : IDisposable
     private bool hasPlacedMarkers;
     private byte ownMapMarkerCount;
     private byte ownMiniMapMarkerCount;
+    private byte expectedMapMarkerCount;
+    private byte expectedMiniMapMarkerCount;
     private uint cachedTerritoryId;
     private string cachedWorldId = string.Empty;
     private uint cachedWorldRowId;
@@ -121,7 +123,8 @@ internal sealed class HuntsMapMarkers : IDisposable
         }
 
         if (!mustRedraw && hasPlacedMarkers && points.Count == lastPlacedPoints.Count &&
-            lastPlacedPoints.SetEquals(points))
+            lastPlacedPoints.SetEquals(points) && agentMap->MapMarkerCount == expectedMapMarkerCount &&
+            agentMap->MiniMapMarkerCount == expectedMiniMapMarkerCount)
         {
             return;
         }
@@ -147,6 +150,8 @@ internal sealed class HuntsMapMarkers : IDisposable
 
         ownMapMarkerCount = (byte)(agentMap->MapMarkerCount - mapMarkerCountBefore);
         ownMiniMapMarkerCount = (byte)(agentMap->MiniMapMarkerCount - miniMapMarkerCountBefore);
+        expectedMapMarkerCount = agentMap->MapMarkerCount;
+        expectedMiniMapMarkerCount = agentMap->MiniMapMarkerCount;
     }
 
     private unsafe void RemoveOwnMarkers(AgentMap* agentMap)
@@ -155,6 +160,8 @@ internal sealed class HuntsMapMarkers : IDisposable
         agentMap->MiniMapMarkerCount = (byte)Math.Max(0, agentMap->MiniMapMarkerCount - ownMiniMapMarkerCount);
         ownMapMarkerCount = 0;
         ownMiniMapMarkerCount = 0;
+        expectedMapMarkerCount = agentMap->MapMarkerCount;
+        expectedMiniMapMarkerCount = agentMap->MiniMapMarkerCount;
     }
 
     private unsafe bool TryResolveTarget(uint territoryId, string worldId, out Map map)
