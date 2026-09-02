@@ -18,8 +18,12 @@ internal static class HuntCandidateResolver
             if (phases.Length > 0)
             {
                 var phaseIndex = Math.Clamp(phase.PhaseNum - 1, 0, phases.Length - 1);
-                finalPhase = phaseIndex > 0;
-                AddPoiIds(poiIds, phases[phaseIndex].ZonePoiIds);
+                var activePhaseEntry = phases[phaseIndex];
+                if (OwnsPhase(mob, activePhaseEntry))
+                {
+                    finalPhase = phaseIndex > 0;
+                    AddPoiIds(poiIds, activePhaseEntry.ZonePoiIds);
+                }
             }
 
             return poiIds;
@@ -30,17 +34,26 @@ internal static class HuntCandidateResolver
             var phases = mob.Windows[windowIndex].Phases;
             for (var phaseIndex = 0; phaseIndex < phases.Length; phaseIndex++)
             {
+                var phaseEntry = phases[phaseIndex];
+                if (!OwnsPhase(mob, phaseEntry))
+                {
+                    continue;
+                }
+
                 if (mob.Rank == "SS" && phases.Length > 1 && phaseIndex == phases.Length - 1)
                 {
                     continue;
                 }
 
-                AddPoiIds(poiIds, phases[phaseIndex].ZonePoiIds);
+                AddPoiIds(poiIds, phaseEntry.ZonePoiIds);
             }
         }
 
         return poiIds;
     }
+
+    private static bool OwnsPhase(HuntMobDefinition mob, HuntMobPhase phase) =>
+        phase.MobId is null || string.Equals(phase.MobId, mob.Id, StringComparison.Ordinal);
 
     public static HuntPoiEntry? ResolveFinalPhasePoint(HuntMobDefinition mob,
         (int WindowNum, int PhaseNum)? activePhase, string zoneId, HuntZoneCatalog zoneCatalog)
@@ -116,7 +129,7 @@ internal static class HuntCandidateResolver
     }
 
     public static void ResolveMobZoneStates(HuntMobDefinition mob, string worldId, int zoneInstance,
-        string targetZoneId, HuntMobCatalog mobCatalog, HuntZoneCatalog zoneCatalog, HuntsService hunts,
+        string targetZoneId, HuntZoneCatalog zoneCatalog, HuntsService hunts,
         List<HuntPoiState> results, out int? reportedPoiId)
     {
         results.Clear();
@@ -146,10 +159,6 @@ internal static class HuntCandidateResolver
 
         var activePhase = hunts.PhaseFor(mob.Id, worldId, zoneInstance);
         var poiIds = ResolveCandidatePoiIds(mob, activePhase, out var finalPhase);
-        if (mob.Rank != "SS")
-        {
-            poiIds.ExceptWith(mobCatalog.SsRankPoiIdsForZone(targetZoneId));
-        }
 
         var points = new List<HuntPoiEntry>();
         foreach (var poiId in poiIds)

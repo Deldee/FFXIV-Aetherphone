@@ -48,8 +48,8 @@ internal sealed class HuntCandidateCache
                 }
 
                 var states = new List<HuntPoiState>();
-                HuntCandidateResolver.ResolveMobZoneStates(mob, worldId, zoneInstance, zoneId, mobCatalog,
-                    zoneCatalog, hunts, states, out var reportedPoiId);
+                HuntCandidateResolver.ResolveMobZoneStates(mob, worldId, zoneInstance, zoneId, zoneCatalog, hunts,
+                    states, out var reportedPoiId);
                 entry = new Entry(token, states, reportedPoiId);
                 entries[key] = entry;
             }
