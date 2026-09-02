@@ -735,9 +735,19 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
 
     public void MigrateBadgeSettings()
     {
-        if (BadgeSettingsMigrated)
+        if (!ApplyBadgeSettingsMigration())
         {
             return;
+        }
+
+        Save();
+    }
+
+    internal bool ApplyBadgeSettingsMigration()
+    {
+        if (BadgeSettingsMigrated)
+        {
+            return false;
         }
 
         if (!LegacyShowWalletBadge)
@@ -756,7 +766,7 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
         }
 
         BadgeSettingsMigrated = true;
-        Save();
+        return true;
     }
 
     public void MigrateSoundSettings()
