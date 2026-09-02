@@ -109,7 +109,6 @@ internal sealed class AppNotificationPage : ISettingsPage
         }
 
         configuration.SetAppBadgeEnabled(entry.AppId, updated);
-        configuration.Save();
     }
 
     private void Select(string? token)

@@ -731,6 +731,7 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public void SetAppBadgeEnabled(string appId, bool enabled)
     {
         BadgeSettings[appId] = enabled;
+        Save();
     }
 
     public void MigrateBadgeSettings()
