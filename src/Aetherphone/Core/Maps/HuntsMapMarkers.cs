@@ -10,13 +10,6 @@ namespace Aetherphone.Core.Maps;
 
 internal sealed class HuntsMapMarkers : IDisposable
 {
-    private const uint CandidateIconId = 60557u;
-    private const uint SightedIconId = 60444u;
-    private const uint ConfirmedIconId = 60403u;
-    private const uint ActiveMinionIconId = 60424u;
-    private const uint SsSpawnIconId = 60422u;
-    private const uint FateInactiveIconId = 63936u;
-    private const uint FateActiveIconId = 63939u;
     private const int MarkerScale = 600;
     private const int FateMarkerScale = 200;
     private const string AreaMapAddonName = "AreaMap";
@@ -146,7 +139,7 @@ internal sealed class HuntsMapMarkers : IDisposable
             var worldX = MapPixelMath.ToWorldCoordinate(point.RawX, map.SizeFactor, map.OffsetX);
             var worldZ = MapPixelMath.ToWorldCoordinate(point.RawY, map.SizeFactor, map.OffsetY);
             var worldPosition = new Vector3(worldX, 0f, worldZ);
-            var iconId = IconFor(point.State);
+            var iconId = HuntsMapMarkerIcons.IconFor(point.State);
             var scale = ScaleFor(point.State);
             agentMap->AddMapMarker(worldPosition, iconId, scale);
             agentMap->AddMiniMapMarker(worldPosition, iconId, scale);
@@ -222,17 +215,6 @@ internal sealed class HuntsMapMarkers : IDisposable
         var instanceId = (int)uiState->PublicInstance.InstanceId;
         return instanceId == 0 ? null : instanceId;
     }
-
-    private static uint IconFor(HuntsMapMarkerState state) => state switch
-    {
-        HuntsMapMarkerState.Sighted => SightedIconId,
-        HuntsMapMarkerState.Confirmed => ConfirmedIconId,
-        HuntsMapMarkerState.ActiveMinion => ActiveMinionIconId,
-        HuntsMapMarkerState.SsSpawn => SsSpawnIconId,
-        HuntsMapMarkerState.FateInactive => FateInactiveIconId,
-        HuntsMapMarkerState.FateActive => FateActiveIconId,
-        _ => CandidateIconId,
-    };
 
     private static int ScaleFor(HuntsMapMarkerState state) => state switch
     {
