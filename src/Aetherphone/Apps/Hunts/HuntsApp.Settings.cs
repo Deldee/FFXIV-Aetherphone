@@ -4,6 +4,7 @@ using Aetherphone.Core.Localization;
 using Aetherphone.Core.Onboarding;
 using Aetherphone.Core.Theme;
 using Aetherphone.Windows.Components;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 
 namespace Aetherphone.Apps.Hunts;
@@ -17,70 +18,24 @@ internal sealed partial class HuntsApp
     private readonly List<string> notifyWorldOptionsList = new();
     private bool notifySettingsDirty;
 
-    private void DrawNotificationSettingsHeader(Rect area, float scale)
+    private void DrawSettingsHeader(Rect area, float scale)
     {
         var rowCenterY = area.Min.Y + area.Height * 0.5f;
-        var resetLabel = Loc.T(L.Hunts.ResetToDefault);
-        var buttonHeight = 28f * scale;
-        var buttonWidth = AppSkin.PillWidthFor(resetLabel, buttonHeight);
-        var buttonRect = new Rect(new Vector2(area.Max.X - buttonWidth, rowCenterY - buttonHeight * 0.5f),
-            new Vector2(area.Max.X, rowCenterY + buttonHeight * 0.5f));
-
-        var titleStyle = new TextStyle(1.05f, FontWeight.SemiBold);
-        var titleY = rowCenterY - Typography.LineHeight(titleStyle) * 0.5f;
-        var titleMaxWidth = MathF.Max(0f, buttonRect.Min.X - area.Min.X - 12f * scale);
-        Marquee.DrawLeftAuto("hunts.notificationSettings.header", Loc.T(L.Hunts.NotificationSettingsTitle),
-            area.Min.X, titleY, titleMaxWidth, titleStyle, ui.TitleInk);
-
-        if (ui.PillButton(buttonRect, resetLabel, true))
-        {
-            hunts.NotificationSettings.ResetToDefault();
-            notifySettingsDirty = true;
-        }
+        Typography.DrawCentered(new Vector2(area.Center.X, rowCenterY), Loc.T(L.Hunts.SettingsTab), ui.TitleInk,
+            1.05f, FontWeight.SemiBold);
     }
 
-    private void DrawNotificationSettings(Rect body, float scale)
+    private void DrawSettings(Rect body, float scale)
     {
         using (AppSurface.Begin(body))
         {
             Gap(8f);
 
-            SettingsSection.Header(Loc.T(L.Hunts.RanksLabel), frameTheme);
-            DrawNotifyRankChips();
-            Gap(20f);
-
-            SettingsSection.Header(Loc.T(L.Hunts.ExpansionsLabel), frameTheme);
-            DrawNotifyExpansionChips();
-            Gap(20f);
-
-            SettingsSection.Header(Loc.T(L.Hunts.WorldsLabel), frameTheme);
-            var worldsCard = GroupCard.Begin(frameTheme, 1);
-            var worldsRow = worldsCard.NextRow();
-            if (SettingsRow.Disclosure(worldsRow, Loc.T(L.Hunts.WorldsLabel), NotifyWorldsValueText(), frameTheme,
-                    "hunts.notificationSettings.worlds"))
-            {
-                OpenNotifyWorldMenu(worldsRow);
-            }
-
-            worldsCard.End();
-            Gap(20f);
-
-            var markCard = GroupCard.Begin(frameTheme, 1);
-            if (SettingsRow.Link(markCard.NextRow(), FontAwesomeIcon.Bell, frameTheme.Accent,
-                    Loc.T(L.Hunts.MarkNotificationsTitle), MarkNotificationsCountValueText(), frameTheme,
-                    id: "hunts.notificationSettings.markNotifications"))
-            {
-                OpenMarkNotifications();
-            }
-
-            markCard.End();
-            Gap(20f);
-
             var nativeMapMarkersCard = GroupCard.Begin(frameTheme, 1);
             var nativeMapMarkersRow = nativeMapMarkersCard.NextRow();
+            UiAnchors.Report("hunts.settings.nativeMapMarkers", nativeMapMarkersRow);
             var nativeMapMarkersValue = SettingsRow.Bool(nativeMapMarkersRow, Loc.T(L.Hunts.NativeMapMarkersLabel),
-                configuration.HuntsNativeMapMarkers, frameTheme, "hunts.notificationSettings.nativeMapMarkers",
-                Loc.T(L.Hunts.NativeMapMarkersHint));
+                configuration.HuntsNativeMapMarkers, frameTheme, "hunts.settings.nativeMapMarkers");
             if (nativeMapMarkersValue != configuration.HuntsNativeMapMarkers)
             {
                 configuration.HuntsNativeMapMarkers = nativeMapMarkersValue;
@@ -104,7 +59,65 @@ internal sealed partial class HuntsApp
 
             tutorialCard.End();
             Gap(24f);
+
+            DrawNotificationsSectionHeader();
+
+            SettingsSection.Header(Loc.T(L.Hunts.RanksLabel), frameTheme);
+            DrawNotifyRankChips();
+            Gap(20f);
+
+            SettingsSection.Header(Loc.T(L.Hunts.ExpansionsLabel), frameTheme);
+            DrawNotifyExpansionChips();
+            Gap(20f);
+
+            SettingsSection.Header(Loc.T(L.Hunts.WorldsLabel), frameTheme);
+            var worldsCard = GroupCard.Begin(frameTheme, 1);
+            var worldsRow = worldsCard.NextRow();
+            if (SettingsRow.Disclosure(worldsRow, Loc.T(L.Hunts.WorldsLabel), NotifyWorldsValueText(), frameTheme,
+                    "hunts.settings.worlds"))
+            {
+                OpenNotifyWorldMenu(worldsRow);
+            }
+
+            worldsCard.End();
+            Gap(20f);
+
+            var markCard = GroupCard.Begin(frameTheme, 1);
+            if (SettingsRow.Link(markCard.NextRow(), FontAwesomeIcon.Bell, frameTheme.Accent,
+                    Loc.T(L.Hunts.MarkNotificationsTitle), MarkNotificationsCountValueText(), frameTheme,
+                    id: "hunts.settings.markNotifications"))
+            {
+                OpenMarkNotifications();
+            }
+
+            markCard.End();
+            Gap(20f);
+
+            var resetNotificationsCard = GroupCard.Begin(frameTheme, 1);
+            if (SettingsRow.Action(resetNotificationsCard.NextRow(), Loc.T(L.Hunts.ResetToDefault),
+                    frameTheme.Accent, frameTheme))
+            {
+                hunts.NotificationSettings.ResetToDefault();
+                notifySettingsDirty = true;
+            }
+
+            resetNotificationsCard.End();
+            Gap(24f);
         }
+    }
+
+    private void DrawNotificationsSectionHeader()
+    {
+        var scale = UiScale.Current;
+        ImGui.Dummy(new Vector2(0f, Metrics.Space.Sm * scale));
+        var style = new TextStyle(1.05f, FontWeight.SemiBold);
+        var lineHeight = Typography.LineHeight(style);
+        var origin = ImGui.GetCursorScreenPos();
+        var center = new Vector2(origin.X + ImGui.GetContentRegionAvail().X * 0.5f, origin.Y + lineHeight * 0.5f);
+        Typography.DrawCentered(ImGui.GetWindowDrawList(), center, Loc.T(L.Hunts.NotificationsSectionHeader),
+            ui.TitleInk, style.Scale, style.Weight);
+        ImGui.Dummy(new Vector2(ImGui.GetContentRegionAvail().X, lineHeight));
+        ImGui.Dummy(new Vector2(0f, Metrics.Space.Xs * scale));
     }
 
     private string MarkNotificationsCountValueText()
@@ -191,7 +204,7 @@ internal sealed partial class HuntsApp
         menuTarget = HuntsMenuTarget.NotifyWorld;
         menu.KeepOpen = true;
         PopulateNotifyWorldMenuItems();
-        menu.Toggle("hunts.notificationSettings.worlds", anchor);
+        menu.Toggle("hunts.settings.worlds", anchor);
     }
 
     private void PopulateNotifyWorldMenuItems()

@@ -1216,19 +1216,13 @@ internal static class L
             new("hunts.historyRequiresLoginTooltip", "Log in to Faloop to see hunt history");
         public static readonly LocString HistoryEmpty = new("hunts.historyEmpty", "No recent hunts found");
         public static readonly LocString ListTab = new("hunts.listTab", "List");
-        public static readonly LocString NotificationSettingsTab =
+        public static readonly LocString SettingsTab = new("hunts.settingsTab", "Settings");
+        public static readonly LocString NotificationsSectionHeader =
             new("hunts.notificationSettingsTab", "Notifications");
-        public static readonly LocString NotificationSettingsTitle =
-            new("hunts.notificationSettingsTitle", "Notification Settings");
-        public static readonly LocString NotificationSettingsRequiresLoginTooltip =
-            new("hunts.notificationSettingsRequiresLoginTooltip",
-                "Log in to Faloop to receive live spawn notifications");
         public static readonly LocString ResetToDefault = new("hunts.resetToDefault", "Reset to Default");
         public static readonly LocString ResetTutorial = new("hunts.resetTutorial", "Reset Tutorial");
         public static readonly LocString NativeMapMarkersLabel =
             new("hunts.nativeMapMarkersLabel", "Show Map Markers");
-        public static readonly LocString NativeMapMarkersHint = new("hunts.nativeMapMarkersHint",
-            "Experimental: adds the candidate spawn points to FFXIV's own map and minimap while a mark's detail page is open");
         public static readonly LocString NativeMapMarkersIndicator =
             new("hunts.nativeMapMarkersIndicator", "Hunt markers on");
         public static readonly LocString NativeMapMarkersInstanceIndicator = new(
@@ -6363,6 +6357,10 @@ internal static class L
         public static readonly LocString HuntsSignInBody = new("onboarding.huntsSignInBody", "Tap here to sign in or create a Faloop account and start getting live spawns.");
         public static readonly LocString HuntsGuideTitle = new("onboarding.huntsGuideTitle", "Learn more");
         public static readonly LocString HuntsGuideBody = new("onboarding.huntsGuideBody", "Want to learn more about hunts? Check our guide for more information.");
+        public static readonly LocString HuntsSettingsTitle = new("onboarding.huntsSettingsTitle", "Settings");
+        public static readonly LocString HuntsSettingsBody = new("onboarding.huntsSettingsBody", "Tap here to reset this tutorial and, once you sign in, manage which notifications you get.");
+        public static readonly LocString HuntsMapMarkersTitle = new("onboarding.huntsMapMarkersTitle", "In-game map markers");
+        public static readonly LocString HuntsMapMarkersBody = new("onboarding.huntsMapMarkersBody", "Turn on Show Map Markers to add candidate spawn points to FFXIV's own map and minimap.");
     }
 
     internal static class Setup
