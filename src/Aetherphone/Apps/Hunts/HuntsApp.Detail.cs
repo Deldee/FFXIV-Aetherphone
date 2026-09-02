@@ -196,7 +196,7 @@ internal sealed partial class HuntsApp
                 ? candidateCache.ResolveFor(def, view.WorldId, view.ZoneInstance, detailMapZoneId,
                     includeLandmineOnlySpots: false)
                 : (Array.Empty<HuntPoiState>(), null);
-            if (DrawDetailZoneMap(scale, states, confirmedPoiId, view))
+            if (DrawDetailZoneMap(scale, states, view))
             {
                 Gap(20f);
             }
@@ -367,8 +367,7 @@ internal sealed partial class HuntsApp
             TextStyles.Headline, 8f * scale);
     }
 
-    private bool DrawDetailZoneMap(float scale, IReadOnlyList<HuntPoiState> states, int? confirmedPoiId,
-        HuntsView view)
+    private bool DrawDetailZoneMap(float scale, IReadOnlyList<HuntPoiState> states, HuntsView view)
     {
         if (states.Count == 0 && detailMapAetherytePoints.Count == 0)
         {
@@ -408,7 +407,7 @@ internal sealed partial class HuntsApp
         {
             if (mapChild)
             {
-                DrawDetailZoneMapContent(stage, texture, scale, states, confirmedPoiId, view, territoryId);
+                DrawDetailZoneMapContent(stage, texture, scale, states, view, territoryId);
             }
         }
 
@@ -437,7 +436,7 @@ internal sealed partial class HuntsApp
             : null;
 
     private void DrawDetailZoneMapContent(Rect stage, IDalamudTextureWrap texture, float scale,
-        IReadOnlyList<HuntPoiState> states, int? confirmedPoiId, HuntsView view, uint territoryId)
+        IReadOnlyList<HuntPoiState> states, HuntsView view, uint territoryId)
     {
         if (detailMapPendingFocus)
         {
@@ -474,8 +473,7 @@ internal sealed partial class HuntsApp
             var (normalizedX, normalizedY) = MapPixelMath.NormalizeToFullCanvas(rawX, rawY);
             var dotPosition = new Vector2(min.X + normalizedX * (max.X - min.X),
                 min.Y + normalizedY * (max.Y - min.Y));
-            DrawAetheryteDot(drawList, dotPosition, scale, poi, territoryId, worldId, mapId, view.ZoneInstance,
-                confirmedPoiId);
+            DrawAetheryteDot(drawList, dotPosition, scale, poi, territoryId, worldId, mapId, view.ZoneInstance);
         }
 
         drawList.PopClipRect();
@@ -536,7 +534,7 @@ internal sealed partial class HuntsApp
     }
 
     private void DrawAetheryteDot(ImDrawListPtr drawList, Vector2 center, float scale, HuntPoiEntry poi,
-        uint territoryId, uint worldId, uint mapId, int zoneInstance, int? confirmedPoiId)
+        uint territoryId, uint worldId, uint mapId, int zoneInstance)
     {
         var iconRadius = MapAetheryteIconSize * 0.5f * scale;
         var iconMin = new Vector2(center.X - iconRadius, center.Y - iconRadius);
@@ -555,9 +553,8 @@ internal sealed partial class HuntsApp
 
         if (UiInteract.Click(hitMin, hitMax, hovered) && territoryId != 0 && worldId != 0)
         {
-            var flagCoordinate = confirmedPoiId is { } confirmed ? zoneCatalog.ResolveCoordinate(confirmed) : null;
-            NavigateToCoordinate(territoryId, worldId, mapId, zoneCatalog.ResolveCoordinate(poi.Id), flagCoordinate,
-                zoneInstance);
+            var poiCoordinate = zoneCatalog.ResolveCoordinate(poi.Id);
+            NavigateToAetheryte(territoryId, worldId, mapId, poiCoordinate, zoneInstance);
         }
     }
 
@@ -630,6 +627,21 @@ internal sealed partial class HuntsApp
         }
 
         TravelToHuntZone(in destination, worldId, territoryId, mapId, flagCoordinate);
+    }
+
+    private void NavigateToAetheryte(uint territoryId, uint worldId, uint mapId, (float X, float Y)? targetCoordinate,
+        int zoneInstance)
+    {
+        if (targetCoordinate is not { } coordinate)
+        {
+            return;
+        }
+
+        ArmPendingInstanceSync(worldId, territoryId, zoneInstance);
+
+        var destination = TravelPlanner.ResolveAetheryteAt(territoryId, worldId, LocationShare.CurrentWorldId(),
+            coordinate);
+        TravelToHuntZone(in destination, worldId, territoryId, mapId, null);
     }
 
     private void TravelToHuntZone(in TravelDestination destination, uint worldId, uint territoryId, uint mapId,
