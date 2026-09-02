@@ -5851,6 +5851,7 @@
   "hunts.listTab": "Liste",
   "hunts.settingsTab": "Ayarlar",
   "hunts.notificationSettingsTab": "Bildirimler",
+  "hunts.notificationsSignInHint": "Bu bildirimleri almak için Faloop'a giriş yap",
   "hunts.resetToDefault": "Varsayılana sıfırla",
   "hunts.resetTutorial": "Öğreticiyi sıfırla",
   "hunts.nativeMapMarkersLabel": "Haritada işaretleri göster",

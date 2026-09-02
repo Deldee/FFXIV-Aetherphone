@@ -1219,6 +1219,8 @@ internal static class L
         public static readonly LocString SettingsTab = new("hunts.settingsTab", "Settings");
         public static readonly LocString NotificationsSectionHeader =
             new("hunts.notificationSettingsTab", "Notifications");
+        public static readonly LocString NotificationsSignInHint =
+            new("hunts.notificationsSignInHint", "Log in to Faloop to receive these notifications");
         public static readonly LocString ResetToDefault = new("hunts.resetToDefault", "Reset to Default");
         public static readonly LocString ResetTutorial = new("hunts.resetTutorial", "Reset Tutorial");
         public static readonly LocString NativeMapMarkersLabel =

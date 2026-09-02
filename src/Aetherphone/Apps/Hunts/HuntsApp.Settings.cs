@@ -11,6 +11,8 @@ namespace Aetherphone.Apps.Hunts;
 
 internal sealed partial class HuntsApp
 {
+    private const float NotificationsDisabledAlpha = 0.45f;
+
     private readonly ChipRail notifyRankRail = new();
     private readonly ChipRail notifyExpansionRail = new();
     private readonly bool[] notifyRankChipActive = new bool[5];
@@ -62,19 +64,27 @@ internal sealed partial class HuntsApp
 
             DrawNotificationsSectionHeader();
 
+            var notificationsSignedIn = hunts.IsAuthenticated;
+            if (!notificationsSignedIn)
+            {
+                SettingsSection.Hint(Loc.T(L.Hunts.NotificationsSignInHint), frameTheme);
+                Gap(12f);
+                ImGui.PushStyleVar(ImGuiStyleVar.Alpha, ImGui.GetStyle().Alpha * NotificationsDisabledAlpha);
+            }
+
             SettingsSection.Header(Loc.T(L.Hunts.RanksLabel), frameTheme);
-            DrawNotifyRankChips();
+            DrawNotifyRankChips(notificationsSignedIn);
             Gap(20f);
 
             SettingsSection.Header(Loc.T(L.Hunts.ExpansionsLabel), frameTheme);
-            DrawNotifyExpansionChips();
+            DrawNotifyExpansionChips(notificationsSignedIn);
             Gap(20f);
 
             SettingsSection.Header(Loc.T(L.Hunts.WorldsLabel), frameTheme);
             var worldsCard = GroupCard.Begin(frameTheme, 1);
             var worldsRow = worldsCard.NextRow();
             if (SettingsRow.Disclosure(worldsRow, Loc.T(L.Hunts.WorldsLabel), NotifyWorldsValueText(), frameTheme,
-                    "hunts.settings.worlds"))
+                    "hunts.settings.worlds", dimmed: !notificationsSignedIn, interactive: notificationsSignedIn))
             {
                 OpenNotifyWorldMenu(worldsRow);
             }
@@ -85,7 +95,7 @@ internal sealed partial class HuntsApp
             var markCard = GroupCard.Begin(frameTheme, 1);
             if (SettingsRow.Link(markCard.NextRow(), FontAwesomeIcon.Bell, frameTheme.Accent,
                     Loc.T(L.Hunts.MarkNotificationsTitle), MarkNotificationsCountValueText(), frameTheme,
-                    id: "hunts.settings.markNotifications"))
+                    id: "hunts.settings.markNotifications", interactive: notificationsSignedIn))
             {
                 OpenMarkNotifications();
             }
@@ -95,7 +105,7 @@ internal sealed partial class HuntsApp
 
             var resetNotificationsCard = GroupCard.Begin(frameTheme, 1);
             if (SettingsRow.Action(resetNotificationsCard.NextRow(), Loc.T(L.Hunts.ResetToDefault),
-                    frameTheme.Accent, frameTheme))
+                    frameTheme.Accent, frameTheme, interactive: notificationsSignedIn))
             {
                 hunts.NotificationSettings.ResetToDefault();
                 notifySettingsDirty = true;
@@ -103,6 +113,11 @@ internal sealed partial class HuntsApp
 
             resetNotificationsCard.End();
             Gap(24f);
+
+            if (!notificationsSignedIn)
+            {
+                ImGui.PopStyleVar();
+            }
         }
     }
 
@@ -126,7 +141,7 @@ internal sealed partial class HuntsApp
         return count == 0 ? string.Empty : Loc.T(L.Hunts.MarkNotificationsCount, count);
     }
 
-    private void DrawNotifyRankChips()
+    private void DrawNotifyRankChips(bool interactive)
     {
         var settings = hunts.NotificationSettings;
         notifyRankChipActive[0] = settings.RankSS;
@@ -134,7 +149,7 @@ internal sealed partial class HuntsApp
         notifyRankChipActive[2] = settings.RankA;
         notifyRankChipActive[3] = settings.RankB;
         notifyRankChipActive[4] = settings.RankF;
-        var tapped = notifyRankRail.Draw(ui, RankChipLabels, notifyRankChipActive);
+        var tapped = notifyRankRail.Draw(ui, RankChipLabels, notifyRankChipActive, interactive: interactive);
         switch (tapped)
         {
             case 0:
@@ -160,7 +175,7 @@ internal sealed partial class HuntsApp
         }
     }
 
-    private void DrawNotifyExpansionChips()
+    private void DrawNotifyExpansionChips(bool interactive)
     {
         var settings = hunts.NotificationSettings;
         for (var index = 0; index < notifyExpansionChipActive.Length; index++)
@@ -169,7 +184,7 @@ internal sealed partial class HuntsApp
         }
 
         var tapped = notifyExpansionRail.Draw(ui, HuntExpansions.Labels, notifyExpansionChipActive,
-            labelPadding: ChipRail.CompactLabelPadding);
+            labelPadding: ChipRail.CompactLabelPadding, interactive: interactive);
         if (tapped >= 0)
         {
             settings.ToggleExpansion(tapped);

@@ -5851,6 +5851,7 @@
   "hunts.listTab": "Lista",
   "hunts.settingsTab": "Ajustes",
   "hunts.notificationSettingsTab": "Notificações",
+  "hunts.notificationsSignInHint": "Faça login no Faloop para receber essas notificações",
   "hunts.resetToDefault": "Restaurar padrão",
   "hunts.resetTutorial": "Redefinir tutorial",
   "hunts.nativeMapMarkersLabel": "Mostrar marcadores no mapa",

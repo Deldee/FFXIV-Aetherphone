@@ -5851,6 +5851,7 @@
   "hunts.listTab": "列表",
   "hunts.settingsTab": "设置",
   "hunts.notificationSettingsTab": "通知",
+  "hunts.notificationsSignInHint": "登录 Faloop 以接收这些通知",
   "hunts.resetToDefault": "恢复默认设置",
   "hunts.resetTutorial": "重置教程",
   "hunts.nativeMapMarkersLabel": "在地图上显示标记",

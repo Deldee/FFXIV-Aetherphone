@@ -5851,6 +5851,7 @@
   "hunts.listTab": "リスト",
   "hunts.settingsTab": "設定",
   "hunts.notificationSettingsTab": "通知",
+  "hunts.notificationsSignInHint": "これらの通知を受け取るにはFaloopにログインしてください",
   "hunts.resetToDefault": "デフォルトに戻す",
   "hunts.resetTutorial": "チュートリアルをリセット",
   "hunts.nativeMapMarkersLabel": "マップにマーカーを表示",

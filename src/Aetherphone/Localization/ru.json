@@ -5851,6 +5851,7 @@
   "hunts.listTab": "Список",
   "hunts.settingsTab": "Настройки",
   "hunts.notificationSettingsTab": "Уведомления",
+  "hunts.notificationsSignInHint": "Войдите в Faloop, чтобы получать эти уведомления",
   "hunts.resetToDefault": "Сбросить по умолчанию",
   "hunts.resetTutorial": "Сбросить обучение",
   "hunts.nativeMapMarkersLabel": "Показывать метки на карте",
