@@ -3,8 +3,8 @@ namespace Aetherphone.Core.Hunts;
 internal sealed class HuntMobCatalog
 {
     private readonly HuntJsonCatalogLoader<Dictionary<string, HuntMobDefinition>> loader;
+    private readonly Dictionary<string, HashSet<int>> ssRankPoiIdsByZone = new();
     private Dictionary<string, HuntMobDefinition> byId = new();
-    private HashSet<int>? ssRankPoiIds;
     private HashSet<int>? landminePoiIds;
 
     public HuntMobCatalog(FileInfo source)
@@ -30,11 +30,41 @@ internal sealed class HuntMobCatalog
         return byId.GetValueOrDefault(mobId);
     }
 
-    public bool IsSsRankPoi(int zonePoiId) => (ssRankPoiIds ??= BuildSsRankPoiIds()).Contains(zonePoiId);
+    public HashSet<int> SsRankPoiIdsForZone(string zoneId)
+    {
+        loader.EnsureLoaded();
+        if (ssRankPoiIdsByZone.TryGetValue(zoneId, out var cached))
+        {
+            return cached;
+        }
+
+        var result = new HashSet<int>();
+        foreach (var mob in byId.Values)
+        {
+            if (mob.Rank != "SS" || Array.IndexOf(mob.ZoneIds, zoneId) < 0)
+            {
+                continue;
+            }
+
+            for (var windowIndex = 0; windowIndex < mob.Windows.Length; windowIndex++)
+            {
+                var phases = mob.Windows[windowIndex].Phases;
+                for (var phaseIndex = 0; phaseIndex < phases.Length; phaseIndex++)
+                {
+                    var zonePoiIds = phases[phaseIndex].ZonePoiIds;
+                    for (var poiIndex = 0; poiIndex < zonePoiIds.Length; poiIndex++)
+                    {
+                        result.Add(zonePoiIds[poiIndex]);
+                    }
+                }
+            }
+        }
+
+        ssRankPoiIdsByZone[zoneId] = result;
+        return result;
+    }
 
     public bool IsLandminePoi(int zonePoiId) => (landminePoiIds ??= BuildLandminePoiIds()).Contains(zonePoiId);
-
-    private HashSet<int> BuildSsRankPoiIds() => BuildPoiIdsForRanks(static rank => rank == "SS");
 
     private HashSet<int> BuildLandminePoiIds() => BuildPoiIdsForRanks(static rank => rank is "A" or "B");
 

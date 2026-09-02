@@ -148,7 +148,7 @@ internal static class HuntCandidateResolver
         var poiIds = ResolveCandidatePoiIds(mob, activePhase, out var finalPhase);
         if (mob.Rank != "SS")
         {
-            poiIds.RemoveWhere(mobCatalog.IsSsRankPoi);
+            poiIds.ExceptWith(mobCatalog.SsRankPoiIdsForZone(targetZoneId));
         }
 
         var points = new List<HuntPoiEntry>();
