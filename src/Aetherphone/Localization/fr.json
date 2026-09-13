@@ -5267,6 +5267,7 @@
   "changelog.r1030.45": "Correction d'un chat déjà ouvert qui gardait sa notification et son badge non lu à l'arrivée d'un nouveau message : regarder le chat les efface maintenant, sans revenir à la liste pour le rouvrir",
   "changelog.r1030.46": "Correction des tells reçus pendant que le téléphone était éteint sur leur chat, qui ne notifiaient jamais et ne comptaient pas comme non lus",
   "changelog.r1030.47": "Correction du badge non lu d'un chat ChocoChat, Velvet ou Aethergram qui restait allumé jusqu'à une minute après sa lecture : il disparaît maintenant dès que le chat est à l'écran",
+  "changelog.r1030.48": "Correction d'un lieu partagé depuis l'intérieur d'une maison qui indiquait le quartier résidentiel du design intérieur au lieu de celui où se trouve la maison : la carte affiche maintenant le bon quartier et ouvre la carte sur la parcelle",
   "changelog.r1030.49": "Les notes vocales impossibles à ouvrir l'indiquent maintenant sur la bulle : un cadenas avec Envoyé vers une clé antérieure quand la clé manque sur ce PC, ou Chargement impossible quand le téléchargement a échoué, et toucher la bulle réessaie",
   "changelog.r1030.50": "Correction de MogCast et Musique qui refusaient tous les liens lorsque le nom d'utilisateur Windows contient des caractères chinois, japonais ou coréens",
   "changelog.r1021.0":"Correction du texte collé qui s'envoyait tout seul : un texte collé contenant un saut de ligne attend maintenant dans le champ jusqu'à ce que vous appuyiez sur Entrée",

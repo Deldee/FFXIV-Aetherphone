@@ -5267,6 +5267,7 @@
   "changelog.r1030.45": "Behoben, dass ein bereits geöffneter Chat seine Benachrichtigung und sein Ungelesen-Abzeichen behielt, wenn eine neue Nachricht eintraf: Den Chat anzusehen räumt beides jetzt weg, ohne zur Liste zurückzugehen und ihn erneut zu öffnen",
   "changelog.r1030.46": "Behoben, dass Tells, die eintrafen, während das Telefon auf ihrem Chat ausgeschaltet war, nie benachrichtigten oder als ungelesen zählten",
   "changelog.r1030.47": "Behoben, dass das Ungelesen-Abzeichen eines ChocoChat-, Velvet- oder Aethergram-Chats nach dem Lesen bis zu einer Minute leuchten blieb: Es verschwindet jetzt, sobald der Chat auf dem Bildschirm ist",
+  "changelog.r1030.48": "Behoben, dass ein aus einem Haus heraus geteilter Standort das Wohngebiet der Inneneinrichtung statt des Wohngebiets nannte, in dem das Haus steht: Die Karte nennt jetzt das richtige Wohngebiet und öffnet die Karte auf dem Grundstück",
   "changelog.r1030.49": "Sprachnachrichten, die sich nicht öffnen lassen, zeigen das jetzt in der Blase: ein Schloss mit An einen früheren Schlüssel gesendet, wenn der Schlüssel auf diesem PC fehlt, oder Laden fehlgeschlagen, wenn der Download fehlschlug, und ein Tipp auf die Blase versucht es erneut",
   "changelog.r1030.50": "Behoben, dass MogCast und Musik jeden Link ablehnten, wenn der Windows-Benutzername chinesische, japanische oder koreanische Zeichen enthält",
   "changelog.r1021.0":"Behoben, dass eingefügter Text sich selbst absendete: Text mit einem Zeilenumbruch bleibt jetzt im Feld stehen, bis du die Eingabetaste drückst",

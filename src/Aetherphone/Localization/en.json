@@ -5267,6 +5267,7 @@
   "changelog.r1030.45": "Fixed a chat that was already open keeping its notification and unread badge when a new message came in: looking at the chat now clears them, without going back to the list and opening it again",
   "changelog.r1030.46": "Fixed tells that arrived while the phone was closed on their chat never notifying or counting as unread",
   "changelog.r1030.47": "Fixed the unread badge on a ChocoChat, Velvet or Aethergram chat staying lit for up to a minute after you read it: it now clears as soon as the chat is on screen",
+  "changelog.r1030.48": "Fixed a location shared from inside a house naming the district of its interior design instead of the district the house stands in: the card now names the right district and opens the map on the plot",
   "changelog.r1030.49": "Voice notes that cannot be opened now say so on the bubble: a lock with Sent to an earlier key when this PC is missing the key, or Could not load when the download failed, and tapping the bubble tries again",
   "changelog.r1030.50": "Fixed MogCast and Music refusing every link for players whose Windows user name has Chinese, Japanese, or Korean characters",
   "changelog.r1021.0":"Fixed pasted text sending itself: text you paste with a line break in it now waits in the box until you press Enter",

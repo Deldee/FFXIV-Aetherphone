@@ -1809,6 +1809,8 @@ internal static class L
         {
             new("changelog.r1030.47",
                 "Fixed the unread badge on a ChocoChat, Velvet or Aethergram chat staying lit for up to a minute after you read it: it now clears as soon as the chat is on screen"),
+            new("changelog.r1030.48",
+                "Fixed a location shared from inside a house naming the district of its interior design instead of the district the house stands in: the card now names the right district and opens the map on the plot"),
             new("changelog.r1030.49",
                 "Voice notes that cannot be opened now say so on the bubble: a lock with Sent to an earlier key when this PC is missing the key, or Could not load when the download failed, and tapping the bubble tries again"),
         };
