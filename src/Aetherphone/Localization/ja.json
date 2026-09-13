@@ -5234,6 +5234,7 @@
   "changelog.sectionPhone": "本体",
   "changelog.sectionSocial": "ChirperとAethergram",
   "changelog.sectionAethergramVelvet": "AethergramとVelvet",
+  "changelog.r1031.0": "ポップアウトが位置を忘れてしまう問題を修正しました。閉じたポップアウトは同じ位置と大きさで再び開きます",
   "changelog.r1030.0": "一部の PC でアップロードした写真に赤、青、白の線が混ざる問題を修正しました",
   "changelog.r1030.1": "写真の編集機能を追加しました。明るさや色の調整、フィルムやノワールなどのスタイル、切り抜きと回転ができ、元の写真は常に残ります",
   "changelog.r1030.3": "スマートフォンのカメラで撮った写真が横向きに表示される問題を修正しました",

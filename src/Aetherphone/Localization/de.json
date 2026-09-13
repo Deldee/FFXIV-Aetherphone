@@ -5234,6 +5234,7 @@
   "changelog.sectionPhone": "Telefon",
   "changelog.sectionSocial": "Chirper und Aethergram",
   "changelog.sectionAethergramVelvet": "Aethergram und Velvet",
+  "changelog.r1031.0": "Behoben, dass Pop-outs ihren Platz vergaßen: ein geschlossenes Pop-out öffnet sich wieder dort, wo es war, in derselben Größe",
   "changelog.r1030.0": "Behoben, dass manche PCs hochgeladenen Fotos rote, blaue und weiße Striche hinzufügten",
   "changelog.r1030.1": "Einen Fotoeditor hinzugefügt: Licht und Farbe anpassen, einen Look wie Film oder Noir wählen, zuschneiden und drehen, und das Original bleibt immer erhalten",
   "changelog.r1030.3": "Behoben, dass Fotos von einer Handykamera seitlich verdreht erschienen",

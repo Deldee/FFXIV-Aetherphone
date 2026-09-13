@@ -1756,6 +1756,12 @@ internal static class L
         public static readonly LocString SectionSocial = new("changelog.sectionSocial", "Chirper and Aethergram");
         public static readonly LocString SectionAethergramVelvet = new("changelog.sectionAethergramVelvet", "Aethergram and Velvet");
 
+        public static readonly LocString[] Release1031Linkpearl =
+        {
+            new("changelog.r1031.0",
+                "Fixed pop-out chat windows forgetting their place: a pop-out you close reopens where it was, at the same size"),
+        };
+
         public static readonly LocString[] Release1030Photos =
         {
             new("changelog.r1030.5",

@@ -5234,6 +5234,7 @@
   "changelog.sectionPhone": "Telefon",
   "changelog.sectionSocial": "Chirper ve Aethergram",
   "changelog.sectionAethergramVelvet": "Aethergram ve Velvet",
+  "changelog.r1031.0": "Ayrı pencerelerin yerini unutması düzeltildi: kapattığınız bir pencere aynı yerde ve aynı boyutta yeniden açılıyor",
   "changelog.r1030.0": "Bazı bilgisayarların yüklenen fotoğraflara kırmızı, mavi ve beyaz çizgiler eklemesi düzeltildi",
   "changelog.r1030.1": "Fotoğraf düzenleyici eklendi: ışığı ve rengi ayarlayın, Film veya Noir gibi bir stil seçin, kırpın ve döndürün, orijinal her zaman korunur",
   "changelog.r1030.3": "Telefon kamerasından gelen fotoğrafların yan görünmesi düzeltildi",

@@ -5234,6 +5234,7 @@
   "changelog.sectionPhone": "Telefone",
   "changelog.sectionSocial": "Chirper e Aethergram",
   "changelog.sectionAethergramVelvet": "Aethergram e Velvet",
+  "changelog.r1031.0": "Corrigidas as janelas flutuantes que esqueciam seu lugar: uma janela flutuante que você fecha reabre onde estava, no mesmo tamanho",
   "changelog.r1030.0": "Corrigidos os traços vermelhos, azuis e brancos que alguns PCs adicionavam às fotos enviadas",
   "changelog.r1030.1": "Adicionado um editor de fotos: ajuste luz e cor, escolha um estilo como Filme ou Noir, corte e gire, e o original sempre é mantido",
   "changelog.r1030.3": "Corrigidas as fotos de câmera de celular que apareciam de lado",
