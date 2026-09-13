@@ -5268,6 +5268,7 @@
   "changelog.r1030.46": "Corrigidos os tells recebidos enquanto o telefone estava desligado nessa conversa, que nunca notificavam nem contavam como não lidos",
   "changelog.r1030.47": "Corrigido o selo de não lida de uma conversa do ChocoChat, do Velvet ou do Aethergram que ficava aceso por até um minuto depois de lida: agora some assim que a conversa está na tela",
   "changelog.r1030.49": "Notas de voz que não podem ser abertas agora avisam no balão: um cadeado com Enviado para uma chave anterior quando a chave falta neste PC, ou Não foi possível carregar quando o download falhou, e tocar no balão tenta de novo",
+  "changelog.r1030.50": "Corrigido o MogCast e a Música recusarem todos os links quando o nome de usuário do Windows contém caracteres chineses, japoneses ou coreanos",
   "changelog.r1021.0":"Corrigido o texto colado que se enviava sozinho: um texto colado com uma quebra de linha agora fica no campo até você pressionar Enter",
   "changelog.r1020.2": "Velvet reformulado de cima a baixo: o feed, Descobrir, os perfis, as mensagens, o compositor e os filtros",
   "changelog.r1020.3": "Descobrir mostra as pessoas como uma lista de cartões com foto, cada um com uma linha sobre o que vocês têm em comum",

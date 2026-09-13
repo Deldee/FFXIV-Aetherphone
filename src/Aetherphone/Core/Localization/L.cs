@@ -1855,6 +1855,12 @@ internal static class L
                 "Fixed tells that arrived while the phone was closed on their chat never notifying or counting as unread"),
         };
 
+        public static readonly LocString[] Release1030AetherStream =
+        {
+            new("changelog.r1030.50",
+                "Fixed MogCast and Music refusing every link for players whose Windows user name has Chinese, Japanese, or Korean characters"),
+        };
+
         public static readonly LocString[] Release1021Message =
         {
             new("changelog.r1021.0",

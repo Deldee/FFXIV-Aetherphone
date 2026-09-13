@@ -5268,6 +5268,7 @@
   "changelog.r1030.46": "Corregido que los tells recibidos mientras el teléfono estaba apagado en su chat nunca notificaran ni contaran como no leídos",
   "changelog.r1030.47": "Corregido que la marca de no leído de un chat de ChocoChat, Velvet o Aethergram siguiera encendida hasta un minuto después de leerlo: ahora desaparece en cuanto el chat está en pantalla",
   "changelog.r1030.49": "Las notas de voz que no se pueden abrir ahora lo indican en la burbuja: un candado con Enviado a una clave anterior cuando falta la clave en este PC, o No se pudo cargar cuando falló la descarga, y tocar la burbuja lo intenta de nuevo",
+  "changelog.r1030.50": "Corregido que MogCast y Música rechazaran todos los enlaces cuando el nombre de usuario de Windows contiene caracteres chinos, japoneses o coreanos",
   "changelog.r1021.0":"Corregido que el texto pegado se enviara solo: un texto pegado con un salto de línea ahora espera en el cuadro hasta que pulsas Intro",
   "changelog.r1020.2": "Velvet renovado de arriba abajo: el feed, Descubrir, los perfiles, los mensajes, el editor y los filtros",
   "changelog.r1020.3": "Descubrir muestra a la gente como una lista de tarjetas con foto, cada una con una línea sobre lo que compartís",

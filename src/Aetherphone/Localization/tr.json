@@ -5268,6 +5268,7 @@
   "changelog.r1030.46": "Telefon o sohbette kapalıyken gelen özel mesajların hiç bildirim vermemesi ve okunmamış sayılmaması düzeltildi",
   "changelog.r1030.47": "ChocoChat, Velvet veya Aethergram sohbetindeki okunmamış rozetinin okunduktan sonra bir dakikaya kadar yanık kalması düzeltildi: artık sohbet ekrana gelir gelmez kayboluyor",
   "changelog.r1030.49": "Açılamayan sesli notlar artık bunu balonun üzerinde söylüyor: bu bilgisayarda anahtar yoksa bir kilit ve Daha eski bir anahtara gönderildi, indirme başarısız olduysa Yüklenemedi yazıyor ve balona dokunmak yeniden deniyor",
+  "changelog.r1030.50": "Windows kullanıcı adında Çince, Japonca veya Korece karakterler olduğunda MogCast ve Müzik'in hiçbir bağlantıyı açmaması düzeltildi",
   "changelog.r1021.0":"Yapıştırılan metnin kendiliğinden gönderilmesi düzeltildi: içinde satır sonu olan bir metni yapıştırdığınızda artık Enter'a basana kadar kutuda bekliyor",
   "changelog.r1020.2": "Velvet baştan aşağı elden geçirildi: akış, Keşfet, profiller, mesajlar, gönderi oluşturucu ve filtreler",
   "changelog.r1020.3": "Keşfet artık insanları fotoğraf kartlarından oluşan bir listede gösteriyor, her kartta ortak noktanızı anlatan bir satırla",

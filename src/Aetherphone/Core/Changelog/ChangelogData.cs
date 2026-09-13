@@ -13,6 +13,7 @@ internal static class ChangelogData
             new(L.Apps.Velvet, L.Changelog.Release1030Velvet),
             new(L.Changelog.SectionMessaging, L.Changelog.Release1030Messaging),
             new(L.Apps.Linkpearl, L.Changelog.Release1030Linkpearl),
+            new(L.Apps.AetherStream, L.Changelog.Release1030AetherStream),
             new(L.Changelog.SectionPhone, L.Changelog.Release1030Phone),
         }),
         new ChangelogEntry("1.0.2.1", "2026-09-10", new ChangelogSection[]
