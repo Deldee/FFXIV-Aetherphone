@@ -5267,6 +5267,7 @@
   "changelog.r1030.45": "Fixed a chat that was already open keeping its notification and unread badge when a new message came in: looking at the chat now clears them, without going back to the list and opening it again",
   "changelog.r1030.46": "Fixed tells that arrived while the phone was closed on their chat never notifying or counting as unread",
   "changelog.r1030.47": "Fixed the unread badge on a ChocoChat, Velvet or Aethergram chat staying lit for up to a minute after you read it: it now clears as soon as the chat is on screen",
+  "changelog.r1030.49": "Voice notes that cannot be opened now say so on the bubble: a lock with Sent to an earlier key when this PC is missing the key, or Could not load when the download failed, and tapping the bubble tries again",
   "changelog.r1021.0":"Fixed pasted text sending itself: text you paste with a line break in it now waits in the box until you press Enter",
   "changelog.r1020.2": "Overhauled Velvet from top to bottom: the feed, discover, profiles, messages, the composer and the filters",
   "changelog.r1020.3": "Discover shows people as a scrolling list of photo cards, each with a line about what you two share",
