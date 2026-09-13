@@ -1754,107 +1754,74 @@ internal static class L
         public static readonly LocString SectionMessaging = new("changelog.sectionMessaging", "Messaging");
         public static readonly LocString SectionPhone = new("changelog.sectionPhone", "Phone");
         public static readonly LocString SectionSocial = new("changelog.sectionSocial", "Chirper and Aethergram");
+        public static readonly LocString SectionAethergramVelvet = new("changelog.sectionAethergramVelvet", "Aethergram and Velvet");
 
         public static readonly LocString[] Release1030Photos =
         {
-            new("changelog.r1030.1",
-                "Added an editor to Photos: tap Edit on any photo to adjust brightness, contrast, saturation, warmth and vignette, or pick a look such as Warm, Film or Noir"),
-            new("changelog.r1030.2",
-                "The editor also crops to a ratio, straightens, rotates and flips; saving keeps the original and adds the edited photo beside it"),
             new("changelog.r1030.5",
-                "Photos has a new look: Library and Albums now sit in a tab bar at the bottom, the grid runs edge to edge, and album cards match the social apps"),
-            new("changelog.r1030.6",
-                "Albums are easier to make and manage: tap the plus in the Albums tab or the New Album tile, name it in a sheet, then add photos, rename or delete it from the album menu"),
-            new("changelog.r1030.7",
-                "The photo viewer keeps Share, Add to Album and Delete in a bar at the bottom, with Edit at the top right; Add to Album can now create the album on the spot"),
-            new("changelog.r1030.8",
-                "Monthly albums are now a choice: Photos asks once on the Albums tab, and the switch lives in Settings under General"),
-            new("changelog.r1030.9",
-                "A sort menu in the Library header orders the library by date, name, size or dimensions in either direction, filters it to favorites or photos not in an album, and zooms the grid in and out"),
+                "Overhauled Photos from top to bottom: a tab bar for Library and Albums, an edge to edge grid, a new photo viewer and easier albums"),
+            new("changelog.r1030.1",
+                "Added a photo editor: adjust light and color, pick a look such as Film or Noir, crop and rotate, and the original is always kept"),
             new("changelog.r1030.10",
-                "Favorites: tap the heart on a photo and find it again in the new Favorites collection on the Albums tab"),
+                "Added Favorites: tap the heart on a photo to keep it in its own collection"),
             new("changelog.r1030.11",
-                "Select mode: pick several photos in the library or an album, then favorite them, add them to an album or delete them together"),
+                "Added select mode to favorite, add to an album or delete several photos at once"),
+            new("changelog.r1030.9",
+                "Added a sort menu that orders and filters the library and zooms the grid"),
             new("changelog.r1030.12",
-                "Deleting a photo now moves it to Recently Deleted, where it can be recovered for 30 days before it is removed for good"),
-            new("changelog.r1030.13",
-                "The viewer's Info button shows when a photo was taken, its size in pixels and on disk, and its file name"),
-            new("changelog.r1030.14",
-                "Recently Deleted shows on each thumbnail how many days are left before the photo is removed"),
+                "Added Recently Deleted: a deleted photo can be recovered for 30 days"),
+            new("changelog.r1030.8",
+                "Monthly albums are now optional, with the switch in Settings under General"),
         };
 
-        private static readonly LocString ComposerFlow = new("changelog.r1030.4",
-            "Redesigned how a new post or story comes together: frame each photo while you pick it, tap the corner button to switch between Square, Portrait and Landscape, then polish it with Looks and Adjust on one Edit screen");
-
-        private static readonly LocString ComposerShareScreen = new("changelog.r1030.20",
-            "The last step of a new post is a proper share screen: the caption sits in its own card with a bigger emoji button, the post options sit in a card below it, and a single Share button waits at the bottom");
-
-        public static readonly LocString[] Release1030Aethergram =
+        public static readonly LocString[] Release1030AethergramVelvet =
         {
-            ComposerFlow,
-            ComposerShareScreen,
+            new("changelog.r1030.4",
+                "Redesigned the post and story composer: frame each photo as you pick it, polish it on one Edit screen, and share from a cleaner last step"),
             new("changelog.r1030.40",
-                "Edit post replaces Edit caption on your own posts: change the caption, tag or untag people on any photo, and switch the sensitive mark, all from one screen"),
+                "Edit post replaces Edit caption on your own posts: change the caption, the tags and the post options from one screen"),
         };
 
-        public static readonly LocString[] Release1030Velvet =
+        public static readonly LocString[] Release1030Linkpearl =
         {
-            ComposerFlow,
-            ComposerShareScreen,
-            new("changelog.r1030.41",
-                "Edit post replaces Edit caption on your own posts: change the caption, the tags, and who can see the post from one screen, with the photos right above"),
+            new("changelog.r1030.34",
+                "Overhauled Linkpearl from top to bottom: a tab bar for Chats, People and Settings, edge to edge screens and a green theme by default"),
+            new("changelog.r1030.35",
+                "Rebuilt People with portraits, a friend card with quick actions, and Lodestone pages for characters and Free Companies"),
+            new("changelog.r1030.30",
+                "Added chat themes and wallpapers, for every chat or a single one"),
+            new("changelog.r1030.31",
+                "Added a Log layout in the game's own channel colors, and any chat switches between Log and Bubbles with one tap"),
+            new("changelog.r1030.32",
+                "Added game chat options: the game's log colors, a tab that follows the game chat box, a screenshot mode that masks names, and history export"),
+            new("changelog.r1030.36",
+                "Pop-outs gather new chats as tabs, follow your chat theme, open where you choose and carry their own settings button"),
+            new("changelog.r1030.46",
+                "Fixed tells that arrived while the phone was closed on their chat never notifying or counting as unread"),
         };
 
         public static readonly LocString[] Release1030Messaging =
         {
-            new("changelog.r1030.47",
-                "Fixed the unread badge on a ChocoChat, Velvet or Aethergram chat staying lit for up to a minute after you read it: it now clears as soon as the chat is on screen"),
-            new("changelog.r1030.48",
-                "Fixed a location shared from inside a house naming the district of its interior design instead of the district the house stands in: the card now names the right district and opens the map on the plot"),
             new("changelog.r1030.49",
-                "Voice notes that cannot be opened now say so on the bubble: a lock with Sent to an earlier key when this PC is missing the key, or Could not load when the download failed, and tapping the bubble tries again"),
+                "Voice notes that cannot be played now say why on the bubble, and tapping it tries again"),
+            new("changelog.r1030.47",
+                "Fixed the unread badge staying on a chat you are already reading, in ChocoChat, Velvet, Aethergram and Linkpearl"),
+            new("changelog.r1030.48",
+                "Fixed a location shared from inside a house naming the wrong district"),
         };
 
         public static readonly LocString[] Release1030Phone =
         {
             new("changelog.r1030.42",
-                "The minimized phone can be resized: drag its bottom right corner, the same way the full phone resizes, and the mini phone or minimap scales with it"),
+                "The minimized phone can be resized from its bottom right corner"),
             new("changelog.r1030.43",
-                "The minimized phone no longer turns off when you hold it: that was easy to trip while starting a drag, and the side button, the server info bar entry and the chat command still turn the phone off"),
+                "The minimized phone no longer turns off when you hold it"),
             new("changelog.r1030.0",
-                "Fixed the scattered red, blue and white dashes some PCs added to uploaded photos: Aetherphone now writes every JPEG itself instead of relying on a library that misbehaved on those machines"),
+                "Fixed some PCs adding red, blue and white dashes to uploaded photos"),
             new("changelog.r1030.3",
-                "Fixed photos from a phone camera showing up sideways: a picture's own orientation tag is now honoured everywhere a photo is previewed or uploaded"),
+                "Fixed photos from a phone camera showing up sideways"),
             new("changelog.r1030.44",
-                "Fixed text entered through an input method (Chinese, Japanese or Korean, for example) going unnoticed in ChocoChat, Linkpearl and every other text box: Send and Enter now work as soon as the text is confirmed, without typing another key"),
-        };
-
-        public static readonly LocString[] Release1030Linkpearl =
-        {
-            new("changelog.r1030.30",
-                "Added chat themes and wallpapers to Linkpearl: pick one of nine color themes, and a wallpaper for every chat or for a single one, the same ones ChocoChat offers"),
-            new("changelog.r1030.31",
-                "Added a Log layout in place of Compact: one line per message in the game's own channel colors, with a timestamp column and clickable names, and each tab can choose Log or Bubbles, its own text size and whether it shows timestamps"),
-            new("changelog.r1030.32",
-                "Added the game chat options people asked for: import the game's log colors, a tab that follows the game chat box, a screenshot mode that masks names, hiding during cutscenes and with the HUD, a text size setting and history export"),
-            new("changelog.r1030.33",
-                "Added a placement setting for pop-outs: a new window lands beside the phone or in the corner you pick, instead of always at the bottom right"),
-            new("changelog.r1030.34",
-                "Redesigned Linkpearl on the same chrome as ChocoChat: Chats, People and Settings sit in a tab bar at the bottom, every screen runs edge to edge, the thread has a proper header with avatars, and a green theme is the default"),
-            new("changelog.r1030.35",
-                "Rebuilt People: friends, party and Free Company rows with portraits and subtitles that no longer cut off, a friend card with Message, Plate, Party and Visit, and Lodestone pages for characters and Free Companies"),
-            new("changelog.r1030.36",
-                "New chats now open as a tab in the pop-out you are using instead of a new window each time; the title strip is the tab rail, and a collapsed window shows the stacked avatars, the names and one count of new messages"),
-            new("changelog.r1030.37",
-                "Pop-out windows have a glass look that follows your chat theme and wallpaper"),
-            new("changelog.r1030.38",
-                "Switch any chat between the Log and Bubbles layouts with one tap on the thread header, tells included"),
-            new("changelog.r1030.39",
-                "Pop-out windows have a settings button on the bar: change the layout, text size, opacity and fade without opening the phone"),
-            new("changelog.r1030.45",
-                "Fixed a chat that was already open keeping its notification and unread badge when a new message came in: looking at the chat now clears them, without going back to the list and opening it again"),
-            new("changelog.r1030.46",
-                "Fixed tells that arrived while the phone was closed on their chat never notifying or counting as unread"),
+                "Fixed Send and Enter missing text typed through an input method, such as Chinese, Japanese or Korean, until another key was pressed"),
         };
 
         public static readonly LocString[] Release1030AetherStream =

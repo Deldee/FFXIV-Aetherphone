@@ -9,12 +9,11 @@ internal static class ChangelogData
         new ChangelogEntry("1.0.3.0", "2026-09-12", new ChangelogSection[]
         {
             new(L.Apps.Photos, L.Changelog.Release1030Photos),
-            new(L.Apps.Aethergram, L.Changelog.Release1030Aethergram),
-            new(L.Apps.Velvet, L.Changelog.Release1030Velvet),
-            new(L.Changelog.SectionMessaging, L.Changelog.Release1030Messaging),
+            new(L.Changelog.SectionAethergramVelvet, L.Changelog.Release1030AethergramVelvet),
             new(L.Apps.Linkpearl, L.Changelog.Release1030Linkpearl),
-            new(L.Apps.AetherStream, L.Changelog.Release1030AetherStream),
+            new(L.Changelog.SectionMessaging, L.Changelog.Release1030Messaging),
             new(L.Changelog.SectionPhone, L.Changelog.Release1030Phone),
+            new(L.Apps.AetherStream, L.Changelog.Release1030AetherStream),
         }),
         new ChangelogEntry("1.0.2.1", "2026-09-10", new ChangelogSection[]
         {
