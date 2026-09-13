@@ -179,7 +179,19 @@ internal sealed class SoftWrapEditor
             return;
         }
 
+        if (BufferDriftedOutsideImGui(data))
+        {
+            ApplyWrap(data);
+            return;
+        }
+
         cursorBytes = data.CursorPos;
+    }
+
+    private bool BufferDriftedOutsideImGui(ImGuiInputTextCallbackDataPtr data)
+    {
+        var imeHoldsComposition = data.SelectionStart != data.SelectionEnd;
+        return !imeHoldsComposition && !SoftWrap.MatchesUtf8(wrapped.Display, data.BufSpan[..data.BufTextLen]);
     }
 
     private int TakeCursor()
