@@ -1833,11 +1833,20 @@ internal sealed class ChatTranscript
         }
 
         var state = model.Voice?.StateFor(message.Id) ?? default;
+        var failed = state.Failure != VoiceNoteFailure.None;
         var playCenter = new Vector2(bubbleMin.X + paddingX + playRadius, contentTop + playRadius);
-        var playFill = mine ? new Vector4(1f, 1f, 1f, 0.22f) : Palette.WithAlpha(model.Accent, 0.9f);
+        var playFill = mine
+            ? new Vector4(1f, 1f, 1f, failed ? 0.12f : 0.22f)
+            : Palette.WithAlpha(model.Accent, failed ? 0.45f : 0.9f);
         drawList.AddCircleFilled(playCenter, playRadius, ImGui.GetColorU32(Palette.WithAlpha(playFill,
             playFill.W * fx.Alpha)), 28);
-        AppSkin.Icon(drawList, playCenter, IconGlyph.Of((state.Playing ? FontAwesomeIcon.Pause : FontAwesomeIcon.Play)), new Vector4(1f, 1f, 1f, fx.Alpha), 0.7f);
+        var playGlyph = state.Failure switch
+        {
+            VoiceNoteFailure.NoKey => FontAwesomeIcon.Lock,
+            VoiceNoteFailure.Unavailable => FontAwesomeIcon.ExclamationCircle,
+            _ => state.Playing ? FontAwesomeIcon.Pause : FontAwesomeIcon.Play,
+        };
+        AppSkin.Icon(drawList, playCenter, IconGlyph.Of(playGlyph), new Vector4(1f, 1f, 1f, fx.Alpha), 0.7f);
         var trackLeft = playCenter.X + playRadius + 9f * scale;
         var trackRight = bubbleMax.X - paddingX;
         var trackY = playCenter.Y;
@@ -1857,9 +1866,20 @@ internal sealed class ChatTranscript
         var duration = state.Current && state.Playing
             ? (int)MathF.Round(progress * message.DurationSecs)
             : message.DurationSecs;
-        var durationText = TimeText.MinutesSeconds(duration);
+        var footerText = state.Failure switch
+        {
+            VoiceNoteFailure.NoKey => Loc.T(L.Encryption.OlderKeyPlaceholder),
+            VoiceNoteFailure.Unavailable => Loc.T(L.Common.LoadFailed),
+            _ => TimeText.MinutesSeconds(duration),
+        };
+        if (failed)
+        {
+            var footerMaxWidth = bubbleMax.X - paddingX - stamp.Width - 6f * scale - trackLeft;
+            footerText = Typography.FitText(footerText, footerMaxWidth, StampTextScale, FontWeight.Regular);
+        }
+
         Typography.Draw(drawList, new Vector2(trackLeft, bubbleMax.Y - paddingY - stamp.Height),
-            durationText, Palette.WithAlpha(mine ? new Vector4(1f, 1f, 1f, 0.72f) : model.MutedInk, fx.Alpha),
+            footerText, Palette.WithAlpha(mine ? new Vector4(1f, 1f, 1f, 0.72f) : model.MutedInk, fx.Alpha),
             StampTextScale);
         var timeColor = mine ? new Vector4(1f, 1f, 1f, 0.72f) : Palette.WithAlpha(model.MutedInk, 0.95f);
         DrawStamp(drawList, stamp, new Vector2(bubbleMax.X - paddingX, bubbleMax.Y - paddingY), fx, timeColor);

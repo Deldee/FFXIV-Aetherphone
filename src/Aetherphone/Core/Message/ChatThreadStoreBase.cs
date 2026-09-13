@@ -1395,6 +1395,17 @@ internal abstract class ChatThreadStoreBase<TMessage, TThread> : IDisposable
         return null;
     }
 
+    public bool MediaUrlFailed(string messageId) => dmMediaFailed.ContainsKey(messageId);
+
+    public void ForgetMediaUrlFailure(string messageId) => dmMediaFailed.TryRemove(messageId, out _);
+
+    public bool HasMediaKey(string messageId, string? threadId)
+    {
+        return threadId is not null
+            && cipher.TryGetGeneration(messageId, out var generation)
+            && keys.TryGetCek(ScopeFor(threadId), generation, out _);
+    }
+
     public void ReportMessage(string messageId, string? reason, Action<bool> onComplete)
     {
         var snapshot = messages;

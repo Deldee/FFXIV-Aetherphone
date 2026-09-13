@@ -57,7 +57,7 @@ internal abstract class ChatThreadView<TMessage, TThread> : IDisposable, IChatTr
     private static readonly TimeSpan SyncBannerFloor = TimeSpan.FromSeconds(2);
     private readonly ConcurrentDictionary<string, byte[]> voiceBytes = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, byte> voiceFetching = new(StringComparer.Ordinal);
-    private readonly ConcurrentDictionary<string, DateTime> voiceFailed = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, VoiceFailure> voiceFailed = new(StringComparer.Ordinal);
     private readonly float threadPollSeconds;
     private readonly float typingSendSeconds;
     private readonly Action<string> pickImage;
@@ -518,7 +518,13 @@ internal abstract class ChatThreadView<TMessage, TThread> : IDisposable, IChatTr
 
     void IChatTranscriptInteractions.OnReactionClick(string messageId, string token) => OpenReactions(messageId);
 
-    VoiceNoteState IChatTranscriptVoice.StateFor(string messageId) => voicePlayer.StateFor(messageId);
+    VoiceNoteState IChatTranscriptVoice.StateFor(string messageId)
+    {
+        var state = voicePlayer.StateFor(messageId);
+        return voiceFailed.TryGetValue(messageId, out var failure)
+            ? state with { Failure = failure.Kind }
+            : state;
+    }
 
     void IChatTranscriptVoice.Toggle(string messageId) => ToggleVoice(messageId);
 
@@ -816,6 +822,8 @@ internal abstract class ChatThreadView<TMessage, TThread> : IDisposable, IChatTr
             return;
         }
 
+        voiceFailed.TryRemove(messageId, out _);
+        store.ForgetMediaUrlFailure(messageId);
         pendingVoicePlay = messageId;
         FetchVoice(messageId);
     }
@@ -827,9 +835,9 @@ internal abstract class ChatThreadView<TMessage, TThread> : IDisposable, IChatTr
             return;
         }
 
-        if (voiceFailed.TryGetValue(messageId, out var failedAtUtc))
+        if (voiceFailed.TryGetValue(messageId, out var recorded))
         {
-            if (DateTime.UtcNow - failedAtUtc < VoiceFailureRetryFor)
+            if (DateTime.UtcNow - recorded.AtUtc < VoiceFailureRetryFor)
             {
                 return;
             }
@@ -838,7 +846,17 @@ internal abstract class ChatThreadView<TMessage, TThread> : IDisposable, IChatTr
         }
 
         var url = store.DmMediaUrl(messageId);
-        if (url is null || !voiceFetching.TryAdd(messageId, 0))
+        if (url is null)
+        {
+            if (store.MediaUrlFailed(messageId))
+            {
+                MarkVoiceFailed(messageId, VoiceNoteFailure.Unavailable);
+            }
+
+            return;
+        }
+
+        if (!voiceFetching.TryAdd(messageId, 0))
         {
             return;
         }
@@ -850,24 +868,36 @@ internal abstract class ChatThreadView<TMessage, TThread> : IDisposable, IChatTr
             try
             {
                 var data = await http.GetBytesAsync(new Uri(url), CancellationToken.None).ConfigureAwait(false);
-                var plain = data is null
-                    ? null
-                    : message is not null && IsEncrypted(message)
-                        ? DecryptSealed(message, threadId, data)
-                        : data;
+                if (data is null)
+                {
+                    AepLog.Warning($"[{LogTag}] voice note {messageId} download returned nothing");
+                    MarkVoiceFailed(messageId, VoiceNoteFailure.Unavailable);
+                    return;
+                }
+
+                if (message is null || !IsEncrypted(message))
+                {
+                    voiceBytes[messageId] = data;
+                    return;
+                }
+
+                var plain = DecryptSealed(message, threadId, data);
                 if (plain is not null)
                 {
                     voiceBytes[messageId] = plain;
+                    return;
                 }
-                else
-                {
-                    MarkVoiceFailed(messageId);
-                }
+
+                var failure = store.HasMediaKey(messageId, threadId)
+                    ? VoiceNoteFailure.Unavailable
+                    : VoiceNoteFailure.NoKey;
+                AepLog.Warning($"[{LogTag}] voice note {messageId} could not be opened on this device ({failure})");
+                MarkVoiceFailed(messageId, failure);
             }
             catch (Exception exception)
             {
-                AepLog.Warning(exception, "Voice note download failed");
-                MarkVoiceFailed(messageId);
+                AepLog.Warning(exception, $"[{LogTag}] voice note {messageId} download failed");
+                MarkVoiceFailed(messageId, VoiceNoteFailure.Unavailable);
             }
             finally
             {
@@ -876,9 +906,9 @@ internal abstract class ChatThreadView<TMessage, TThread> : IDisposable, IChatTr
         });
     }
 
-    private void MarkVoiceFailed(string messageId)
+    private void MarkVoiceFailed(string messageId, VoiceNoteFailure failure)
     {
-        voiceFailed[messageId] = DateTime.UtcNow;
+        voiceFailed[messageId] = new VoiceFailure(DateTime.UtcNow, failure);
         if (pendingVoicePlay == messageId)
         {
             pendingVoicePlay = null;
@@ -1275,4 +1305,6 @@ internal abstract class ChatThreadView<TMessage, TThread> : IDisposable, IChatTr
         voicePlayer.Dispose();
         encryptionPane.Dispose();
     }
+
+    private readonly record struct VoiceFailure(DateTime AtUtc, VoiceNoteFailure Kind);
 }

@@ -533,14 +533,13 @@ internal sealed partial class VelvetStore : ChatThreadStoreBase<VelvetMessageDto
 
     public byte[]? DecryptMedia(VelvetMessageDto message, byte[] sealedBytes, string threadPartnerId)
     {
-        if (message.EncVersion != EnvelopeCodec.VersionEnvelope
-            || !cipher.TryGetGeneration(message.Id, out var generation))
+        if (message.EncVersion != EnvelopeCodec.VersionEnvelope)
         {
             return null;
         }
 
-        var scope = ScopeFor(threadPartnerId);
-        return cipher.TryDecryptMedia(scope, generation, sealedBytes, message.SenderId, message.Kind);
+        return cipher.TryDecryptMedia(message.Id, ScopeFor(threadPartnerId), sealedBytes, message.SenderId,
+            message.Kind);
     }
 
     public void ClearDiscover()

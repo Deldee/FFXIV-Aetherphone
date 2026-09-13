@@ -312,14 +312,13 @@ internal sealed class DirectMessagesStore : ChatThreadStoreBase<ChatMessageDto, 
 
     public byte[]? DecryptMedia(ChatMessageDto message, byte[] sealedBytes)
     {
-        if (message.EncVersion != EnvelopeCodec.VersionEnvelope
-            || !cipher.TryGetGeneration(message.Id, out var generation))
+        if (message.EncVersion != EnvelopeCodec.VersionEnvelope)
         {
             return null;
         }
 
-        var scope = ConversationKeyStore.ChatScope(message.ConversationId);
-        return cipher.TryDecryptMedia(scope, generation, sealedBytes, message.SenderId, message.Kind);
+        return cipher.TryDecryptMedia(message.Id, ConversationKeyStore.ChatScope(message.ConversationId), sealedBytes,
+            message.SenderId, message.Kind);
     }
 
     public void SetMuted(string id, bool muted, Action<bool> onComplete)
