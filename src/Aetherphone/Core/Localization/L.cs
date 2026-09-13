@@ -1805,6 +1805,12 @@ internal static class L
                 "Edit post replaces Edit caption on your own posts: change the caption, the tags, and who can see the post from one screen, with the photos right above"),
         };
 
+        public static readonly LocString[] Release1030Messaging =
+        {
+            new("changelog.r1030.47",
+                "Fixed the unread badge on a ChocoChat, Velvet or Aethergram chat staying lit for up to a minute after you read it: it now clears as soon as the chat is on screen"),
+        };
+
         public static readonly LocString[] Release1030Phone =
         {
             new("changelog.r1030.42",
@@ -1841,6 +1847,10 @@ internal static class L
                 "Switch any chat between the Log and Bubbles layouts with one tap on the thread header, tells included"),
             new("changelog.r1030.39",
                 "Pop-out windows have a settings button on the bar: change the layout, text size, opacity and fade without opening the phone"),
+            new("changelog.r1030.45",
+                "Fixed a chat that was already open keeping its notification and unread badge when a new message came in: looking at the chat now clears them, without going back to the list and opening it again"),
+            new("changelog.r1030.46",
+                "Fixed tells that arrived while the phone was closed on their chat never notifying or counting as unread"),
         };
 
         public static readonly LocString[] Release1021Message =
