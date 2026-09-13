@@ -1807,14 +1807,16 @@ internal static class L
 
         public static readonly LocString[] Release1030Phone =
         {
+            new("changelog.r1030.42",
+                "The minimized phone can be resized: drag its bottom right corner, the same way the full phone resizes, and the mini phone or minimap scales with it"),
+            new("changelog.r1030.43",
+                "The minimized phone no longer turns off when you hold it: that was easy to trip while starting a drag, and the side button, the server info bar entry and the chat command still turn the phone off"),
             new("changelog.r1030.0",
                 "Fixed the scattered red, blue and white dashes some PCs added to uploaded photos: Aetherphone now writes every JPEG itself instead of relying on a library that misbehaved on those machines"),
             new("changelog.r1030.3",
                 "Fixed photos from a phone camera showing up sideways: a picture's own orientation tag is now honoured everywhere a photo is previewed or uploaded"),
-            new("changelog.r1030.38",
-                "The minimized phone can be resized: drag its bottom right corner, the same way the full phone resizes, and the mini phone or minimap scales with it"),
-            new("changelog.r1030.39",
-                "The minimized phone no longer turns off when you hold it: that was easy to trip while starting a drag, and the side button, the server info bar entry and the chat command still turn the phone off"),
+            new("changelog.r1030.44",
+                "Fixed text entered through an input method (Chinese, Japanese or Korean, for example) going unnoticed in ChocoChat, Linkpearl and every other text box: Send and Enter now work as soon as the text is confirmed, without typing another key"),
         };
 
         public static readonly LocString[] Release1030Linkpearl =
