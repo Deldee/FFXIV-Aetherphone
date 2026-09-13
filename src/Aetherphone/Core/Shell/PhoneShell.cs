@@ -192,9 +192,11 @@ internal sealed class PhoneShell : IDisposable
 
     public float MinimizeEased => minimize.EasedProgress;
 
-    public Vector2 MinimizedSize => minimizedPhone.Measure(UiScale.Global);
+    public Vector2 MinimizedSize => minimizedPhone.Measure();
 
-    public Vector2 MinimizedIdleSize => minimizedPhone.IdleSize(UiScale.Global);
+    public Vector2 MinimizedIdleSize => minimizedPhone.IdleSize();
+
+    public float MinimizedZoom => minimizedPhone.Zoom;
 
     public MinimizedDrag ConsumeMinimizedDrag() => minimizedPhone.ConsumeDrag();
 
@@ -270,11 +272,7 @@ internal sealed class PhoneShell : IDisposable
                 loading.Cancel();
             }
 
-            if (morph.Draw(device, delta))
-            {
-                closeRequested = true;
-            }
-
+            morph.Draw(device, delta);
             HoverTooltip.Flush();
             ShellToast.Draw(device, themes.Chrome);
             return;

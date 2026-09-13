@@ -10,6 +10,8 @@ using Aetherphone.Core.Net;
 using Aetherphone.Core.Notifications;
 using Aetherphone.Core.Media;
 using Aetherphone.Core.Runtime;
+using Aetherphone.Core.Social;
+using Aetherphone.Core.Telephony;
 using Aetherphone.Core.Wallpapers;
 using Aetherphone.Windows.Components;
 
@@ -22,6 +24,7 @@ internal sealed class DirectMessagesStore : ChatThreadStoreBase<ChatMessageDto, 
     private readonly ChatClient client;
     private readonly PeerKeyDirectory peers;
     private readonly RealtimeSignalBus signals;
+    private readonly ContactBook contacts;
 
     private volatile ConversationDto? conversation;
     private volatile ConversationMemberDto[] members = Array.Empty<ConversationMemberDto>();
@@ -29,13 +32,14 @@ internal sealed class DirectMessagesStore : ChatThreadStoreBase<ChatMessageDto, 
     public DirectMessagesStore(AethernetSession session, ChatClient client, SafetyClient safety, MediaClient media,
         NotificationService notifications, KeyVault vault, ConversationKeyStore keys, PeerKeyDirectory peers,
         DecryptedHistoryStore chatHistory, PhoneVisibility visibility, RealtimeSignalBus signals,
-        AppInstaller installer, bool tracksInbox = true)
+        AppInstaller installer, ContactBook contacts, bool tracksInbox = true)
         : base("Messages", session, safety, media, notifications, vault, keys, chatHistory, visibility,
             installer.Gate("message"), tracksInbox)
     {
         this.client = client;
         this.peers = peers;
         this.signals = signals;
+        this.contacts = contacts;
         signals.ChatPinged += OnChatPinged;
         signals.ConnectedChanged += OnRealtimeConnected;
     }
@@ -91,6 +95,7 @@ internal sealed class DirectMessagesStore : ChatThreadStoreBase<ChatMessageDto, 
     public string? ConversationId => CurrentThreadId;
     public ConversationDto? Conversation => conversation;
     public ConversationMemberDto[] Members => members;
+    public ContactBook Contacts => contacts;
     public string? MyPublicKey => vault.PublicKey;
     public int MyKeyVersion => vault.KeyVersion;
     public int UnreadTotal => ComputeUnread();
@@ -239,6 +244,8 @@ internal sealed class DirectMessagesStore : ChatThreadStoreBase<ChatMessageDto, 
 
     protected override int ThreadUnreadCountOf(ConversationDto thread) => thread.UnreadCount;
 
+    protected override ConversationDto WithUnreadCleared(ConversationDto thread) => thread with { UnreadCount = 0 };
+
     protected override bool IsThreadMuted(ConversationDto thread) => thread.Muted;
 
     protected override PhoneNotification BuildInboxNotification(ConversationDto thread)
@@ -264,10 +271,14 @@ internal sealed class DirectMessagesStore : ChatThreadStoreBase<ChatMessageDto, 
             || cipher.IsPreviewResolved(thread.Id, thread.LastMessageAtUnix);
     }
 
-    public static string DisplayTitle(ConversationDto item) => ConversationTitle.Of(item);
+    public string DisplayTitle(ConversationDto item) => ConversationTitle.Of(item, contacts);
 
-    public static string MemberLabel(ConversationMemberDto member) =>
-        member.DisplayName.Length > 0 ? member.DisplayName : member.Handle;
+    public bool TitleMatches(ConversationDto item, string query) => ConversationTitle.Matches(item, contacts, query);
+
+    public string MemberLabel(ConversationMemberDto member) =>
+        contacts.NameFor(member.UserId, SocialIdentity.Name(member.DisplayName, member.Handle));
+
+    public string SenderLabel(ChatMessageDto message) => contacts.NameFor(message.SenderId, message.SenderDisplayName);
 
     private static string PreviewText(ConversationDto item)
     {
@@ -301,14 +312,13 @@ internal sealed class DirectMessagesStore : ChatThreadStoreBase<ChatMessageDto, 
 
     public byte[]? DecryptMedia(ChatMessageDto message, byte[] sealedBytes)
     {
-        if (message.EncVersion != EnvelopeCodec.VersionEnvelope
-            || !cipher.TryGetGeneration(message.Id, out var generation))
+        if (message.EncVersion != EnvelopeCodec.VersionEnvelope)
         {
             return null;
         }
 
-        var scope = ConversationKeyStore.ChatScope(message.ConversationId);
-        return cipher.TryDecryptMedia(scope, generation, sealedBytes, message.SenderId, message.Kind);
+        return cipher.TryDecryptMedia(message.Id, ConversationKeyStore.ChatScope(message.ConversationId), sealedBytes,
+            message.SenderId, message.Kind);
     }
 
     public void SetMuted(string id, bool muted, Action<bool> onComplete)
@@ -458,13 +468,16 @@ internal sealed class DirectMessagesStore : ChatThreadStoreBase<ChatMessageDto, 
         });
     }
 
-    public void AddMembers(string id, string[] memberIds, Action<bool> onComplete)
+    public void AddMembers(string id, string[] memberIds, Action<bool> onComplete, Action<AepFailure> onFailure)
     {
         work.Run("add members", async token =>
         {
-            var detail = await client.AddMembersAsync(id, memberIds, token).ConfigureAwait(false);
+            var reported = AepFailure.None;
+            var detail = await client.AddMembersAsync(id, memberIds, token, failure => reported = failure)
+                .ConfigureAwait(false);
             if (detail is null)
             {
+                onFailure(reported.Failed ? reported : AepFailure.Transport(AepFailureKind.Offline));
                 return false;
             }
 

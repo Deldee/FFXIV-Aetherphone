@@ -161,7 +161,7 @@ internal sealed record CreatePostRequest(
 
 internal sealed record SetSensitiveRequest(bool Sensitive);
 
-internal sealed record EditGramCaptionRequest(string Caption);
+internal sealed record EditGramRequest(string Caption, PhotoTagInput[] PhotoTags, bool Sensitive);
 
 internal sealed record ReactRequest(int Kind);
 
@@ -455,7 +455,7 @@ internal sealed record CreateVelvetPostRequest(
 
 internal sealed record UpdateVelvetPostAudienceRequest(int Audience);
 
-internal sealed record EditVelvetCaptionRequest(string Caption);
+internal sealed record EditVelvetPostRequest(string Caption, string[] Tags, int Audience);
 
 internal sealed record VelvetCommentDto(
     string Id,

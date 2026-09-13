@@ -1,24 +1,23 @@
 using Aetherphone.Core;
 using Aetherphone.Core.Theme;
 using Aetherphone.Core.Wallpapers;
-using Aetherphone.Windows.Components;
 using Dalamud.Bindings.ImGui;
 
-namespace Aetherphone.Apps.Message;
+namespace Aetherphone.Windows.Components;
 
-internal readonly struct MessageWallpaperColor
+internal readonly struct ChatWallpaperColor
 {
     public readonly string Id;
     public readonly Vector4 Color;
 
-    public MessageWallpaperColor(string id, Vector4 color)
+    public ChatWallpaperColor(string id, Vector4 color)
     {
         Id = id;
         Color = color;
     }
 }
 
-internal static class MessageWallpapers
+internal static class ChatWallpapers
 {
     public const string PhotoPrefix = "photo:";
     private const float PatternCell = 56f;
@@ -36,9 +35,9 @@ internal static class MessageWallpapers
         PhoneIcons.Bookmark,
     };
 
-    public static readonly MessageWallpaperColor[] Colors =
+    public static readonly ChatWallpaperColor[] Colors =
     {
-        new("default", MessageThemes.Body),
+        new("default", ChatThemes.Body),
         new("sage", new Vector4(0.070f, 0.130f, 0.110f, 1f)),
         new("teal", new Vector4(0.050f, 0.140f, 0.160f, 1f)),
         new("ocean", new Vector4(0.030f, 0.120f, 0.190f, 1f)),
@@ -75,20 +74,21 @@ internal static class MessageWallpapers
         return Colors[0].Color;
     }
 
-    public static string Effective(Configuration configuration, string conversationId)
+    public static string Effective(Dictionary<string, string> perConversation, string fallback,
+        string conversationId)
     {
         if (conversationId.Length > 0
-            && configuration.MessageChatWallpapers.TryGetValue(conversationId, out var chatChoice)
+            && perConversation.TryGetValue(conversationId, out var chatChoice)
             && chatChoice.Length > 0)
         {
             return chatChoice;
         }
 
-        return configuration.MessageWallpaper;
+        return fallback;
     }
 
     public static void Paint(ImDrawListPtr drawList, Rect area, string id, bool pattern,
-        WallpaperImageCache images)
+        WallpaperImageCache images, float alpha = 1f)
     {
         drawList.PushClipRect(area.Min, area.Max, true);
         var painted = false;
@@ -98,15 +98,17 @@ internal static class MessageWallpapers
             if (texture is not null)
             {
                 var (uv0, uv1) = ImageFit.Cover(texture.Size.X, texture.Size.Y, area.Width, area.Height);
-                drawList.AddImage(texture.Handle, area.Min, area.Max, uv0, uv1);
-                drawList.AddRectFilled(area.Min, area.Max, ImGui.GetColorU32(new Vector4(0f, 0f, 0f, PhotoVeil)));
+                drawList.AddImage(texture.Handle, area.Min, area.Max, uv0, uv1,
+                    ImGui.GetColorU32(new Vector4(1f, 1f, 1f, alpha)));
+                drawList.AddRectFilled(area.Min, area.Max,
+                    ImGui.GetColorU32(new Vector4(0f, 0f, 0f, PhotoVeil * alpha)));
                 painted = true;
             }
         }
 
         if (!painted)
         {
-            drawList.AddRectFilled(area.Min, area.Max, ImGui.GetColorU32(ColorOf(id)));
+            drawList.AddRectFilled(area.Min, area.Max, ImGui.GetColorU32(Palette.WithAlpha(ColorOf(id), alpha)));
             if (pattern)
             {
                 PaintPattern(drawList, area);

@@ -221,7 +221,8 @@ internal sealed partial class AethergramApp : IResumableApp
             conversationKeys, chatHistory, visibility, realtimeSignals, installer);
         composeMentions = new MentionAutocomplete(store.NewMentionSuggestions());
         commentMentions = new MentionAutocomplete(store.NewMentionSuggestions());
-        editCaptionMentions = new MentionAutocomplete(store.NewMentionSuggestions());
+        editPostMentions = new MentionAutocomplete(store.NewMentionSuggestions());
+        editPostPreviewPage = DrawEditPostPreviewPage;
         personPicker = new PersonPicker(store.NewMentionSuggestions());
         stories = new StoryPresenter(session, net.Grams, net.Media, images, lodestone, AethergramArt.StoryRing,
             AppPalettes.Aethergram, new StoryConfirmLabels(L.Aethergram.DeleteConfirm, L.Aethergram.DeleteCancel,
@@ -234,6 +235,9 @@ internal sealed partial class AethergramApp : IResumableApp
         this.lodestone = lodestone;
         this.library = library;
         composeSession = new PhotoComposeSession(library, wallpaperImages);
+        composeEditBack = composeSession.EditBack;
+        composeCaptionBack = composeSession.CaptionBack;
+        composeExitTagMode = ExitTagMode;
         this.images = images;
         this.http = http;
         this.social = social;
@@ -399,8 +403,8 @@ internal sealed partial class AethergramApp : IResumableApp
             case AethergramScreen.EditProfile:
                 DrawEditProfile(area);
                 break;
-            case AethergramScreen.EditCaption:
-                DrawEditCaption(area);
+            case AethergramScreen.EditPost:
+                DrawEditPost(area);
                 break;
             case AethergramScreen.UserList:
                 DrawUserList(area, route.Id!, route.Kind);
@@ -598,7 +602,7 @@ internal sealed partial class AethergramApp : IResumableApp
 
         if (store.Me is { } me && me.Id == post.AuthorId)
         {
-            AddPostSheetItem(PostSheetAction.Edit, Loc.T(L.Aethergram.EditCaption), false);
+            AddPostSheetItem(PostSheetAction.Edit, Loc.T(L.Aethergram.EditPost), false);
             AddPostSheetItem(PostSheetAction.Delete, Loc.T(L.Aethergram.DeleteConfirm), true);
         }
         else
@@ -639,7 +643,7 @@ internal sealed partial class AethergramApp : IResumableApp
                 OpenDetail(post);
                 break;
             case PostSheetAction.Edit:
-                OpenEditCaption(post);
+                OpenEditPost(post);
                 break;
             case PostSheetAction.Delete:
                 profile.AskDeletePost(post.Id, router.Current.Screen == AethergramScreen.Detail ? back : null);
@@ -1355,6 +1359,7 @@ internal sealed partial class AethergramApp : IResumableApp
     {
         settingsCancellation.Cancel();
         settingsCancellation.Dispose();
+        composeSession.Dispose();
         threadView.Dispose();
         dmStore.Dispose();
         store.Dispose();

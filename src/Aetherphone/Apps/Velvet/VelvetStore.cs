@@ -455,6 +455,8 @@ internal sealed partial class VelvetStore : ChatThreadStoreBase<VelvetMessageDto
 
     protected override int ThreadUnreadCountOf(VelvetThreadDto thread) => thread.UnreadCount;
 
+    protected override VelvetThreadDto WithUnreadCleared(VelvetThreadDto thread) => thread with { UnreadCount = 0 };
+
     protected override PhoneNotification BuildInboxNotification(VelvetThreadDto thread)
     {
         var name = string.IsNullOrEmpty(thread.OtherDisplayName) ? thread.OtherHandle : thread.OtherDisplayName;
@@ -531,14 +533,13 @@ internal sealed partial class VelvetStore : ChatThreadStoreBase<VelvetMessageDto
 
     public byte[]? DecryptMedia(VelvetMessageDto message, byte[] sealedBytes, string threadPartnerId)
     {
-        if (message.EncVersion != EnvelopeCodec.VersionEnvelope
-            || !cipher.TryGetGeneration(message.Id, out var generation))
+        if (message.EncVersion != EnvelopeCodec.VersionEnvelope)
         {
             return null;
         }
 
-        var scope = ScopeFor(threadPartnerId);
-        return cipher.TryDecryptMedia(scope, generation, sealedBytes, message.SenderId, message.Kind);
+        return cipher.TryDecryptMedia(message.Id, ScopeFor(threadPartnerId), sealedBytes, message.SenderId,
+            message.Kind);
     }
 
     public void ClearDiscover()

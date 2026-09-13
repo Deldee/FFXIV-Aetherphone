@@ -4,6 +4,7 @@ using Aetherphone.Core.Apps;
 using Aetherphone.Core.Confirm;
 using Aetherphone.Core.Localization;
 using Aetherphone.Core.Message;
+using Aetherphone.Core.Net;
 using Aetherphone.Core.Social;
 using Aetherphone.Core.Theme;
 using Aetherphone.Windows.Components;
@@ -49,6 +50,13 @@ internal sealed partial class MessageApp
 
     private void ProcessGroupOutcomes()
     {
+        var addFailure = addMembersFailure;
+        if (addFailure is not null)
+        {
+            addMembersFailure = null;
+            ShellToast.Show(FailureText.Resolve(addFailure.Failure));
+        }
+
         var photo = groupPhotoOutcome;
         if (photo != 0)
         {
@@ -110,7 +118,7 @@ internal sealed partial class MessageApp
 
         var top = area.Min.Y + AppHeader.Height * scale;
         var body = new Rect(new Vector2(area.Min.X, top), area.Max);
-        var title = DirectMessagesStore.DisplayTitle(conversation);
+        var title = store.DisplayTitle(conversation);
         using (AppSurface.Begin(body))
         {
             var drawList = ImGui.GetWindowDrawList();
@@ -126,7 +134,7 @@ internal sealed partial class MessageApp
             {
                 var badgeCenter = avatarCenter + new Vector2(radius * 0.7f, radius * 0.7f);
                 drawList.AddCircleFilled(badgeCenter, GroupCameraBadgeRadius * scale + 2f * scale,
-                    ImGui.GetColorU32(MessageThemes.Body), 24);
+                    ImGui.GetColorU32(ChatThemes.Body), 24);
                 drawList.AddCircleFilled(badgeCenter, GroupCameraBadgeRadius * scale, ImGui.GetColorU32(ui.Accent), 24);
                 PhoneIcon.Draw(drawList, badgeCenter, PhoneIcons.Camera, White, GroupCameraGlyph * scale);
                 HoverTooltip.Show(new Rect(avatarCenter - avatarExtent, avatarCenter + avatarExtent),
@@ -339,7 +347,7 @@ internal sealed partial class MessageApp
             right -= RowTrailingGap * scale;
         }
 
-        var label = isMe ? Loc.T(L.Message.You) : DirectMessagesStore.MemberLabel(member);
+        var label = isMe ? Loc.T(L.Message.You) : store.MemberLabel(member);
         var subtitle = member.Handle.Length > 0 ? "@" + member.Handle : string.Empty;
         var titleHeight = Typography.LineHeight(RowTitleStyle);
         var subHeight = subtitle.Length > 0 ? Typography.LineHeight(RowSubStyle) : 0f;
@@ -363,7 +371,7 @@ internal sealed partial class MessageApp
     {
         memberSheetConversationId = conversation.Id;
         memberSheetUserId = member.UserId;
-        memberSheetTitle = DirectMessagesStore.MemberLabel(member);
+        memberSheetTitle = store.MemberLabel(member);
         var count = 0;
         var contact = contacts.Find(member.UserId);
         if (contact is { IsMutual: true })
@@ -656,7 +664,7 @@ internal sealed partial class MessageApp
                 {
                     backToDetailPending = true;
                 }
-            });
+            }, failure => addMembersFailure = new AepFailureBox(failure));
         }
     }
 

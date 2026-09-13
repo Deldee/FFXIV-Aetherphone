@@ -96,6 +96,7 @@ internal sealed partial class MessageApp : IResumableApp, ISpotlightConversation
     private volatile string? composeResult;
     private volatile bool backToListPending;
     private volatile bool backToDetailPending;
+    private volatile AepFailureBox? addMembersFailure;
     private string addError = string.Empty;
     private float copiedTimer;
     private volatile bool removePending;
@@ -135,6 +136,12 @@ internal sealed partial class MessageApp : IResumableApp, ISpotlightConversation
         router = new ViewRouter<MessageRoute>(MessageRoute.Root);
         drawView = DrawView;
         back = () => router.Pop();
+        chrome = new ChatListChrome(ui, ink);
+        pickers = new ChatAppearancePickers(chrome, wallpaperImages, library);
+        pickTheme = SetTheme;
+        pickWallpaper = id => SetWallpaper(wallpaperScope, id);
+        setWallpaperPattern = SetWallpaperPattern;
+        clearWallpaperOverride = ClearWallpaperOverride;
         refreshContacts = () => contacts.Refresh(force: true);
         groupPhotoPicker = new ImagePickCrop(library, wallpaperImages);
         threadView = new ThreadView(this);
@@ -225,6 +232,7 @@ internal sealed partial class MessageApp : IResumableApp, ISpotlightConversation
         groupPhotoSheet.Gate();
         var screen = SceneChrome.ScreenFrom(context.Content, theme, UiScale.Current);
         screenRect = screen;
+        chrome.ScreenRect = screen;
         ui.Backdrop(screen);
         using (InputShield.Engage(avatarLightbox.Expanded))
         {
@@ -586,6 +594,5 @@ internal sealed partial class MessageApp : IResumableApp, ISpotlightConversation
     {
         threadView.Dispose();
         store.Dispose();
-        contacts.Dispose();
     }
 }

@@ -29,31 +29,32 @@ internal sealed class MinimizeMorphView
         this.configuration = configuration;
     }
 
-    public bool Draw(Rect device, float delta)
+    public void Draw(Rect device, float delta)
     {
         if (minimize.MorphActive)
         {
             DrawMorph(device, delta);
-            return false;
+            return;
         }
 
-        return DrawResting(device, delta);
+        if (minimizedPhone.Draw(device, themes.Chrome, delta))
+        {
+            minimize.BeginExpand();
+        }
     }
 
     private void DrawMorph(Rect device, float delta)
     {
         var scale = UiScale.Current;
         var theme = themes.Chrome;
-        var puckScale = UiScale.Global;
         var startBody = DeviceChrome.BodyRect(device, theme);
-        var endBody = MinimizedRect(device, puckScale);
+        var endBody = MinimizedRect(device);
         var eased = minimize.EasedProgress;
         var body = new Rect(Vector2.Lerp(startBody.Min, endBody.Min, eased),
             Vector2.Lerp(startBody.Max, endBody.Max, eased));
         var geometry = ChassisGeometry.Morph(body, theme, scale, eased);
 
         var shell = ImGui.GetWindowDrawList();
-        Elevation.Squircle(shell, geometry.Body.Min, geometry.Body.Max, geometry.BodyRadius, scale, eased);
         DeviceChrome.DrawShell(shell, geometry, scale, theme, 1f, true);
         DrawRailButtons(shell, geometry, theme, scale, eased);
         RevealMorphContent(DeviceChrome.Chassis(device, theme), theme, geometry, eased, device.IsLandscape());
@@ -103,19 +104,5 @@ internal sealed class MinimizeMorphView
         }
     }
 
-    private bool DrawResting(Rect device, float delta)
-    {
-        switch (minimizedPhone.Draw(device, themes.Chrome, delta))
-        {
-            case MinimizedAction.Expand:
-                minimize.BeginExpand();
-                break;
-            case MinimizedAction.Close:
-                return true;
-        }
-
-        return false;
-    }
-
-    private Rect MinimizedRect(Rect device, float scale) => new(device.Min, device.Min + minimizedPhone.Measure(scale));
+    private Rect MinimizedRect(Rect device) => new(device.Min, device.Min + minimizedPhone.Measure());
 }

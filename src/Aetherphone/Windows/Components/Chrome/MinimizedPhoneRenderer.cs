@@ -55,12 +55,10 @@ internal static class MinimizedPhoneRenderer
     private const float CardBodyGap = 2f;
     private const float BadgeTile = 22f;
     private const float BadgePillHeight = 14f;
-    private const float PowerIcon = 16f;
     private static readonly Vector4 MusicAccent = AppAccents.For("music");
     private static readonly Vector4 CallAccent = new(0.20f, 0.78f, 0.35f, 1f);
     private static readonly Vector4 BadgeTone = new(0.90f, 0.22f, 0.19f, 1f);
     private static readonly Vector4 White = new(1f, 1f, 1f, 1f);
-    private static readonly Vector4 Black = new(0f, 0f, 0f, 1f);
 
     public static float InlineMeridiemWidth(string meridiem, float scale) =>
         Typography.Measure(meridiem, Text(MeridiemScale), FontWeight.Medium).X + MeridiemGap * scale;
@@ -288,21 +286,6 @@ internal static class MinimizedPhoneRenderer
             FontWeight.Bold);
     }
 
-    public static void DrawHoldSweep(ImDrawListPtr dl, in ChassisGeometry geometry, PhoneTheme theme, float progress,
-        float scale)
-    {
-        var screen = geometry.Screen;
-        Squircle.Fill(dl, screen.Min, screen.Max, geometry.ScreenRadius,
-            ImGui.GetColorU32(Palette.WithAlpha(Black, 0.35f * progress)));
-        var sweepTop = screen.Max.Y - screen.Height * progress;
-        dl.PushClipRect(new Vector2(screen.Min.X, sweepTop), screen.Max, true);
-        Squircle.Fill(dl, screen.Min, screen.Max, geometry.ScreenRadius,
-            ImGui.GetColorU32(Palette.WithAlpha(theme.Danger, 0.62f)));
-        dl.PopClipRect();
-        ProgressRing.CenterIcon(dl, screen.Center, FontAwesomeIcon.PowerOff, Palette.WithAlpha(White, progress),
-            PowerIcon * scale);
-    }
-
     public static void DrawPulse(ImDrawListPtr dl, in ChassisGeometry geometry, Vector4 accent, float strength,
         float scale)
     {
@@ -333,5 +316,5 @@ internal static class MinimizedPhoneRenderer
     private static bool Hovered(Vector2 center, float radius) =>
         UiInteract.Hover(center - new Vector2(radius, radius), center + new Vector2(radius, radius));
 
-    private static float Text(float scale) => scale / UiScale.Phone;
+    private static float Text(float scale) => UiScale.MinimizedText(scale);
 }

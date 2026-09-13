@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Text;
 using Newtonsoft.Json.Linq;
 using SharpCompress.Archives;
 
@@ -116,6 +117,7 @@ internal sealed class MediaDependencies : IDisposable
     private const string ResolverPlayerClient = "web_embedded";
 
     private static readonly TimeSpan DownloadTimeout = TimeSpan.FromMinutes(10);
+    private static readonly UTF8Encoding ResolverConfigurationEncoding = new(encoderShouldEmitUTF8Identifier: true);
 
     private readonly HttpClient httpClient;
     private readonly string installRoot;
@@ -562,7 +564,8 @@ internal sealed class MediaDependencies : IDisposable
 
             File.WriteAllText(configurationPath,
                 $"--extractor-args \"youtube:player_client={ResolverPlayerClient}\"\n"
-                + $"--js-runtimes \"{JsRuntime.Id}:{runtimePath}\"\n");
+                + $"--js-runtimes \"{JsRuntime.Id}:{runtimePath}\"\n",
+                ResolverConfigurationEncoding);
         }
         catch (Exception exception)
         {

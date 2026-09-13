@@ -400,6 +400,8 @@ internal sealed class GramDmStore : ChatThreadStoreBase<GramMessageDto, GramThre
 
     protected override int ThreadUnreadCountOf(GramThreadDto thread) => thread.UnreadCount;
 
+    protected override GramThreadDto WithUnreadCleared(GramThreadDto thread) => thread with { UnreadCount = 0 };
+
     protected override PhoneNotification BuildInboxNotification(GramThreadDto thread)
     {
         var name = string.IsNullOrEmpty(thread.OtherDisplayName) ? thread.OtherHandle : thread.OtherDisplayName;
@@ -487,14 +489,13 @@ internal sealed class GramDmStore : ChatThreadStoreBase<GramMessageDto, GramThre
 
     public byte[]? DecryptMedia(GramMessageDto message, byte[] sealedBytes, string threadPartnerId)
     {
-        if (message.EncVersion != EnvelopeCodec.VersionEnvelope
-            || !cipher.TryGetGeneration(message.Id, out var generation))
+        if (message.EncVersion != EnvelopeCodec.VersionEnvelope)
         {
             return null;
         }
 
-        var scope = ScopeFor(threadPartnerId);
-        return cipher.TryDecryptMedia(scope, generation, sealedBytes, message.SenderId, message.Kind);
+        return cipher.TryDecryptMedia(message.Id, ScopeFor(threadPartnerId), sealedBytes, message.SenderId,
+            message.Kind);
     }
 
     protected override void DisposeCore()

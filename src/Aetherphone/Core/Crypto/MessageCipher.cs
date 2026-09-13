@@ -134,14 +134,35 @@ internal sealed class MessageCipher
         return false;
     }
 
-    public byte[]? TryDecryptMedia(string scope, int generation, byte[] sealedBytes, string senderId, int mediaKind)
+    public byte[]? TryDecryptMedia(string messageId, string scope, byte[] sealedBytes, string senderId, int mediaKind)
     {
-        if (generation > 0 && keys.TryGetCek(scope, generation, out var cek))
+        if (generationByMessage.TryGetValue(messageId, out var generation))
         {
-            return MediaEnvelope.Open(sealedBytes, cek, scope, generation, senderId, mediaKind);
+            return TryDecryptMedia(scope, generation, sealedBytes, senderId, mediaKind);
         }
 
+        AepLog.Warning(
+            $"[Crypto] media kind {mediaKind} for message {messageId} in {scope} has no recorded key generation on this device.");
         return null;
+    }
+
+    public byte[]? TryDecryptMedia(string scope, int generation, byte[] sealedBytes, string senderId, int mediaKind)
+    {
+        if (generation <= 0 || !keys.TryGetCek(scope, generation, out var cek))
+        {
+            AepLog.Warning(
+                $"[Crypto] media kind {mediaKind} in {scope} generation {generation} has no key on this device (vault {vault.State}, scope hydrated {keys.IsScopeHydrated(scope)}, current generation {keys.CurrentGeneration(scope)}).");
+            return null;
+        }
+
+        var plain = MediaEnvelope.Open(sealedBytes, cek, scope, generation, senderId, mediaKind);
+        if (plain is null)
+        {
+            AepLog.Warning(
+                $"[Crypto] media kind {mediaKind} in {scope} generation {generation} did not open with the key on this device.");
+        }
+
+        return plain;
     }
 
     private DmBodyState MissingKeyState(string scope)

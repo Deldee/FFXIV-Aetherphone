@@ -35,7 +35,6 @@ internal static class L
         public static readonly LocString Next = new("common.next", "Next");
         public static readonly LocString Previous = new("common.previous", "Previous");
         public static readonly LocString PhotoCounter = new("common.photoCounter", "{0}/{1}");
-        public static readonly LocString PhotoStep = new("common.photoStep", "Photo {0} of {1}");
         public static readonly LocString PhotoLimit = new("common.photoLimit", "You can add up to {0} photos");
         public static readonly LocString ImageFailed = new("common.imageFailed", "Couldn't load image");
         public static readonly LocString Pin = new("common.pin", "Pin");
@@ -83,6 +82,9 @@ internal static class L
         public static readonly LocString AspectSquare = new("social.aspectSquare", "Square");
         public static readonly LocString AspectPortrait = new("social.aspectPortrait", "Portrait");
         public static readonly LocString AspectLandscape = new("social.aspectLandscape", "Landscape");
+        public static readonly LocString ComposeEditTitle = new("social.compose.editTitle", "Edit");
+        public static readonly LocString ComposeChoosePhoto = new("social.compose.choosePhoto", "Choose a photo");
+        public static readonly LocString ComposeTapToEdit = new("social.compose.tapToEdit", "Tap to edit");
         public static readonly LocString LikedChirp = new("social.likedChirp", "liked your chirp");
         public static readonly LocString LikedPhoto = new("social.likedPhoto", "liked your photo");
         public static readonly LocString LikedComment = new("social.likedComment", "liked your comment");
@@ -691,14 +693,6 @@ internal static class L
         public static readonly LocString WallpaperColors = new("message.wallpaperColors", "Colors");
         public static readonly LocString WallpaperPhotos = new("message.wallpaperPhotos", "My photos");
         public static readonly LocString WallpaperPattern = new("message.wallpaperPattern", "Show pattern");
-        public static readonly LocString ThemeChocobo = new("message.themeChocobo", "Chocobo");
-        public static readonly LocString ThemeEmerald = new("message.themeEmerald", "Emerald");
-        public static readonly LocString ThemeOcean = new("message.themeOcean", "Ocean");
-        public static readonly LocString ThemeLavender = new("message.themeLavender", "Lavender");
-        public static readonly LocString ThemeRose = new("message.themeRose", "Rose");
-        public static readonly LocString ThemeSunset = new("message.themeSunset", "Sunset");
-        public static readonly LocString ThemeSky = new("message.themeSky", "Sky");
-        public static readonly LocString ThemeSlate = new("message.themeSlate", "Slate");
         public static readonly LocString PreviewIncoming = new("message.previewIncoming", "Are you around for the raid tonight?");
         public static readonly LocString PreviewOutgoing = new("message.previewOutgoing", "On my way, see you at the plaza!");
         public static readonly LocString Recent = new("message.recent", "Recent");
@@ -734,6 +728,19 @@ internal static class L
         public static readonly LocString PopoutSwitch = new("message.popoutSwitch", "Switch conversation");
         public static readonly LocString PopoutSignedOut = new("message.popoutSignedOut", "Sign in on the phone to keep chatting here.");
         public static readonly LocString OpensSettings = new("message.opensSettings", "Notifications, privacy and calls are managed in the Settings app.");
+    }
+
+    internal static class Chat
+    {
+        public static readonly LocString ThemeChocobo = new("chat.themeChocobo", "Chocobo");
+        public static readonly LocString ThemeLeaf = new("chat.themeLeaf", "Leaf");
+        public static readonly LocString ThemeEmerald = new("chat.themeEmerald", "Emerald");
+        public static readonly LocString ThemeOcean = new("chat.themeOcean", "Ocean");
+        public static readonly LocString ThemeLavender = new("chat.themeLavender", "Lavender");
+        public static readonly LocString ThemeRose = new("chat.themeRose", "Rose");
+        public static readonly LocString ThemeSunset = new("chat.themeSunset", "Sunset");
+        public static readonly LocString ThemeSky = new("chat.themeSky", "Sky");
+        public static readonly LocString ThemeSlate = new("chat.themeSlate", "Slate");
     }
 
     internal static class FindPeople
@@ -1645,6 +1652,8 @@ internal static class L
         public static readonly LocString ShowInGposeHint = new("settings.showInGposeHint", "Keep the phone available while you're in Group Pose, so you can open it during photo shoots. Turn it off to keep your screen clear for screenshots.");
         public static readonly LocString ImportScreenshots = new("settings.importScreenshots", "Import screenshots");
         public static readonly LocString ImportScreenshotsHint = new("settings.importScreenshotsHint", "Copy screenshots you take into the Photos gallery, including ones from ReShade and GShade. Only shots taken while the phone is running are copied, and the originals stay where they are.");
+        public static readonly LocString MonthlyAlbums = new("settings.monthlyAlbums", "Monthly albums in Photos");
+        public static readonly LocString MonthlyAlbumsHint = new("settings.monthlyAlbumsHint", "Add an album for each month to the Albums tab in Photos automatically. Photos asks once the first time you open Albums.");
         public static readonly LocString NativeFileDialog = new("settings.nativeFileDialog", "Windows file browser");
         public static readonly LocString NativeFileDialogHint = new("settings.nativeFileDialogHint", "Pick photos and sounds with the Windows file browser. Turn it off if importing a file crashes your game.");
         public static readonly LocString ChirperShowPhotos = new("settings.chirperShowPhotos", "Show photo chirps");
@@ -1745,6 +1754,81 @@ internal static class L
         public static readonly LocString SectionMessaging = new("changelog.sectionMessaging", "Messaging");
         public static readonly LocString SectionPhone = new("changelog.sectionPhone", "Phone");
         public static readonly LocString SectionSocial = new("changelog.sectionSocial", "Chirper and Aethergram");
+        public static readonly LocString SectionAethergramVelvet = new("changelog.sectionAethergramVelvet", "Aethergram and Velvet");
+
+        public static readonly LocString[] Release1030Photos =
+        {
+            new("changelog.r1030.5",
+                "Overhauled Photos from top to bottom: a tab bar for Library and Albums, an edge to edge grid, a new photo viewer and easier albums"),
+            new("changelog.r1030.1",
+                "Added a photo editor: adjust light and color, pick a look such as Film or Noir, crop and rotate, and the original is always kept"),
+            new("changelog.r1030.10",
+                "Added Favorites: tap the heart on a photo to keep it in its own collection"),
+            new("changelog.r1030.11",
+                "Added select mode to favorite, add to an album or delete several photos at once"),
+            new("changelog.r1030.9",
+                "Added a sort menu that orders and filters the library and zooms the grid"),
+            new("changelog.r1030.12",
+                "Added Recently Deleted: a deleted photo can be recovered for 30 days"),
+            new("changelog.r1030.8",
+                "Monthly albums are now optional, with the switch in Settings under General"),
+        };
+
+        public static readonly LocString[] Release1030AethergramVelvet =
+        {
+            new("changelog.r1030.4",
+                "Redesigned the post and story composer: frame each photo as you pick it, polish it on one Edit screen, and share from a cleaner last step"),
+            new("changelog.r1030.40",
+                "Edit post replaces Edit caption on your own posts: change the caption, the tags and the post options from one screen"),
+        };
+
+        public static readonly LocString[] Release1030Linkpearl =
+        {
+            new("changelog.r1030.34",
+                "Overhauled Linkpearl from top to bottom: a tab bar for Chats, People and Settings, edge to edge screens and a green theme by default"),
+            new("changelog.r1030.35",
+                "Rebuilt People with portraits, a friend card with quick actions, and Lodestone pages for characters and Free Companies"),
+            new("changelog.r1030.30",
+                "Added chat themes and wallpapers, for every chat or a single one"),
+            new("changelog.r1030.31",
+                "Added a Log layout in the game's own channel colors, and any chat switches between Log and Bubbles with one tap"),
+            new("changelog.r1030.32",
+                "Added game chat options: the game's log colors, a tab that follows the game chat box, a screenshot mode that masks names, and history export"),
+            new("changelog.r1030.36",
+                "Pop-outs gather new chats as tabs, follow your chat theme, open where you choose and carry their own settings button"),
+            new("changelog.r1030.46",
+                "Fixed tells that arrived while the phone was closed on their chat never notifying or counting as unread"),
+        };
+
+        public static readonly LocString[] Release1030Messaging =
+        {
+            new("changelog.r1030.49",
+                "Voice notes that cannot be played now say why on the bubble, and tapping it tries again"),
+            new("changelog.r1030.47",
+                "Fixed the unread badge staying on a chat you are already reading, in ChocoChat, Velvet, Aethergram and Linkpearl"),
+            new("changelog.r1030.48",
+                "Fixed a location shared from inside a house naming the wrong district"),
+        };
+
+        public static readonly LocString[] Release1030Phone =
+        {
+            new("changelog.r1030.42",
+                "The minimized phone can be resized from its bottom right corner"),
+            new("changelog.r1030.43",
+                "The minimized phone no longer turns off when you hold it"),
+            new("changelog.r1030.0",
+                "Fixed some PCs adding red, blue and white dashes to uploaded photos"),
+            new("changelog.r1030.3",
+                "Fixed photos from a phone camera showing up sideways"),
+            new("changelog.r1030.44",
+                "Fixed Send and Enter missing text typed through an input method, such as Chinese, Japanese or Korean, until another key was pressed"),
+        };
+
+        public static readonly LocString[] Release1030AetherStream =
+        {
+            new("changelog.r1030.50",
+                "Fixed MogCast and Music refusing every link for players whose Windows user name has Chinese, Japanese, or Korean characters"),
+        };
 
         public static readonly LocString[] Release1021Message =
         {
@@ -3898,7 +3982,7 @@ internal static class L
         public static readonly LocString EmptySlot = new("linkpearl.emptySlot", "Empty slot");
         public static readonly LocString RepliesGoTo = new("linkpearl.repliesGoTo", "Replies go to");
         public static readonly LocString Layout = new("linkpearl.layout", "Layout");
-        public static readonly LocString LayoutCompact = new("linkpearl.layoutCompact", "Compact");
+        public static readonly LocString LayoutLog = new("linkpearl.layoutLog", "Log");
         public static readonly LocString LayoutBubbles = new("linkpearl.layoutBubbles", "Bubbles");
         public static readonly LocString KeepHistory = new("linkpearl.keepHistory", "Keep history");
         public static readonly LocString HistoryOff = new("linkpearl.historyOff", "Off");
@@ -4003,7 +4087,14 @@ internal static class L
         public static readonly LocString Expand = new("linkpearl.expand", "Expand");
         public static readonly LocString CollapseAllPopouts = new("linkpearl.collapseAllPopouts", "Collapse all pop-outs ({0})");
         public static readonly LocString ExpandAllPopouts = new("linkpearl.expandAllPopouts", "Expand all pop-outs ({0})");
-        public static readonly LocString PopoutTabs = new("linkpearl.popoutTabs", "Group chats as tabs");
+        public static readonly LocString PopoutTabs = new("linkpearl.popoutTabs", "New chats open as tabs");
+        public static readonly LocString PopoutPlacement = new("linkpearl.popoutPlacement", "Placement");
+        public static readonly LocString PlacementBesidePhone = new("linkpearl.placementBesidePhone", "Beside the phone");
+        public static readonly LocString PlacementTopLeft = new("linkpearl.placementTopLeft", "Top left");
+        public static readonly LocString PlacementTopRight = new("linkpearl.placementTopRight", "Top right");
+        public static readonly LocString PlacementBottomLeft = new("linkpearl.placementBottomLeft", "Bottom left");
+        public static readonly LocString PlacementBottomRight = new("linkpearl.placementBottomRight", "Bottom right");
+        public static readonly LocString NewCount = new("linkpearl.newCount", "{0} new");
         public static readonly LocString PopoutTabsHint = new("linkpearl.popoutTabsHint", "Drag a pop-out onto another to merge them into one window.");
         public static readonly LocString PopoutOutgoingTells = new("linkpearl.popoutOutgoingTells", "Pop up tells you send too");
         public static readonly LocString PopoutCloseOnLogout = new("linkpearl.popoutCloseOnLogout", "Close pop-outs when you log out");
@@ -4015,6 +4106,31 @@ internal static class L
         public static readonly LocString MoveTabOut = new("linkpearl.moveTabOut", "Move to its own window");
         public static readonly LocString CloseTab = new("linkpearl.closeTab", "Close this tab");
         public static readonly LocString PopoutTabLimit = new("linkpearl.popoutTabLimit", "A pop-out holds up to {0} conversations.");
+        public static readonly LocString Appearance = new("linkpearl.appearance", "Appearance");
+        public static readonly LocString ChatThemeHint = new("linkpearl.chatThemeHint", "The color of your messages, buttons and badges in Linkpearl.");
+        public static readonly LocString DefaultLayout = new("linkpearl.defaultLayout", "Layout for tabs");
+        public static readonly LocString TextSize = new("linkpearl.textSize", "Text size");
+        public static readonly LocString LogTimestamps = new("linkpearl.logTimestamps", "Timestamps");
+        public static readonly LocString LogWorldNames = new("linkpearl.logWorldNames", "Show world names");
+        public static readonly LocString LogGameColors = new("linkpearl.logGameColors", "Color lines like the game");
+        public static readonly LocString LogGroupLines = new("linkpearl.logGroupLines", "Group consecutive lines");
+        public static readonly LocString CollapseDuplicates = new("linkpearl.collapseDuplicates", "Collapse duplicate messages");
+        public static readonly LocString ScopeLodestone = new("linkpearl.scopeLodestone", "Lodestone");
+        public static readonly LocString TabInfo = new("linkpearl.tabInfo", "Tab info");
+        public static readonly LocString LodestoneProfile = new("linkpearl.lodestoneProfile", "Lodestone profile");
+        public static readonly LocString FollowGameMode = new("linkpearl.followGameMode", "Follow the game's chat mode");
+        public static readonly LocString HideInCutscene = new("linkpearl.hideInCutscene", "Hide in cutscenes");
+        public static readonly LocString HideWhenUiHidden = new("linkpearl.hideWhenUiHidden", "Hide when the HUD is hidden");
+        public static readonly LocString ImportGameColors = new("linkpearl.importGameColors", "Import the game's log colors");
+        public static readonly LocString ImportedGameColors = new("linkpearl.importedGameColors", "Game colors imported");
+        public static readonly LocString ScreenshotMode = new("linkpearl.screenshotMode", "Screenshot mode");
+        public static readonly LocString ScreenshotModeHint = new("linkpearl.screenshotModeHint", "Replaces player names in chat with anonymous labels until you turn it off.");
+        public static readonly LocString ExportHistory = new("linkpearl.exportHistory", "Export history");
+        public static readonly LocString ExportedHistory = new("linkpearl.exportedHistory", "History exported to the exports folder");
+        public static readonly LocString ExportFailed = new("linkpearl.exportFailed", "Couldn't export the history");
+        public static readonly LocString ThisChat = new("linkpearl.thisChat", "This chat");
+        public static readonly LocString ShowAsLog = new("linkpearl.showAsLog", "Show as a log");
+        public static readonly LocString ShowAsBubbles = new("linkpearl.showAsBubbles", "Show as bubbles");
     }
 
     internal static class Character
@@ -4208,10 +4324,7 @@ internal static class L
         public static readonly LocString NewPost = new("aethergram.newPost", "New Post");
         public static readonly LocString NewAvatar = new("aethergram.newAvatar", "New Photo");
         public static readonly LocString ImportFromPc = new("aethergram.importFromPc", "Import from PC");
-        public static readonly LocString MoveAndScale = new("aethergram.moveAndScale", "Move and Scale");
-        public static readonly LocString GestureHint = new("aethergram.gestureHint", "Drag to move · scroll to zoom");
         public static readonly LocString CaptionHint = new("aethergram.captionHint", "Write a caption…");
-        public static readonly LocString TapToAdjust = new("aethergram.tapToAdjust", "Tap the photo to adjust the crop");
         public static readonly LocString Next = new("aethergram.next", "Next");
         public static readonly LocString PeopleSection = new("aethergram.peopleSection", "People");
         public static readonly LocString TagsSection = new("aethergram.tagsSection", "Tags");
@@ -4249,8 +4362,8 @@ internal static class L
         public static readonly LocString DeleteConfirm = new("aethergram.deleteConfirm", "Delete");
         public static readonly LocString DeleteCancel = new("aethergram.deleteCancel", "Cancel");
         public static readonly LocString DeleteFailed = new("aethergram.deleteFailed", "Couldn't delete the post");
-        public static readonly LocString EditCaption = new("aethergram.editCaption", "Edit caption");
-        public static readonly LocString EditCaptionFailed = new("aethergram.editCaptionFailed", "Couldn't save the caption");
+        public static readonly LocString EditPost = new("aethergram.editPost", "Edit post");
+        public static readonly LocString EditPostFailed = new("aethergram.editPostFailed", "Couldn't save the changes");
         public static readonly LocString EditedStamp = new("aethergram.editedStamp", "{0} · Edited");
         public static readonly LocString DeleteCommentFailed = new("aethergram.deleteCommentFailed", "Couldn't delete the comment");
         public static readonly LocString DeleteComment = new("aethergram.deleteComment", "Delete comment");
@@ -4327,8 +4440,8 @@ internal static class L
         public static readonly LocString PresenceDnd = new("velvet.presenceDnd", "Do not disturb");
         public static readonly LocString PresenceOffline = new("velvet.presenceOffline", "Offline");
         public static readonly LocString EditProfile = new("velvet.editProfile", "Edit profile");
-        public static readonly LocString EditCaption = new("velvet.editCaption", "Edit caption");
-        public static readonly LocString EditCaptionFailed = new("velvet.editCaptionFailed", "Couldn't save the caption");
+        public static readonly LocString EditPost = new("velvet.editPost", "Edit post");
+        public static readonly LocString EditPostFailed = new("velvet.editPostFailed", "Couldn't save the changes");
         public static readonly LocString EditedStamp = new("velvet.editedStamp", "{0} · Edited");
         public static readonly LocString PronounsLabel = new("velvet.pronounsLabel", "Pronouns");
         public static readonly LocString DiscoverableLabel = new("velvet.discoverableLabel", "Appear in Discover");
@@ -5077,7 +5190,6 @@ internal static class L
         public static readonly LocString UseCameraHint = new("photos.useCameraHint", "Use the Camera to take a shot");
         public static readonly LocPlural Count = new("photos.count", "{0} Photo", "{0} Photos");
         public static readonly LocString Delete = new("photos.delete", "Delete");
-        public static readonly LocString DeleteConfirmMessage = new("photos.deleteConfirmMessage", "Delete this photo? This can't be undone.");
         public static readonly LocString DeleteConfirm = new("photos.deleteConfirm", "Delete");
         public static readonly LocString DeleteCancel = new("photos.deleteCancel", "Cancel");
         public static readonly LocString Library = new("photos.library", "Library");
@@ -5101,9 +5213,98 @@ internal static class L
         public static readonly LocString EmptyAlbum = new("photos.emptyAlbum", "No photos yet");
         public static readonly LocString AlbumExists = new("photos.albumExists", "An album with this name already exists");
         public static readonly LocString Done = new("photos.done", "Done");
-        public static readonly LocString NoAlbums = new("photos.noAlbums", "No Albums");
-        public static readonly LocString AlbumNamePlaceholder = new("photos.albumNamePlaceholder", "My Album");
-        public static readonly LocString CreateAlbumHint = new("photos.noAlbumsHint", "Take a photo or create an album");
+        public static readonly LocString Edit = new("photos.edit", "Edit");
+        public static readonly LocString Save = new("photos.save", "Save");
+        public static readonly LocString Reset = new("photos.reset", "Reset");
+        public static readonly LocString ToolAdjust = new("photos.tool.adjust", "Adjust");
+        public static readonly LocString ToolLooks = new("photos.tool.looks", "Looks");
+        public static readonly LocString ToolCrop = new("photos.tool.crop", "Crop");
+        public static readonly LocString Brightness = new("photos.adjust.brightness", "Brightness");
+        public static readonly LocString Contrast = new("photos.adjust.contrast", "Contrast");
+        public static readonly LocString Saturation = new("photos.adjust.saturation", "Saturation");
+        public static readonly LocString Warmth = new("photos.adjust.warmth", "Warmth");
+        public static readonly LocString Vignette = new("photos.adjust.vignette", "Vignette");
+        public static readonly LocString Straighten = new("photos.adjust.straighten", "Straighten");
+        public static readonly LocString Rotate = new("photos.rotate", "Rotate");
+        public static readonly LocString Flip = new("photos.flip", "Flip");
+        public static readonly LocString Strength = new("photos.strength", "Strength");
+        public static readonly LocString LookOriginal = new("photos.look.original", "Original");
+        public static readonly LocString LookWarm = new("photos.look.warm", "Warm");
+        public static readonly LocString LookCool = new("photos.look.cool", "Cool");
+        public static readonly LocString LookVivid = new("photos.look.vivid", "Vivid");
+        public static readonly LocString LookFilm = new("photos.look.film", "Film");
+        public static readonly LocString LookFade = new("photos.look.fade", "Fade");
+        public static readonly LocString LookMono = new("photos.look.mono", "Mono");
+        public static readonly LocString LookNoir = new("photos.look.noir", "Noir");
+        public static readonly LocString AspectOriginal = new("photos.aspect.original", "Original");
+        public static readonly LocString AspectSquare = new("photos.aspect.square", "Square");
+        public static readonly LocString AspectFourByThree = new("photos.aspect.fourByThree", "4:3");
+        public static readonly LocString AspectThreeByFour = new("photos.aspect.threeByFour", "3:4");
+        public static readonly LocString AspectSixteenByNine = new("photos.aspect.sixteenByNine", "16:9");
+        public static readonly LocString AspectNineBySixteen = new("photos.aspect.nineBySixteen", "9:16");
+        public static readonly LocString EditFailed = new("photos.editFailed", "The edited photo could not be saved");
+        public static readonly LocString EditOpenFailed = new("photos.editOpenFailed", "This photo could not be opened for editing");
+        public static readonly LocString MyAlbums = new("photos.myAlbums", "My Albums");
+        public static readonly LocString Months = new("photos.months", "Months");
+        public static readonly LocPlural Selected = new("photos.selected", "{0} selected", "{0} selected");
+        public static readonly LocString AlbumOptions = new("photos.albumOptions", "Album options");
+        public static readonly LocString EmptyAlbumHint = new("photos.emptyAlbumHint", "Add photos from your library");
+        public static readonly LocString RemoveFromAlbumConfirm =
+            new("photos.removeFromAlbumConfirm", "Remove this photo from {0}? It stays in your library.");
+        public static readonly LocString SortNewestFirst = new("photos.sortNewestFirst", "Newest First");
+        public static readonly LocString SortOldestFirst = new("photos.sortOldestFirst", "Oldest First");
+        public static readonly LocString SortBy = new("photos.sortBy", "Sort by");
+        public static readonly LocString SortDate = new("photos.sortDate", "Sort by Date");
+        public static readonly LocString SortName = new("photos.sortName", "Sort by Name");
+        public static readonly LocString SortSize = new("photos.sortSize", "Sort by Size");
+        public static readonly LocString SortDimensions = new("photos.sortDimensions", "Sort by Dimensions");
+        public static readonly LocString SortAToZ = new("photos.sortAToZ", "A to Z");
+        public static readonly LocString SortZToA = new("photos.sortZToA", "Z to A");
+        public static readonly LocString SortLargestFirst = new("photos.sortLargestFirst", "Largest first");
+        public static readonly LocString SortSmallestFirst = new("photos.sortSmallestFirst", "Smallest first");
+        public static readonly LocString Filter = new("photos.filter", "Filter");
+        public static readonly LocString FilterAll = new("photos.filterAll", "All Items");
+        public static readonly LocString FilterNotInAlbum = new("photos.filterNotInAlbum", "Not in an Album");
+        public static readonly LocString ViewOptions = new("photos.viewOptions", "View Options");
+        public static readonly LocString ZoomIn = new("photos.zoomIn", "Zoom In");
+        public static readonly LocString ZoomOut = new("photos.zoomOut", "Zoom Out");
+        public static readonly LocString AspectRatioGrid = new("photos.aspectRatioGrid", "Aspect Ratio Grid");
+        public static readonly LocString MenuBack = new("photos.menuBack", "Back");
+        public static readonly LocPlural DaysLeft = new("photos.daysLeft", "{0} day", "{0} days");
+        public static readonly LocString MonthlyAlbums = new("photos.monthlyAlbums", "Monthly Albums");
+        public static readonly LocString MonthlyAlbumsPrompt = new("photos.monthlyAlbumsPrompt",
+            "Photos can add an album for each month on its own. Turn on monthly albums? You can change this later in Settings.");
+        public static readonly LocString MonthlyAlbumsOn = new("photos.monthlyAlbumsOn", "Turn On");
+        public static readonly LocString MonthlyAlbumsNotNow = new("photos.monthlyAlbumsNotNow", "Not Now");
+        public static readonly LocString Favorites = new("photos.favorites", "Favorites");
+        public static readonly LocString Favorite = new("photos.favorite", "Favorite");
+        public static readonly LocString Unfavorite = new("photos.unfavorite", "Unfavorite");
+        public static readonly LocString NoFavorites = new("photos.noFavorites", "No Favorites");
+        public static readonly LocString NoFavoritesHint =
+            new("photos.noFavoritesHint", "Tap the heart on a photo to keep it here");
+        public static readonly LocString RecentlyDeleted = new("photos.recentlyDeleted", "Recently Deleted");
+        public static readonly LocString RecentlyDeletedHint =
+            new("photos.recentlyDeletedHint", "Photos stay here for 30 days, then they are removed for good.");
+        public static readonly LocString TrashEmpty = new("photos.trashEmpty", "Nothing Deleted");
+        public static readonly LocString TrashEmptyHint = new("photos.trashEmptyHint", "Deleted photos wait here for 30 days");
+        public static readonly LocString Recover = new("photos.recover", "Recover");
+        public static readonly LocString RecoverAll = new("photos.recoverAll", "Recover All");
+        public static readonly LocString DeletePermanently = new("photos.deletePermanently", "Delete Permanently");
+        public static readonly LocString DeleteAll = new("photos.deleteAll", "Delete All");
+        public static readonly LocPlural DeleteToTrash = new("photos.deleteToTrash",
+            "Move this photo to Recently Deleted?", "Move {0} photos to Recently Deleted?");
+        public static readonly LocPlural DeleteForever = new("photos.deleteForever",
+            "Delete this photo for good? This can't be undone.", "Delete {0} photos for good? This can't be undone.");
+        public static readonly LocString Select = new("photos.select", "Select");
+        public static readonly LocString SelectPhotos = new("photos.selectPhotos", "Select Photos");
+        public static readonly LocString Collections = new("photos.collections", "Collections");
+        public static readonly LocString Info = new("photos.info", "Info");
+        public static readonly LocString InfoTaken = new("photos.infoTaken", "Taken");
+        public static readonly LocString InfoDimensions = new("photos.infoDimensions", "Dimensions");
+        public static readonly LocString InfoSize = new("photos.infoSize", "Size");
+        public static readonly LocString InfoName = new("photos.infoName", "File name");
+        public static readonly LocString SizeKilobytes = new("photos.sizeKilobytes", "{0} KB");
+        public static readonly LocString SizeMegabytes = new("photos.sizeMegabytes", "{0} MB");
     }
 
     internal static class Skywatcher
@@ -5533,13 +5734,10 @@ internal static class L
         public static readonly LocString ShapeHint = new("minimized.shapeHint", "Choose what the phone collapses into. The minimap draws the zone map around you, so it can sit where the game minimap does.");
         public static readonly LocString Wallpaper = new("minimized.wallpaper", "Show wallpaper");
         public static readonly LocString WallpaperHint = new("minimized.wallpaperHint", "Paints your home wallpaper behind the mini phone, dimmed so the clock stays readable.");
-        public static readonly LocString Size = new("minimized.size", "Size");
-        public static readonly LocString SizeSmall = new("minimized.sizeSmall", "Small");
-        public static readonly LocString SizeMedium = new("minimized.sizeMedium", "Medium");
-        public static readonly LocString SizeLarge = new("minimized.sizeLarge", "Large");
-        public static readonly LocString MinimapHint = new("minimized.minimapHint", "The map faces north and shows your heading, the zone name and your coordinates. Tap it to open the phone, hold it to close.");
+        public static readonly LocString MinimapHint = new("minimized.minimapHint", "The map faces north and shows your heading, the zone name and your coordinates. Tap it to open the phone.");
         public static readonly LocString MinimapZoomHint = new("minimized.minimapZoomHint", "Scroll the wheel over the map to zoom, or use the plus and minus buttons that fade in when you hover it.");
         public static readonly LocString NoMap = new("minimized.noMap", "No map here");
+        public static readonly LocString ResizeHint = new("minimized.resizeHint", "Drag its bottom right corner to make the minimized phone bigger or smaller.");
     }
 
     internal static class Time
@@ -5571,7 +5769,7 @@ internal static class L
         public static readonly LocString ShortcutNotFound = new("plugin.shortcutNotFound", "No shortcut named {0}.");
         public static readonly LocString SearchTheMarket = new("plugin.searchTheMarket", "Search the Market");
         public static readonly LocString SideButtonHint = new("plugin.sideButtonHint", "Tap to minimize · Hold to turn off");
-        public static readonly LocString MinimizedHint = new("plugin.minimizedHint", "Tap to open · Hold to turn off");
+        public static readonly LocString MinimizedHint = new("plugin.minimizedHint", "Tap to open");
         public static readonly LocString LockPositionHint = new("plugin.lockPositionHint", "Lock position");
         public static readonly LocString UnlockPositionHint = new("plugin.unlockPositionHint", "Unlock position");
         public static readonly LocString ResizeHint = new("plugin.resizeHint", "Drag to resize");
@@ -6393,7 +6591,7 @@ internal static class L
         public static readonly LocString BatteryTourTitle = new("onboarding.batteryTourTitle", "Real battery");
         public static readonly LocString BatteryTourBody = new("onboarding.batteryTourBody", "And this is your device's actual battery, read straight from your computer.");
         public static readonly LocString MinimizeTitle = new("onboarding.minimizeTitle", "Tuck it away");
-        public static readonly LocString MinimizeBody = new("onboarding.minimizeBody", "This side button shrinks the phone into a small one in the corner that keeps showing the time, your music and new alerts. Tap it to bring the phone back, or hold it to turn off.");
+        public static readonly LocString MinimizeBody = new("onboarding.minimizeBody", "This side button shrinks the phone into a small one in the corner that keeps showing the time, your music and new alerts. Tap it to bring the phone back.");
         public static readonly LocString LockTitle = new("onboarding.lockTitle", "Lock it in place");
         public static readonly LocString LockBody = new("onboarding.lockBody", "This button locks the phone's position on your screen so it stays put while you play. That's the tour: enjoy your Aetherphone.");
         public static readonly LocString MessagesTitle = new("onboarding.messagesTitle", "Messages");
@@ -7639,6 +7837,7 @@ internal static class L
         public static readonly LocString ChatNotMember = new("failure.chatNotMember", "You're no longer in this conversation.");
         public static readonly LocString ChatNotMutualContact = new("failure.chatNotMutualContact", "You both need to add each other as contacts first.");
         public static readonly LocString ChatBlocked = new("failure.chatBlocked", "You can't message this person.");
+        public static readonly LocString ChatMemberBlocked = new("failure.chatMemberBlocked", "There's a block between that person and someone in this group.");
         public static readonly LocString ChatNotOwner = new("failure.chatNotOwner", "Only the group owner can do that.");
         public static readonly LocString ChatNotAdmin = new("failure.chatNotAdmin", "Only group admins can do that.");
         public static readonly LocString ChatGroupFull = new("failure.chatGroupFull", "This group is full at {0} people.");

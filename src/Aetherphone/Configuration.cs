@@ -81,9 +81,9 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public Vector2? LandscapePosition { get; set; }
     public MinimizedLayout? MinimizedLayout { get; set; }
     public MinimizedShape MinimizedShape { get; set; } = MinimizedShape.Phone;
-    public MinimizedMapSize MinimizedMapSize { get; set; } = MinimizedMapSize.Medium;
     public int MinimizedMapZoom { get; set; } = MinimizedShapes.DefaultMapZoom;
     public bool MinimizedWallpaper { get; set; }
+    public float MinimizedScale { get; set; } = 1f;
     public bool DoNotDisturb { get; set; }
     public bool QuietWhileBusy { get; set; } = true;
     public bool Vibration { get; set; } = true;
@@ -133,6 +133,13 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public bool CameraFlash { get; set; } = true;
     public bool CameraShowUi { get; set; }
     public int PhotosSegment { get; set; }
+    public int PhotosSortKey { get; set; }
+    public bool PhotosSortAscending { get; set; }
+    public int PhotosFilter { get; set; }
+    public int PhotosGridColumns { get; set; }
+    public bool PhotosAspectGrid { get; set; }
+    public bool PhotosMonthlyAlbums { get; set; }
+    public bool PhotosMonthlyAlbumsAsked { get; set; }
     public string Language { get; set; } = string.Empty;
     public string TranslationTargetLanguage { get; set; } = string.Empty;
     public bool TranslationDisclosureSeen { get; set; }
@@ -282,6 +289,7 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public List<RadioStationRecord> RadioFavorites { get; set; } = new();
     public List<string> CustomAlbumOrder { get; set; } = new();
     public Dictionary<string, List<string>> CustomAlbumPhotos { get; set; } = new();
+    public List<string> PhotoFavorites { get; set; } = new();
     public const int VelvetGateVersion = 1;
     public const int VelvetOnboardVersion = 3;
     public bool VelvetAcknowledgedGate { get; set; }
@@ -304,6 +312,17 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public string MessageWallpaper { get; set; } = string.Empty;
     public bool MessageWallpaperPattern { get; set; } = true;
     public Dictionary<string, string> MessageChatWallpapers { get; set; } = new();
+    public string LinkpearlChatTheme { get; set; } = string.Empty;
+    public string LinkpearlWallpaper { get; set; } = string.Empty;
+    public bool LinkpearlWallpaperPattern { get; set; } = true;
+    public Dictionary<string, string> LinkpearlChatWallpapers { get; set; } = new();
+    public int LinkpearlDefaultDensity { get; set; }
+    public float LinkpearlTextScale { get; set; } = 1f;
+    public bool LinkpearlLogTimestamps { get; set; } = true;
+    public bool LinkpearlLogWorldNames { get; set; } = true;
+    public bool LinkpearlLogGameColors { get; set; }
+    public bool LinkpearlLogGroupLines { get; set; }
+    public bool LinkpearlCollapseDuplicates { get; set; }
     public bool ArchiveTellsToDisk { get; set; } = true;
     public bool LinkpearlNotificationsPaused { get; set; }
     public bool MessageMigrated { get; set; }
@@ -322,6 +341,7 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public Dictionary<string, long> LinkpearlSeen { get; set; } = new();
     public List<string> LinkpearlPinnedTells { get; set; } = new();
     public List<string> LinkpearlMutedTells { get; set; } = new();
+    public Dictionary<string, int> LinkpearlTellLayouts { get; set; } = new();
     public bool LinkpearlPopoutTells { get; set; } = true;
     public float LinkpearlPopoutOpacity { get; set; } = 0.96f;
     public float LinkpearlPopoutTextScale { get; set; } = 1f;
@@ -336,6 +356,9 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public bool LinkpearlPopoutHideInDuty { get; set; }
     public bool LinkpearlPopoutFieldOperationsExempt { get; set; } = true;
     public bool LinkpearlPopoutReopenAfterCombat { get; set; } = true;
+    public bool LinkpearlPopoutHideInCutscene { get; set; } = true;
+    public int LinkpearlPopoutPlacement { get; set; }
+    public bool LinkpearlPopoutHideWhenUiHidden { get; set; } = true;
     public bool LinkpearlHotkeyEnabled { get; set; }
     public int LinkpearlHotkeyModifier { get; set; }
     public int LinkpearlHotkeyKey { get; set; }
