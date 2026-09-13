@@ -35,7 +35,7 @@ internal sealed partial class LinkpearlApp
             return;
         }
 
-        inbox.Viewing = key;
+        NoteConversationViewed(row);
         var scale = UiScale.Current;
         var header = new Rect(area.Min, new Vector2(area.Max.X, area.Min.Y + AppHeader.Height * scale));
         OpenThread(row);
@@ -45,6 +45,12 @@ internal sealed partial class LinkpearlApp
         chatThread.Draw(new Rect(new Vector2(area.Min.X, header.Max.Y), area.Max), frameTheme);
         DrawThreadHeader(header, row, scale);
         chatMenu.Draw(area, frameTheme);
+    }
+
+    private void NoteConversationViewed(InboxRow row)
+    {
+        inbox.NoteViewing(row.Key);
+        MarkConversationRead(row);
     }
 
     private void PaintThreadBackdrop(Rect listRect) =>

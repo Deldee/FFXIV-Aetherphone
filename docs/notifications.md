@@ -270,9 +270,10 @@ Do not disturb is toggled three ways: the switch on the phone chassis (`PhoneShe
 
 Muting is per tab and per channel (`ChatTab.MutedChannels`), and a tab's `AlertPolicy` decides whether anything notifies at all. The same rule drives the unread badge in `ChatInbox`, so a channel that cannot notify you also cannot badge you. Legacy per-character linkshell mutes (`Configuration.MutedLinkshellsByCharacter`) are carried into any tab that later includes the channel.
 
-The viewing grace deserves detail because it protects a correctness invariant. `ChatThreadStoreBase` (src/Aetherphone/Core/Message/ChatThreadStoreBase.cs) records `NoteThreadViewed(threadKey)` while a thread view draws, with a 4 second `ViewingGrace`. Two things key off it:
+The viewing grace deserves detail because it protects a correctness invariant. `ViewingMark` (src/Aetherphone/Core/Message/ViewingMark.cs) holds one key plus the time it was last noted and covers that key for `Grace` (4 seconds); `ChatThreadStoreBase` notes it through `NoteThreadViewed(threadKey)` while a thread view draws, and `ChatInbox` notes it through `NoteViewing` while Linkpearl's thread screen draws. Because the mark lapses on its own, closing the phone with a thread open stops counting as viewing in every chat app. Three things key off it:
 
-- The inbox scan skips notifying for the thread the user is looking at.
+- The inbox scan skips notifying for the thread the user is looking at, and `ChatNotifier` does the same for Linkpearl.
+- Clear-on-view: every frame a thread is on screen, the store removes its notification group and zeroes its local unread count (Linkpearl marks the row read instead). Any unread or card that accrued while the app was backgrounded clears on resume; a trip back to the list is never required.
 - Realtime chat pings call `RequestThreadRefresh`, which flags a pending refresh; `ConsumePendingThreadRefresh` only executes it while the open thread is being viewed (`IsBeingViewed`, inside the grace window). Refreshing a thread makes the server mark it read, so an ungated background refresh would silently mark threads read, suppress the sender's notification, and break seen ticks. The chat stores (`DirectMessagesStore`, `GramDmStore`, `VelvetStore`) all route pings through `RequestThreadRefresh`; keep it that way for any new chat surface.
 
 ## Gotchas

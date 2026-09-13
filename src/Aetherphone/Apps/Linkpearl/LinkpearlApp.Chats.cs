@@ -413,9 +413,8 @@ internal sealed partial class LinkpearlApp
 
                 break;
             case MenuMarkRead:
-                inbox.MarkRead(row);
+                MarkConversationRead(row);
                 inbox.FlushSeen();
-                notifications.RemoveGroup(row.Key);
                 break;
             case MenuTogglePin:
                 TogglePin(row);
@@ -494,9 +493,18 @@ internal sealed partial class LinkpearlApp
             return;
         }
 
-        inbox.MarkRead(row);
-        notifications.RemoveGroup(key);
+        MarkConversationRead(row);
         router.Push(LinkpearlRoute.Conversation(key));
+    }
+
+    private void MarkConversationRead(InboxRow row)
+    {
+        if (row.Unread > 0)
+        {
+            inbox.MarkRead(row);
+        }
+
+        notifications.RemoveGroup(row.Key);
     }
 
     private static string Title(InboxRow row) => row.Tab is { } tab ? tab.Name : NameMask.Display(row.Title);

@@ -128,7 +128,7 @@ internal sealed partial class LinkpearlApp : IResumableApp
         backToList = () =>
         {
             chatMenu.Close();
-            inbox.Viewing = string.Empty;
+            inbox.ClearViewing();
             threadKey = string.Empty;
             router.Pop();
         };
@@ -147,7 +147,7 @@ internal sealed partial class LinkpearlApp : IResumableApp
         threadKey = string.Empty;
         chatFilter = ChatFilter.All;
         ResetChatSearch();
-        inbox.Viewing = string.Empty;
+        inbox.ClearViewing();
         inbox.Invalidate();
         inbox.Sync();
         ResetPeopleState();
@@ -159,11 +159,6 @@ internal sealed partial class LinkpearlApp : IResumableApp
     {
         inbox.Invalidate();
         inbox.Sync();
-        if (threadKey.Length > 0)
-        {
-            inbox.Viewing = threadKey;
-        }
-
         ReadFriends();
         ConsumeLaunchRequests();
     }
@@ -210,7 +205,7 @@ internal sealed partial class LinkpearlApp : IResumableApp
         settingsMenu.Close();
         newChatSheet.Close();
         chatThread.Close();
-        inbox.Viewing = string.Empty;
+        inbox.ClearViewing();
         inbox.ClearTransient();
         inbox.FlushSeen();
     }
@@ -281,7 +276,7 @@ internal sealed partial class LinkpearlApp : IResumableApp
                 DrawFreeCompanyDetail(area, route);
                 break;
             default:
-                inbox.Viewing = string.Empty;
+                inbox.ClearViewing();
                 DrawRoot(area);
                 break;
         }

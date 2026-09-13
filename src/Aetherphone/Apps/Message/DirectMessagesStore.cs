@@ -244,6 +244,8 @@ internal sealed class DirectMessagesStore : ChatThreadStoreBase<ChatMessageDto, 
 
     protected override int ThreadUnreadCountOf(ConversationDto thread) => thread.UnreadCount;
 
+    protected override ConversationDto WithUnreadCleared(ConversationDto thread) => thread with { UnreadCount = 0 };
+
     protected override bool IsThreadMuted(ConversationDto thread) => thread.Muted;
 
     protected override PhoneNotification BuildInboxNotification(ConversationDto thread)

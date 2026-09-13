@@ -286,12 +286,29 @@ public sealed class ChatInboxTests
         var (log, inbox, _) = Build(Tab("FC", "fc"));
         using var scope = inbox;
         inbox.Sync();
-        inbox.Viewing = "tab:FC";
+        inbox.NoteViewing("tab:FC");
 
         log.Append(Entry(log, "fc", "Rin", DateTime.Now));
 
         Assert.Equal(0, inbox.Find("tab:FC")!.Unread);
         Assert.Equal(0, inbox.TotalUnread);
+    }
+
+    [Fact]
+    public void ClearingTheViewedConversationCountsAgain()
+    {
+        var (log, inbox, _) = Build(Tab("FC", "fc"));
+        using var scope = inbox;
+        inbox.Sync();
+        inbox.NoteViewing("tab:FC");
+        log.Append(Entry(log, "fc", "Rin", DateTime.Now));
+        Assert.Equal(0, inbox.TotalUnread);
+
+        inbox.ClearViewing();
+        log.Append(Entry(log, "fc", "Mira", DateTime.Now.AddSeconds(1)));
+
+        Assert.Equal(1, inbox.Find("tab:FC")!.Unread);
+        Assert.Equal(1, inbox.TotalUnread);
     }
 
     [Fact]

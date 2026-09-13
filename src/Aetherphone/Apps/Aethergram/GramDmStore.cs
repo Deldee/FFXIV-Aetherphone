@@ -400,6 +400,8 @@ internal sealed class GramDmStore : ChatThreadStoreBase<GramMessageDto, GramThre
 
     protected override int ThreadUnreadCountOf(GramThreadDto thread) => thread.UnreadCount;
 
+    protected override GramThreadDto WithUnreadCleared(GramThreadDto thread) => thread with { UnreadCount = 0 };
+
     protected override PhoneNotification BuildInboxNotification(GramThreadDto thread)
     {
         var name = string.IsNullOrEmpty(thread.OtherDisplayName) ? thread.OtherHandle : thread.OtherDisplayName;

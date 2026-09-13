@@ -455,6 +455,8 @@ internal sealed partial class VelvetStore : ChatThreadStoreBase<VelvetMessageDto
 
     protected override int ThreadUnreadCountOf(VelvetThreadDto thread) => thread.UnreadCount;
 
+    protected override VelvetThreadDto WithUnreadCleared(VelvetThreadDto thread) => thread with { UnreadCount = 0 };
+
     protected override PhoneNotification BuildInboxNotification(VelvetThreadDto thread)
     {
         var name = string.IsNullOrEmpty(thread.OtherDisplayName) ? thread.OtherHandle : thread.OtherDisplayName;

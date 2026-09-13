@@ -1,4 +1,5 @@
 using Aetherphone.Core.Localization;
+using Aetherphone.Core.Message;
 using Aetherphone.Core.Theme;
 
 namespace Aetherphone.Core.GameChat;
@@ -41,6 +42,7 @@ internal sealed class ChatInbox : IDisposable
     private readonly List<InboxRow> pinned = new(6);
     private readonly List<string> streamScratch = new(32);
     private readonly HashSet<string> attended = new(StringComparer.Ordinal);
+    private readonly ViewingMark viewing = new();
     private InboxRow? transient;
     private long expectedRevision = -1;
     private bool stale = true;
@@ -64,8 +66,6 @@ internal sealed class ChatInbox : IDisposable
 
     public int TotalUnread { get; private set; }
 
-    public string Viewing { get; set; } = string.Empty;
-
     public int Count => rows.Count + pinned.Count;
 
     public void Invalidate()
@@ -74,8 +74,11 @@ internal sealed class ChatInbox : IDisposable
         stale = true;
     }
 
-    public bool IsViewing(string key) =>
-        string.Equals(Viewing, key, StringComparison.Ordinal) || attended.Contains(key);
+    public bool IsViewing(string key) => viewing.Covers(key) || attended.Contains(key);
+
+    public void NoteViewing(string key) => viewing.Note(key);
+
+    public void ClearViewing() => viewing.Clear();
 
     public void SetAttended(string key, bool attending)
     {

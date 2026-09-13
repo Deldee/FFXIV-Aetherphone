@@ -25,7 +25,6 @@ internal abstract class ChatThreadStoreBase<TMessage, TThread> : IDisposable
     private const string ReportEvidenceUploadScope = "report-evidence";
     private static readonly TimeSpan ForegroundInboxPollInterval = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan BackgroundInboxPollInterval = TimeSpan.FromSeconds(120);
-    private static readonly TimeSpan ViewingGrace = TimeSpan.FromSeconds(4);
     private static readonly TimeSpan VaultRetryInterval = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan KeyStatusRetryInterval = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan ThreadReopenCooldown = TimeSpan.FromSeconds(3);
@@ -75,8 +74,7 @@ internal abstract class ChatThreadStoreBase<TMessage, TThread> : IDisposable
     private volatile bool inboxPolling;
     private volatile bool threadRefreshPending;
     private bool inboxPrimed;
-    private volatile string? viewingThreadKey;
-    private DateTime lastViewingUtc = DateTime.MinValue;
+    private readonly ViewingMark viewing = new();
     private volatile bool vaultRefreshRequested;
     private volatile bool vaultRefreshInFlight;
     private DateTime nextVaultRetryUtc = DateTime.MinValue;
@@ -213,6 +211,8 @@ internal abstract class ChatThreadStoreBase<TMessage, TThread> : IDisposable
     protected abstract long ThreadLastMessageAtOf(TThread thread);
 
     protected abstract int ThreadUnreadCountOf(TThread thread);
+
+    protected abstract TThread WithUnreadCleared(TThread thread);
 
     protected abstract PhoneNotification BuildInboxNotification(TThread thread);
 
@@ -392,15 +392,33 @@ internal abstract class ChatThreadStoreBase<TMessage, TThread> : IDisposable
         return total;
     }
 
-    protected bool IsBeingViewed(string threadKey) =>
-        string.Equals(viewingThreadKey, threadKey, StringComparison.Ordinal)
-        && DateTime.UtcNow - lastViewingUtc < ViewingGrace;
+    protected bool IsBeingViewed(string threadKey) => viewing.Covers(threadKey);
 
     public void NoteThreadViewed(string threadKey)
     {
-        viewingThreadKey = threadKey;
-        lastViewingUtc = DateTime.UtcNow;
+        viewing.Note(threadKey);
+        ClearLocalUnread(threadKey);
         notifications.RemoveGroup(threadKey);
+    }
+
+    private void ClearLocalUnread(string threadKey)
+    {
+        var snapshot = threadList;
+        for (var index = 0; index < snapshot.Length; index++)
+        {
+            var thread = snapshot[index];
+            if (!string.Equals(ThreadKeyOf(thread), threadKey, StringComparison.Ordinal)
+                || ThreadUnreadCountOf(thread) <= 0)
+            {
+                continue;
+            }
+
+            var updated = new TThread[snapshot.Length];
+            Array.Copy(snapshot, updated, snapshot.Length);
+            updated[index] = WithUnreadCleared(thread);
+            threadList = updated;
+            return;
+        }
     }
 
     private void OnFrameworkTick(IFramework framework)
