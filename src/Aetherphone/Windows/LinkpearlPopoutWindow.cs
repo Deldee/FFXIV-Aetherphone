@@ -183,6 +183,8 @@ internal sealed partial class LinkpearlPopoutWindow : Window
 
     public Rect Frame => frame;
 
+    public bool HasFrame => frame.Width > 0f;
+
     public string KeyAt(int index) => index >= 0 && index < keys.Count ? keys[index] : string.Empty;
 
     public int IndexOfTab(string conversationKey) => PopoutTabs.IndexOf(keys, conversationKey);
@@ -316,8 +318,9 @@ internal sealed partial class LinkpearlPopoutWindow : Window
         var zoom = OwnZoom();
         var saved = savedPlacement;
         savedPlacement = null;
-        expandedSize = saved is { Width: > 0f, Height: > 0f }
-            ? new Vector2(saved.Width, saved.Height)
+        var sized = saved ?? owner.LastPlacement;
+        expandedSize = sized is { Width: > 0f, Height: > 0f }
+            ? new Vector2(sized.Width, sized.Height)
             : new Vector2(DefaultWidth * zoom, DefaultHeight * zoom);
         collapsed = saved?.Collapsed ?? false;
         collapseSpring.SnapTo(collapsed ? 1f : 0f);
@@ -463,18 +466,20 @@ internal sealed partial class LinkpearlPopoutWindow : Window
 
     public void ReopenThread() => threadKey = string.Empty;
 
+    public LinkpearlPopoutState Placement() => new()
+    {
+        X = frame.Min.X,
+        Y = frame.Min.Y,
+        Width = expandedSize.X,
+        Height = expandedSize.Y,
+    };
+
     public LinkpearlPopoutState Snapshot()
     {
-        var state = new LinkpearlPopoutState
-        {
-            Key = Key,
-            Active = active,
-            X = frame.Min.X,
-            Y = frame.Min.Y,
-            Width = expandedSize.X,
-            Height = expandedSize.Y,
-            Collapsed = collapsed,
-        };
+        var state = Placement();
+        state.Key = Key;
+        state.Active = active;
+        state.Collapsed = collapsed;
         for (var index = 0; index < keys.Count; index++)
         {
             state.Keys.Add(keys[index]);

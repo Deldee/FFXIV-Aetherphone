@@ -27,6 +27,9 @@ internal static class PopoutPlacements
         return Clamp(origin, viewport, size);
     }
 
+    public static Vector2 Recall(Vector2 origin, Rect viewport, Vector2 size, float stagger) =>
+        Clamp(origin + new Vector2(stagger, stagger), viewport, size);
+
     private static Vector2 BesidePhone(Rect viewport, Rect? phone, Vector2 size, float margin, float stagger)
     {
         if (phone is not { } frame || frame.Width <= 0f)

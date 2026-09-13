@@ -52,4 +52,19 @@ public sealed class PopoutPlacementTests
         Assert.Equal(1920f - Size.X, topLeft.X);
         Assert.Equal(1080f - Size.Y, topLeft.Y);
     }
+
+    [Fact]
+    public void RecallReturnsToTheRememberedSpotAndStaysInsideTheViewport()
+    {
+        var remembered = new Vector2(300f, 400f);
+
+        var same = PopoutPlacements.Recall(remembered, Viewport, Size, 0f);
+        var staggered = PopoutPlacements.Recall(remembered, Viewport, Size, 28f);
+        var offscreen = PopoutPlacements.Recall(new Vector2(-500f, 2000f), Viewport, Size, 0f);
+
+        Assert.Equal(remembered, same);
+        Assert.Equal(new Vector2(328f, 428f), staggered);
+        Assert.Equal(0f, offscreen.X);
+        Assert.Equal(1080f - Size.Y, offscreen.Y);
+    }
 }

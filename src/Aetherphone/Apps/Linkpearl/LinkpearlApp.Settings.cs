@@ -384,6 +384,7 @@ internal sealed partial class LinkpearlApp
             if (pickedPlacement >= 0)
             {
                 configuration.LinkpearlPopoutPlacement = (int)PlacementChoices[pickedPlacement];
+                configuration.LinkpearlPopoutLastPlacement = null;
                 configuration.Save();
             }
 

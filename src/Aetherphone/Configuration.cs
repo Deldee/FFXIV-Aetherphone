@@ -346,6 +346,7 @@ internal sealed class Configuration : IPluginConfiguration, IHomeConfiguration, 
     public float LinkpearlPopoutOpacity { get; set; } = 0.96f;
     public float LinkpearlPopoutTextScale { get; set; } = 1f;
     public List<LinkpearlPopoutState> LinkpearlPopouts { get; set; } = new();
+    public LinkpearlPopoutState? LinkpearlPopoutLastPlacement { get; set; }
     public bool LinkpearlPopoutTabs { get; set; } = true;
     public bool LinkpearlPopoutFade { get; set; } = true;
     public float LinkpearlPopoutIdleOpacity { get; set; } = 0.62f;

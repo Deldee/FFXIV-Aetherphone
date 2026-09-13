@@ -178,14 +178,22 @@ internal sealed class LinkpearlPopouts : IDisposable
         return true;
     }
 
+    public LinkpearlPopoutState? LastPlacement => configuration.LinkpearlPopoutLastPlacement;
+
     public Vector2 DefaultPosition(Vector2 scaledSize)
     {
+        var viewport = PhoneBounds.Viewport();
+        var stagger = StaggerStep * UiScale.Global * Math.Max(0, OpenCount - 1);
+        if (LastPlacement is { } remembered)
+        {
+            return PopoutPlacements.Recall(new Vector2(remembered.X, remembered.Y), viewport, scaledSize, stagger);
+        }
+
         var mode = (PopoutPlacement)Math.Clamp(configuration.LinkpearlPopoutPlacement, 0,
             (int)PopoutPlacement.BottomRight);
         Rect? phone = visibility.TryGetFrame(out var frame) ? frame : null;
         var margin = ViewportMargin * UiScale.Global;
-        var stagger = StaggerStep * UiScale.Global * OpenCount;
-        return PopoutPlacements.Resolve(mode, PhoneBounds.Viewport(), phone, scaledSize, margin, stagger);
+        return PopoutPlacements.Resolve(mode, viewport, phone, scaledSize, margin, stagger);
     }
 
     public void Close(string key)
@@ -196,8 +204,7 @@ internal sealed class LinkpearlPopouts : IDisposable
             return;
         }
 
-        window.RemoveTab(window.IndexOfTab(key));
-        Persist();
+        CloseTab(window, window.IndexOfTab(key));
     }
 
     public bool Toggle(string key)
@@ -213,6 +220,11 @@ internal sealed class LinkpearlPopouts : IDisposable
 
     public void CloseAll()
     {
+        if (MostRecentlyActive(false) is { } latest)
+        {
+            Remember(latest);
+        }
+
         for (var index = 0; index < windows.Length; index++)
         {
             windows[index].Unbind();
@@ -301,6 +313,11 @@ internal sealed class LinkpearlPopouts : IDisposable
             return;
         }
 
+        if (!window.Bound)
+        {
+            Remember(window);
+        }
+
         Persist();
     }
 
@@ -362,8 +379,19 @@ internal sealed class LinkpearlPopouts : IDisposable
 
     public void OnWindowClosed(LinkpearlPopoutWindow window)
     {
+        Remember(window);
         window.Unbind();
         Persist();
+    }
+
+    private void Remember(LinkpearlPopoutWindow window)
+    {
+        if (!window.HasFrame)
+        {
+            return;
+        }
+
+        configuration.LinkpearlPopoutLastPlacement = window.Placement();
     }
 
     public void Persist()
@@ -437,18 +465,15 @@ internal sealed class LinkpearlPopouts : IDisposable
         return null;
     }
 
-    private LinkpearlPopoutWindow? Host()
-    {
-        if (!configuration.LinkpearlPopoutTabs)
-        {
-            return null;
-        }
+    private LinkpearlPopoutWindow? Host() => configuration.LinkpearlPopoutTabs ? MostRecentlyActive(true) : null;
 
+    private LinkpearlPopoutWindow? MostRecentlyActive(bool withRoom)
+    {
         LinkpearlPopoutWindow? best = null;
         for (var index = 0; index < windows.Length; index++)
         {
             var window = windows[index];
-            if (!window.Bound || window.TabCount >= PopoutTabs.MaxTabs)
+            if (!window.Bound || (withRoom && window.TabCount >= PopoutTabs.MaxTabs))
             {
                 continue;
             }
