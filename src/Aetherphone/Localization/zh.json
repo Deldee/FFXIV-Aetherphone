@@ -5234,6 +5234,7 @@
   "changelog.sectionPhone": "手机",
   "changelog.sectionSocial": "Chirper 和 Aethergram",
   "changelog.sectionAethergramVelvet": "Aethergram 和 Velvet",
+  "changelog.r1032.0": "修复了手机显示“请求过多，N 秒后重试”并卡顿数秒的问题（多发生在打开聊天时）；与服务器的通信现在更轻量，并且能自行恢复",
   "changelog.r1031.0": "修复了弹出窗口忘记位置的问题：关闭的弹出窗口会在原来的位置以原来的大小重新打开",
   "changelog.r1030.0": "修复了部分电脑会在上传的照片上留下红、蓝、白色短线的问题",
   "changelog.r1030.1": "新增照片编辑器：调整光线和色彩，选择胶片、黑色电影等风格，裁剪和旋转，原图始终保留",

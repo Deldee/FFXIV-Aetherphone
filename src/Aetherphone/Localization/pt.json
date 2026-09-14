@@ -5234,6 +5234,7 @@
   "changelog.sectionPhone": "Telefone",
   "changelog.sectionSocial": "Chirper e Aethergram",
   "changelog.sectionAethergramVelvet": "Aethergram e Velvet",
+  "changelog.r1032.0": "Corrigido um problema em que o telefone mostrava 'Solicitações demais. Nova tentativa em Ns' e travava por alguns segundos, principalmente ao abrir um chat; a comunicação com o servidor agora é mais leve e se recupera sozinha",
   "changelog.r1031.0": "Corrigidas as janelas flutuantes que esqueciam seu lugar: uma janela flutuante que você fecha reabre onde estava, no mesmo tamanho",
   "changelog.r1030.0": "Corrigidos os traços vermelhos, azuis e brancos que alguns PCs adicionavam às fotos enviadas",
   "changelog.r1030.1": "Adicionado um editor de fotos: ajuste luz e cor, escolha um estilo como Filme ou Noir, corte e gire, e o original sempre é mantido",

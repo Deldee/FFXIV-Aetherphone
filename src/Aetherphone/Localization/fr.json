@@ -5234,6 +5234,7 @@
   "changelog.sectionPhone": "Téléphone",
   "changelog.sectionSocial": "Chirper et Aethergram",
   "changelog.sectionAethergramVelvet": "Aethergram et Velvet",
+  "changelog.r1032.0": "Correction d'un problème où le téléphone affichait 'Trop de requêtes. Nouvel essai dans Ns' et se figeait quelques secondes, surtout à l'ouverture d'une discussion ; la communication avec le serveur est désormais plus légère et se rétablit d'elle-même",
   "changelog.r1031.0": "Correction des fenêtres flottantes qui oubliaient leur place : une fenêtre flottante fermée se rouvre là où elle était, à la même taille",
   "changelog.r1030.0": "Correction des tirets rouges, bleus et blancs que certains PC ajoutaient aux photos envoyées",
   "changelog.r1030.1": "Ajout d'un éditeur photo : réglez la lumière et les couleurs, choisissez un style comme Pellicule ou Noir, recadrez et pivotez, et l'original est toujours conservé",
