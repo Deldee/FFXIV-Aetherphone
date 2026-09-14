@@ -2,6 +2,8 @@ namespace Aetherphone.Core.Runtime;
 
 internal sealed class PollCadence
 {
+    private static readonly TimeSpan ReconnectSpread = TimeSpan.FromSeconds(20);
+
     private readonly PhoneVisibility visibility;
     private readonly TimeSpan foregroundInterval;
     private readonly TimeSpan backgroundInterval;
@@ -21,6 +23,11 @@ internal sealed class PollCadence
     public void RequestImmediate()
     {
         immediate = true;
+    }
+
+    public void RequestAfterReconnect()
+    {
+        RequestAt(DateTime.UtcNow + ReconnectSpread * Random.Shared.NextDouble());
     }
 
     public void RequestAt(DateTime dueUtc)

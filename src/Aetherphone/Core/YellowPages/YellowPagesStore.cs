@@ -545,7 +545,7 @@ internal sealed class YellowPagesStore : IDisposable
     {
         if (connected)
         {
-            cadence.RequestImmediate();
+            cadence.RequestAfterReconnect();
         }
     }
 

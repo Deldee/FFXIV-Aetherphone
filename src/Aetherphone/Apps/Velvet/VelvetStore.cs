@@ -154,7 +154,7 @@ internal sealed partial class VelvetStore : ChatThreadStoreBase<VelvetMessageDto
     {
         if (active)
         {
-            InboxCadence.RequestImmediate();
+            InboxCadence.RequestAfterReconnect();
         }
     }
 

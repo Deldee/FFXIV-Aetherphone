@@ -420,7 +420,7 @@ internal sealed class GameRoomsStore : IDisposable
         room.OnRealtimeConnected(connected);
         if (connected)
         {
-            directoryCadence.RequestImmediate();
+            directoryCadence.RequestAfterReconnect();
             return;
         }
 

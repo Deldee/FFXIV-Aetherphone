@@ -510,7 +510,7 @@ internal sealed class AdInquiryStore : IDisposable
     {
         if (connected)
         {
-            cadence.RequestImmediate();
+            cadence.RequestAfterReconnect();
         }
     }
 
