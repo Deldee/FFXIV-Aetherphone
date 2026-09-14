@@ -89,7 +89,13 @@ internal static unsafe class WalletReader
             var entries = sections[sectionIndex].Entries;
             for (var entryIndex = 0; entryIndex < entries.Length; entryIndex++)
             {
-                entries[entryIndex].Amount = ReadAmount(manager, entries[entryIndex]);
+                var entry = entries[entryIndex];
+                entry.Amount = ReadAmount(manager, entry);
+                if (entry.Kind == CurrencyKind.LimitedTomestone)
+                {
+                    entry.WeeklyAmount = manager->GetWeeklyAcquiredTomestoneCount();
+                    entry.WeeklyCap = InventoryManager.GetLimitedTomestoneWeeklyLimit();
+                }
             }
         }
     }
@@ -168,6 +174,7 @@ internal static unsafe class WalletReader
     {
         var ids = new List<uint>(4);
         gameData.CollectTomestoneItemIds(ids);
+        var limitedItemId = gameData.LimitedTomestoneItemId();
         var entries = new List<WalletEntry>(ids.Count);
         for (var index = 0; index < ids.Count; index++)
         {
@@ -177,7 +184,8 @@ internal static unsafe class WalletReader
                 continue;
             }
 
-            entries.Add(new WalletEntry(ids[index], iconId, name, TomestoneCap, CurrencyKind.Tomestone));
+            var kind = ids[index] == limitedItemId ? CurrencyKind.LimitedTomestone : CurrencyKind.Tomestone;
+            entries.Add(new WalletEntry(ids[index], iconId, name, TomestoneCap, kind));
         }
 
         if (entries.Count > 0)
@@ -216,6 +224,7 @@ internal static unsafe class WalletReader
         {
             CurrencyKind.Gil => (long)manager->GetGil(),
             CurrencyKind.Tomestone => (long)manager->GetTomestoneCount(entry.ItemId),
+            CurrencyKind.LimitedTomestone => (long)manager->GetTomestoneCount(entry.ItemId),
             _ => (long)manager->GetInventoryItemCount(entry.ItemId, false, true, true, 0),
         };
     }
@@ -228,6 +237,7 @@ internal static unsafe class WalletReader
             for (var entryIndex = 0; entryIndex < entries.Length; entryIndex++)
             {
                 entries[entryIndex].Amount = 0;
+                entries[entryIndex].WeeklyAmount = 0;
             }
         }
     }

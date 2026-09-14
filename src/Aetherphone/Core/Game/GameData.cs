@@ -15,6 +15,7 @@ internal sealed class GameData
     public const int ChineseSimplifiedClientLanguage = 4;
     private const uint ChinaRegionId = 5;
     public const string ChineseLocale = "cn";
+    private const uint PoeticsItemId = 28;
 
     private readonly IDataManager data;
     private readonly IObjectTable objectTable;
@@ -440,40 +441,49 @@ internal sealed class GameData
 
     public void CollectTomestoneItemIds(List<uint> into)
     {
-        const uint poeticsItemId = 28;
         into.Clear();
-        var highest = 0u;
-        var second = 0u;
+        FindTopTomestoneItemIds(out var newest, out var previous);
+        if (newest != 0)
+        {
+            into.Add(newest);
+        }
+
+        if (previous != 0)
+        {
+            into.Add(previous);
+        }
+
+        into.Add(PoeticsItemId);
+    }
+
+    public uint LimitedTomestoneItemId()
+    {
+        FindTopTomestoneItemIds(out var newest, out _);
+        return newest;
+    }
+
+    private void FindTopTomestoneItemIds(out uint newest, out uint previous)
+    {
+        newest = 0;
+        previous = 0;
         foreach (var row in data.GetExcelSheet<TomestonesItem>())
         {
             var itemId = row.Item.RowId;
-            if (itemId == 0 || itemId == poeticsItemId)
+            if (itemId == 0 || itemId == PoeticsItemId)
             {
                 continue;
             }
 
-            if (itemId > highest)
+            if (itemId > newest)
             {
-                second = highest;
-                highest = itemId;
+                previous = newest;
+                newest = itemId;
             }
-            else if (itemId > second)
+            else if (itemId > previous)
             {
-                second = itemId;
+                previous = itemId;
             }
         }
-
-        if (highest != 0)
-        {
-            into.Add(highest);
-        }
-
-        if (second != 0)
-        {
-            into.Add(second);
-        }
-
-        into.Add(poeticsItemId);
     }
 
     public uint[] CollectableMountIds()

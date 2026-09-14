@@ -7,6 +7,7 @@ internal enum CurrencyKind
     Generic,
     Gil,
     Tomestone,
+    LimitedTomestone,
 }
 
 internal sealed class WalletEntry
@@ -26,6 +27,9 @@ internal sealed class WalletEntry
     public long Cap { get; }
     public CurrencyKind Kind { get; }
     public long Amount { get; set; }
+    public long WeeklyAmount { get; set; }
+    public long WeeklyCap { get; set; }
+    public bool HasWeeklyCap => Kind == CurrencyKind.LimitedTomestone && WeeklyCap > 0;
 }
 
 internal sealed class WalletSection
