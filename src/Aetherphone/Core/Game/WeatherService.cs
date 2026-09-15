@@ -1,3 +1,4 @@
+using Aetherphone.Core.Localization;
 using Dalamud.Game;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Environment;
@@ -9,6 +10,10 @@ internal readonly record struct WeatherEntry(byte Id, string Name, string Englis
 
 internal readonly record struct WeatherWindow(WeatherEntry Weather, int MinutesFromNow, bool IsCurrent, int StartBell);
 
+internal readonly record struct WeatherZoneEntry(uint TerritoryId, string ZoneName);
+
+internal readonly record struct WeatherRegionGroup(string Region, IReadOnlyList<WeatherZoneEntry> Zones);
+
 internal interface IWeatherChance
 {
     int Chance { get; }
@@ -19,10 +24,16 @@ internal sealed class WeatherService
     public const long RealSecondsPerWindow = 1400;
     private const long RealSecondsPerEorzeaHour = 175;
     private const long RealSecondsPerEorzeaDay = 4200;
+    private const uint EurekaIntendedUse = 41;
+    private const uint FieldOperationIntendedUse = 48;
+    private const uint OccultCrescentIntendedUse = 61;
+    private const string UnknownRegionPlaceholder = "???";
     private readonly IDataManager data;
     private readonly IClientState clientState;
     private readonly Dictionary<byte, WeatherEntry> entries = new();
     private readonly Dictionary<uint, ZoneWeatherTable> zoneTables = new();
+    private List<WeatherRegionGroup>? regionGroups;
+    private string regionGroupsLocale = string.Empty;
 
     private readonly record struct WeatherChance(byte Id, int Chance) : IWeatherChance;
 
@@ -49,6 +60,73 @@ internal sealed class WeatherService
         }
 
         return string.Empty;
+    }
+
+    public string RegionName(uint territoryId)
+    {
+        if (territoryId != 0 &&
+            data.GetExcelSheet<TerritoryType>(GameSheetLanguage.Current()).TryGetRow(territoryId, out var territory) &&
+            territory.PlaceNameRegion.IsValid)
+        {
+            var region = territory.PlaceNameRegion.Value.Name.ExtractText();
+            return region == UnknownRegionPlaceholder ? string.Empty : region;
+        }
+
+        return string.Empty;
+    }
+
+    public IReadOnlyList<WeatherRegionGroup> ZonesByRegion()
+    {
+        if (regionGroups != null && regionGroupsLocale == Loc.Current.Code)
+        {
+            return regionGroups;
+        }
+
+        var groups = new Dictionary<string, List<WeatherZoneEntry>>();
+        foreach (var territory in data.GetExcelSheet<TerritoryType>(GameSheetLanguage.Current()))
+        {
+            if (GetZoneTable(territory.RowId).Weathers.Count <= 1)
+            {
+                continue;
+            }
+
+            var zoneName = territory.PlaceName.IsValid ? territory.PlaceName.Value.Name.ExtractText() : string.Empty;
+            if (zoneName.Length == 0)
+            {
+                continue;
+            }
+
+            var region = RegionName(territory.RowId);
+            if (region.Length == 0)
+            {
+                region = IsFieldOps(territory.TerritoryIntendedUse.RowId)
+                    ? Loc.T(L.Skywatcher.FieldOpsRegion)
+                    : Loc.T(L.Skywatcher.MiscellaneousRegion);
+            }
+
+            if (!groups.TryGetValue(region, out var zones))
+            {
+                zones = new List<WeatherZoneEntry>();
+                groups[region] = zones;
+            }
+
+            zones.Add(new WeatherZoneEntry(territory.RowId, zoneName));
+        }
+
+        var sortedRegions = new List<string>(groups.Keys);
+        sortedRegions.Sort(StringComparer.Ordinal);
+
+        var built = new List<WeatherRegionGroup>(sortedRegions.Count);
+        for (var index = 0; index < sortedRegions.Count; index++)
+        {
+            var zones = groups[sortedRegions[index]];
+            zones.Sort(CompareZoneNames);
+            built.Add(new WeatherRegionGroup(sortedRegions[index], zones));
+        }
+
+        regionGroups = built;
+        regionGroupsLocale = Loc.Current.Code;
+        return built;
     }
 
     public IReadOnlyList<WeatherEntry> ZoneWeathers() => ZoneWeathers(clientState.TerritoryType);
@@ -186,6 +264,12 @@ internal sealed class WeatherService
 
         return false;
     }
+
+    private static bool IsFieldOps(uint territoryIntendedUse) =>
+        territoryIntendedUse is EurekaIntendedUse or FieldOperationIntendedUse or OccultCrescentIntendedUse;
+
+    private static int CompareZoneNames(WeatherZoneEntry left, WeatherZoneEntry right) =>
+        string.CompareOrdinal(left.ZoneName, right.ZoneName);
 
     private static byte Resolve(ZoneWeatherTable table, uint target)
     {

@@ -2937,6 +2937,8 @@
   "skywatcher.localOnly": "Só você vê isso. Fates, monstros e pesca seguem o céu real.",
   "skywatcher.combatPaused": "Pausado enquanto você está em combate",
   "skywatcher.nothingToChange": "Não há clima para mudar aqui",
+  "skywatcher.fieldOpsRegion": "Operações de Campo",
+  "skywatcher.miscellaneousRegion": "Diversos",
   "news.topics": "Tópicos",
   "news.notices": "Avisos",
   "news.maintenance": "Manutenção",
