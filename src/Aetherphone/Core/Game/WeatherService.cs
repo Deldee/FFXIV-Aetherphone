@@ -125,7 +125,7 @@ internal sealed class WeatherService
         for (var index = 0; index < sortedRegions.Count; index++)
         {
             var zones = groups[sortedRegions[index]];
-            zones.Sort(CompareZoneNames);
+            zones.Sort(CompareByTerritoryId);
             built.Add(new WeatherRegionGroup(sortedRegions[index], zones));
         }
 
@@ -286,8 +286,8 @@ internal sealed class WeatherService
     private static bool IsFieldOps(uint territoryIntendedUse) =>
         territoryIntendedUse is EurekaIntendedUse or FieldOperationIntendedUse or OccultCrescentIntendedUse;
 
-    private static int CompareZoneNames(WeatherZoneEntry left, WeatherZoneEntry right) =>
-        string.CompareOrdinal(left.ZoneName, right.ZoneName);
+    private static int CompareByTerritoryId(WeatherZoneEntry left, WeatherZoneEntry right) =>
+        left.TerritoryId.CompareTo(right.TerritoryId);
 
     private static byte Resolve(ZoneWeatherTable table, uint target)
     {
