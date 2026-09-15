@@ -9,6 +9,8 @@ internal sealed partial class SkywatcherApp
 {
     private const float PreviewCardHeight = 150f;
     private const int PreviewStripCount = 5;
+    private const float PreviewCurrentGlyphRadius = 20f;
+    private const float PreviewGlyphRadius = 14f;
     private const float ZoneRowHeight = 38f;
     private const float ZoneWeatherColumnWidth = 92f;
     private const float ZoneMiniGlyphRadius = 10f;
@@ -42,22 +44,13 @@ internal sealed partial class SkywatcherApp
         DrawGlass(card, palette, scale);
         var inner = card.Inset(14f * scale);
         var hasWeather = forecast.Count > 0;
-        var headerCenterY = inner.Min.Y + 24f * scale;
-        var textLeft = inner.Min.X;
-        if (hasWeather)
-        {
-            var glyphCenter = new Vector2(inner.Min.X + 24f * scale, headerCenterY);
-            DrawMini(forecast[0], glyphCenter, 20f * scale);
-            textLeft = inner.Min.X + 56f * scale;
-        }
 
-        var nameMaxWidth = inner.Max.X - textLeft;
-        var name = Typography.FitText(zone, nameMaxWidth, TextStyles.Headline);
-        Typography.Draw(new Vector2(textLeft, inner.Min.Y), name, palette.Ink, TextStyles.Headline);
+        var name = Typography.FitText(zone, inner.Width, TextStyles.Headline);
+        Typography.Draw(new Vector2(inner.Min.X, inner.Min.Y), name, palette.Ink, TextStyles.Headline);
         if (hasWeather)
         {
-            var weatherLine = Typography.FitText(forecast[0].Weather.Name, nameMaxWidth, TextStyles.Subheadline);
-            Typography.Draw(new Vector2(textLeft, inner.Min.Y + Typography.LineHeight(TextStyles.Headline)),
+            var weatherLine = Typography.FitText(forecast[0].Weather.Name, inner.Width, TextStyles.Subheadline);
+            Typography.Draw(new Vector2(inner.Min.X, inner.Min.Y + Typography.LineHeight(TextStyles.Headline)),
                 weatherLine, palette.InkSoft, TextStyles.Subheadline);
             DrawPreviewStrip(inner, palette, scale);
         }
@@ -73,20 +66,21 @@ internal sealed partial class SkywatcherApp
 
     private void DrawPreviewStrip(Rect inner, in SkyPalette palette, float scale)
     {
-        var stripTop = inner.Min.Y + 52f * scale;
-        var stripHeight = MathF.Max(1f, inner.Max.Y - stripTop);
         var count = Math.Min(forecast.Count, PreviewStripCount);
         var columnWidth = inner.Width / count;
+        var labelHeight = Typography.LineHeight(TextStyles.Caption2);
+        var labelTop = inner.Max.Y - labelHeight;
+        var glyphBottom = labelTop - 4f * scale;
         for (var index = 0; index < count; index++)
         {
             var window = forecast[index];
             var columnCenterX = inner.Min.X + columnWidth * (index + 0.5f);
+            var radius = (index == 0 ? PreviewCurrentGlyphRadius : PreviewGlyphRadius) * scale;
+            var glyphCenter = new Vector2(columnCenterX, glyphBottom - radius);
+            DrawMini(window, glyphCenter, radius);
             var columnMaxWidth = MathF.Max(1f, columnWidth - 4f * scale);
             Marquee.DrawCentered(new MarqueeId("skywatcher.preview.", index), ShortWhen(window), columnCenterX,
-                stripTop, columnMaxWidth, TextStyles.Caption2, palette.InkFaint, false);
-            var glyphCenter = new Vector2(columnCenterX, stripTop + stripHeight * 0.60f);
-            var glyphRadius = MathF.Min(columnWidth * 0.28f, stripHeight * 0.28f);
-            DrawMini(window, glyphCenter, glyphRadius);
+                labelTop, columnMaxWidth, TextStyles.Caption2, palette.InkFaint, false);
         }
     }
 
