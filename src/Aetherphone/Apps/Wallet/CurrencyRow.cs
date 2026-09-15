@@ -11,8 +11,8 @@ namespace Aetherphone.Apps.Wallet;
 
 internal static class CurrencyRow
 {
-    public const float Height = 62f;
-    public const float WeeklyRowExtra = 18f;
+    private const float Height = 62f;
+    private const float WeeklyRowExtra = 18f;
     private const float HeroHeight = 132f;
     private const float HeroRounding = 24f;
     private const float IconSize = 38f;
