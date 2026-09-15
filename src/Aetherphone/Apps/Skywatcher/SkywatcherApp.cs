@@ -22,7 +22,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 {
     private const int WindowCount = 8;
     private const int HourlyStripCount = 5;
-    private const float RefreshIntervalSeconds = 5f;
+    private const float RefreshIntervalSeconds = 60f;
     private const float NavHeight = 60f;
     public string Id => "skywatcher";
     public string DisplayName => Loc.T(L.Apps.Skywatcher);
@@ -89,7 +89,11 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     public void Draw(in PhoneContext context)
     {
         sinceRefresh += ImGui.GetIO().DeltaTime;
-        if (sinceRefresh >= RefreshIntervalSeconds)
+        if (showingBrowse && weather.CurrentTerritoryId != viewedTerritoryId)
+        {
+            Refresh();
+        }
+        else if (sinceRefresh >= RefreshIntervalSeconds)
         {
             Refresh();
         }
