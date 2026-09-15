@@ -9,11 +9,7 @@ internal readonly record struct HuntConditionWindow(DateTimeOffset Start, DateTi
 
 internal static class HuntSpawnConditionResolver
 {
-    private const double EorzeaSecondsPerRealSecond = 144.0 / 7.0;
-    private const long EorzeaSecondsPerHour = 3600;
-    private const long EorzeaSecondsPerDay = 86400;
-
-    private const long MoonPhaseEorzeaSeconds = 4 * EorzeaSecondsPerDay;
+    private const long MoonPhaseEorzeaSeconds = 4 * EorzeaTime.SecondsPerDay;
     private const long MoonCycleEorzeaSeconds = 8 * MoonPhaseEorzeaSeconds;
     private const int FullMoonPhaseNumber = 5;
     private const int NewMoonPhaseNumber = 1;
@@ -151,7 +147,7 @@ internal static class HuntSpawnConditionResolver
 
         for (var attempt = 0; attempt < MaxCycleAttempts; attempt++)
         {
-            var cycleStart = FloorTo(cycleCursor, MoonCycleEorzeaSeconds) - EorzeaSecondsPerHour * 12;
+            var cycleStart = FloorTo(cycleCursor, MoonCycleEorzeaSeconds) - EorzeaTime.SecondsPerHour * 12;
             var phaseStart = cycleStart + MoonPhaseEorzeaSeconds * (phaseNumber - 1);
 
             long windowStart;
@@ -201,13 +197,13 @@ internal static class HuntSpawnConditionResolver
         }
 
         var nowEorzea = ToEorzeaSeconds(at);
-        var dayCursor = FloorTo(nowEorzea, EorzeaSecondsPerDay) - EorzeaSecondsPerDay;
+        var dayCursor = FloorTo(nowEorzea, EorzeaTime.SecondsPerDay) - EorzeaTime.SecondsPerDay;
 
         for (var attempt = 0; attempt < MaxCycleAttempts; attempt++)
         {
             for (var index = 0; index < hours.Length; index++)
             {
-                var windowStart = dayCursor + hours[index] * EorzeaSecondsPerHour;
+                var windowStart = dayCursor + hours[index] * EorzeaTime.SecondsPerHour;
                 var windowEnd = windowStart + durationEorzeaSeconds;
                 if (windowEnd > nowEorzea)
                 {
@@ -215,7 +211,7 @@ internal static class HuntSpawnConditionResolver
                 }
             }
 
-            dayCursor += EorzeaSecondsPerDay;
+            dayCursor += EorzeaTime.SecondsPerDay;
         }
 
         return null;
@@ -328,10 +324,10 @@ internal static class HuntSpawnConditionResolver
     }
 
     private static long ToEorzeaSeconds(DateTimeOffset at) =>
-        (long)Math.Round(at.ToUnixTimeSeconds() * EorzeaSecondsPerRealSecond);
+        (long)Math.Round(at.ToUnixTimeSeconds() * EorzeaTime.EorzeaSecondsPerRealSecond);
 
     private static DateTimeOffset FromEorzeaSeconds(long eorzeaSeconds) =>
-        DateTimeOffset.FromUnixTimeSeconds((long)Math.Round(eorzeaSeconds / EorzeaSecondsPerRealSecond));
+        DateTimeOffset.FromUnixTimeSeconds((long)Math.Round(eorzeaSeconds / EorzeaTime.EorzeaSecondsPerRealSecond));
 
     private static long FloorTo(long value, long step) => value - (((value % step) + step) % step);
 
