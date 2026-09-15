@@ -49,6 +49,8 @@ internal sealed class WeatherService
         this.clientState = clientState;
     }
 
+    public uint CurrentTerritoryId => clientState.TerritoryType;
+
     public string CurrentZone() => ZoneName(clientState.TerritoryType);
 
     public string ZoneName(uint territoryId)
