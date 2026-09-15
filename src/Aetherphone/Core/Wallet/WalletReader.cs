@@ -111,7 +111,7 @@ internal static unsafe class WalletReader
         var count = CountCappedDefs(manager, HuntDefs) + CountCappedDefs(manager, PvpDefs) +
                     CountCappedDefs(manager, ScripDefs) + CountCappedDefs(manager, OtherDefs);
         TomestoneScratch.Clear();
-        gameData.CollectTomestoneItemIds(TomestoneScratch);
+        gameData.CollectTomestoneItemIds(TomestoneScratch, out _);
         for (var index = 0; index < TomestoneScratch.Count; index++)
         {
             if ((long)manager->GetTomestoneCount(TomestoneScratch[index]) >= TomestoneCap)
@@ -173,8 +173,7 @@ internal static unsafe class WalletReader
     private static void AddTomestones(List<WalletSection> sections, GameData gameData)
     {
         var ids = new List<uint>(4);
-        gameData.CollectTomestoneItemIds(ids);
-        var limitedItemId = gameData.LimitedTomestoneItemId();
+        gameData.CollectTomestoneItemIds(ids, out var limitedItemId);
         var entries = new List<WalletEntry>(ids.Count);
         for (var index = 0; index < ids.Count; index++)
         {

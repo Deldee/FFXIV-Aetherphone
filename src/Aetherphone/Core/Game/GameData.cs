@@ -439,10 +439,10 @@ internal sealed class GameData
         return true;
     }
 
-    public void CollectTomestoneItemIds(List<uint> into)
+    public void CollectTomestoneItemIds(List<uint> into, out uint limitedItemId)
     {
         into.Clear();
-        FindTopTomestoneItemIds(out var newest, out var previous);
+        FindTopTomestoneItemIds(out var newest, out var previous, out limitedItemId);
         if (newest != 0)
         {
             into.Add(newest);
@@ -456,16 +456,11 @@ internal sealed class GameData
         into.Add(PoeticsItemId);
     }
 
-    public uint LimitedTomestoneItemId()
-    {
-        FindTopTomestoneItemIds(out var newest, out _);
-        return newest;
-    }
-
-    private void FindTopTomestoneItemIds(out uint newest, out uint previous)
+    private void FindTopTomestoneItemIds(out uint newest, out uint previous, out uint limited)
     {
         newest = 0;
         previous = 0;
+        limited = 0;
         foreach (var row in data.GetExcelSheet<TomestonesItem>())
         {
             var itemId = row.Item.RowId;
@@ -482,6 +477,11 @@ internal sealed class GameData
             else if (itemId > previous)
             {
                 previous = itemId;
+            }
+
+            if (row.Tomestones.Value.WeeklyLimit > 0)
+            {
+                limited = itemId;
             }
         }
     }
