@@ -76,8 +76,7 @@ internal static class AppStoreCatalog
         ["appstore"] = new(L.StoreCopy.StoreSub, L.StoreCopy.StoreBody, StoreCategory.Tools),
         ["hunts"] = new(L.StoreCopy.HuntsSub, L.StoreCopy.HuntsBody, StoreCategory.Adventure),
         ["casino"] = new(L.StoreCopy.CasinoSub, L.StoreCopy.CasinoBody, StoreCategory.Play),
-        ["aetherstream"] = new(L.StoreCopy.AetherstreamSub, L.StoreCopy.AetherstreamBody, StoreCategory.Play),
-
+        ["aetherstream"] = new(L.StoreCopy.AetherStreamSub, L.StoreCopy.AetherStreamBody, StoreCategory.Play),
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
     public static StoreEntry For(string appId) => Entries.TryGetValue(appId, out var entry) ? entry : Fallback;

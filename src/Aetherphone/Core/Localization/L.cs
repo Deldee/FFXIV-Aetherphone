@@ -494,8 +494,8 @@ internal static class L
         public static readonly LocString GamesSub = new("storeCopy.gamesSub", "Pocket distractions");
         public static readonly LocString GamesBody = new("storeCopy.gamesBody",
             "A small arcade for queue times, with high scores worth chasing.");
-        public static readonly LocString AetherstreamSub = new("storeCopy.aetherstreamSub", "Watch videos together");
-        public static readonly LocString AetherstreamBody = new("storeCopy.aetherstreamBody",
+        public static readonly LocString AetherStreamSub = new("storeCopy.aetherstreamSub", "Watch videos together");
+        public static readonly LocString AetherStreamBody = new("storeCopy.aetherstreamBody",
             "Watch content and show a screen in the world, viewable by your friends and the people around you");
         public static readonly LocString NewsSub = new("storeCopy.newsSub", "Patch notes and posts");
         public static readonly LocString NewsBody = new("storeCopy.newsBody",
