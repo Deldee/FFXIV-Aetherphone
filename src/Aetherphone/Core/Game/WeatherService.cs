@@ -118,15 +118,14 @@ internal sealed class WeatherService
             }
         }
 
-        var sortedRegions = new List<string>(groups.Keys);
-        sortedRegions.Sort(StringComparer.Ordinal);
+        var regionNames = new List<string>(groups.Keys);
 
-        var built = new List<WeatherRegionGroup>(sortedRegions.Count);
-        for (var index = 0; index < sortedRegions.Count; index++)
+        var built = new List<WeatherRegionGroup>(regionNames.Count);
+        for (var index = 0; index < regionNames.Count; index++)
         {
-            var zones = groups[sortedRegions[index]];
+            var zones = groups[regionNames[index]];
             zones.Sort(CompareByTerritoryId);
-            built.Add(new WeatherRegionGroup(sortedRegions[index], zones));
+            built.Add(new WeatherRegionGroup(regionNames[index], zones));
         }
 
         regionGroups = built;
