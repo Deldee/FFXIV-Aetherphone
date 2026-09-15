@@ -2937,6 +2937,8 @@
   "skywatcher.localOnly": "Bunu yalnızca sen görürsün. Fate'ler, canavarlar ve balıkçılık gerçek gökyüzünü izler.",
   "skywatcher.combatPaused": "Savaştayken duraklatılır",
   "skywatcher.nothingToChange": "Burada değiştirilecek hava yok",
+  "skywatcher.fieldOpsRegion": "Saha Operasyonları",
+  "skywatcher.miscellaneousRegion": "Diğer",
   "news.topics": "Gündem",
   "news.notices": "Duyurular",
   "news.maintenance": "Bakım",

@@ -2937,6 +2937,8 @@
   "skywatcher.localOnly": "表示されるのはあなただけです。FATE、モンスター、釣りは実際の天候に従います。",
   "skywatcher.combatPaused": "戦闘中は一時停止します",
   "skywatcher.nothingToChange": "ここには変更できる天候がありません",
+  "skywatcher.fieldOpsRegion": "フィールド探索",
+  "skywatcher.miscellaneousRegion": "その他",
   "news.topics": "トピックス",
   "news.notices": "お知らせ",
   "news.maintenance": "メンテナンス",

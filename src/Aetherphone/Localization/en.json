@@ -2937,6 +2937,8 @@
   "skywatcher.localOnly": "Only you see this. Fates, mobs and fishing follow the real sky.",
   "skywatcher.combatPaused": "Paused while you are in combat",
   "skywatcher.nothingToChange": "No weather to change here",
+  "skywatcher.fieldOpsRegion": "Field Ops",
+  "skywatcher.miscellaneousRegion": "Miscellaneous",
   "news.topics": "Topics",
   "news.notices": "Notices",
   "news.maintenance": "Maintenance",
