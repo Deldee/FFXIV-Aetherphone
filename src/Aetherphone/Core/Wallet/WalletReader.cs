@@ -222,8 +222,7 @@ internal static unsafe class WalletReader
         return entry.Kind switch
         {
             CurrencyKind.Gil => (long)manager->GetGil(),
-            CurrencyKind.Tomestone => (long)manager->GetTomestoneCount(entry.ItemId),
-            CurrencyKind.LimitedTomestone => (long)manager->GetTomestoneCount(entry.ItemId),
+            CurrencyKind.Tomestone or CurrencyKind.LimitedTomestone => (long)manager->GetTomestoneCount(entry.ItemId),
             _ => (long)manager->GetInventoryItemCount(entry.ItemId, false, true, true, 0),
         };
     }
