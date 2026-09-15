@@ -100,7 +100,7 @@ internal static class CurrencyRow
         var accent = capped ? CappedTint : palette.Accent;
         var barTop = content.Max.Y - 15f * scale;
         var hasWeekly = entry.HasWeeklyCap;
-        var weeklyText = hasWeekly ? Loc.T(L.Wallet.WeeklyCap, Format(entry.WeeklyAmount), Format(entry.WeeklyCap)) : string.Empty;
+        var weeklyText = hasWeekly ? entry.WeeklyCapText : string.Empty;
         var weeklySize = hasWeekly ? Typography.Measure(weeklyText, TextStyles.Caption1) : Vector2.Zero;
         var textZoneBottom = hasWeekly ? barTop - WeeklyLineGap * scale - weeklySize.Y : barTop;
         var lineCenterY = (content.Min.Y + textZoneBottom) * 0.5f;
