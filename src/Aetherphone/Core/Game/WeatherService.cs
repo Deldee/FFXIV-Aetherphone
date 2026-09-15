@@ -16,8 +16,8 @@ internal interface IWeatherChance
 
 internal sealed class WeatherService
 {
+    public const long RealSecondsPerWindow = 1400;
     private const long RealSecondsPerEorzeaHour = 175;
-    private const long RealSecondsPerWindow = 1400;
     private const long RealSecondsPerEorzeaDay = 4200;
     private readonly IDataManager data;
     private readonly IClientState clientState;
