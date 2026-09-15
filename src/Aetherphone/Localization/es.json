@@ -4068,6 +4068,8 @@
   "storeCopy.marketBody": "Precios de Universalis para cualquier objeto, con avisos cuando algo baja.",
   "storeCopy.dailiesSub": "No falles ni un reinicio",
   "storeCopy.dailiesBody": "Tareas diarias y semanales, lo que ya está hecho y cuándo llega el próximo reinicio.",
+  "storeCopy.huntsSub": "Sigue las marcas de caza",
+  "storeCopy.huntsBody": "Sigue el rango S, configura notificaciones para cacerías específicas",
   "storeCopy.notesSub": "Ideas rápidas",
   "storeCopy.notesBody": "Apunta macros, rotaciones y recordatorios, y encuéntralos después.",
   "storeCopy.calendarSub": "Planifica la semana",

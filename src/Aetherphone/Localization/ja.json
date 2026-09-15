@@ -4068,6 +4068,8 @@
   "storeCopy.marketBody": "どのアイテムでもUniversalisの相場を確認し、値下がりを通知します。",
   "storeCopy.dailiesSub": "リセットを逃さない",
   "storeCopy.dailiesBody": "デイリーとウィークリー、終わったもの、次のリセットの時刻まで。",
+  "storeCopy.huntsSub": "モブハントを追跡",
+  "storeCopy.huntsBody": "Sランクを追跡し、特定のハントの通知を設定",
   "storeCopy.notesSub": "思いついたことを",
   "storeCopy.notesBody": "マクロやローテーション、覚え書きを残して、あとから見つけられます。",
   "storeCopy.calendarSub": "一週間を組み立てる",

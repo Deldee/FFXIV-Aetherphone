@@ -4068,6 +4068,8 @@
   "storeCopy.marketBody": "任意物品的 Universalis 价格，降价时还会提醒你。",
   "storeCopy.dailiesSub": "不错过任何重置",
   "storeCopy.dailiesBody": "每日与每周任务，完成了什么，以及下次重置什么时候到。",
+  "storeCopy.huntsSub": "追踪狩猎目标",
+  "storeCopy.huntsBody": "追踪S级，为特定狩猎设置通知",
   "storeCopy.notesSub": "随手记",
   "storeCopy.notesBody": "记下宏、循环和提醒，之后还能找得到。",
   "storeCopy.calendarSub": "规划这一周",

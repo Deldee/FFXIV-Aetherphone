@@ -4068,6 +4068,8 @@
   "storeCopy.marketBody": "Preços do Universalis para qualquer item, com alerta quando algo cai.",
   "storeCopy.dailiesSub": "Nunca perca um reset",
   "storeCopy.dailiesBody": "Tarefas diárias e semanais, o que já foi feito e quando cai o próximo reset.",
+  "storeCopy.huntsSub": "Acompanhe as marcas de caça",
+  "storeCopy.huntsBody": "Acompanhe o rank S, configure notificações para caçadas específicas",
   "storeCopy.notesSub": "Ideias rápidas",
   "storeCopy.notesBody": "Anote macros, rotações e lembretes, e encontre tudo depois.",
   "storeCopy.calendarSub": "Planeje a semana",

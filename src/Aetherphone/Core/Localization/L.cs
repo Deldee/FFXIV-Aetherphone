@@ -536,6 +536,9 @@ internal static class L
         public static readonly LocString DailiesSub = new("storeCopy.dailiesSub", "Never miss a reset");
         public static readonly LocString DailiesBody = new("storeCopy.dailiesBody",
             "Daily and weekly duties, what is done, and when the next reset lands.");
+        public static readonly LocString HuntsSub = new("storeCopy.huntsSub", "Track Hunt marks");
+        public static readonly LocString HuntsBody = new("storeCopy.huntsBody",
+            "Track S rank, set notifications for specific hunts");
         public static readonly LocString NotesSub = new("storeCopy.notesSub", "Quick thoughts");
         public static readonly LocString NotesBody = new("storeCopy.notesBody",
             "Jot down macros, rotations and reminders, and find them again later.");
