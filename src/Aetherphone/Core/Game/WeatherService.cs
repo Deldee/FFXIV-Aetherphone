@@ -42,7 +42,8 @@ internal sealed class WeatherService
 
     public string ZoneName(uint territoryId)
     {
-        if (territoryId != 0 && data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territory))
+        if (territoryId != 0 &&
+            data.GetExcelSheet<TerritoryType>(GameSheetLanguage.Current()).TryGetRow(territoryId, out var territory))
         {
             return territory.PlaceName.Value.Name.ExtractText();
         }
