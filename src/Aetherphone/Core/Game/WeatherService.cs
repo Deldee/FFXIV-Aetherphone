@@ -112,7 +112,10 @@ internal sealed class WeatherService
                 groups[region] = zones;
             }
 
-            zones.Add(new WeatherZoneEntry(territory.RowId, zoneName));
+            if (!ContainsZoneName(zones, zoneName))
+            {
+                zones.Add(new WeatherZoneEntry(territory.RowId, zoneName));
+            }
         }
 
         var sortedRegions = new List<string>(groups.Keys);
@@ -259,6 +262,19 @@ internal sealed class WeatherService
         for (var index = 0; index < weathers.Count; index++)
         {
             if (weathers[index].Id == id)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool ContainsZoneName(List<WeatherZoneEntry> zones, string zoneName)
+    {
+        for (var index = 0; index < zones.Count; index++)
+        {
+            if (zones[index].ZoneName == zoneName)
             {
                 return true;
             }
