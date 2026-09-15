@@ -535,7 +535,7 @@ internal static class L
             "Check in, play, and talk to earn Aether Coin, then spend it on frames and badges. Never pay to win.");
         public static readonly LocString CasinoSub = new("storeCopy.casinoSub", "Gambling from your pocket");
         public static readonly LocString CasinoBody = new("storeCopy.casinoBody",
-            "Gamble your aethercoins with Blackjack, Slots, Scratch and more");
+            "Gamble your Aether Coin with Blackjack, Slots, Scratch and more");
         public static readonly LocString MarketSub = new("storeCopy.marketSub", "Prices, live");
         public static readonly LocString MarketBody = new("storeCopy.marketBody",
             "Universalis prices for any item, with alerts when something drops.");
