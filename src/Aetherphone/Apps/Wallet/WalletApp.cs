@@ -151,11 +151,11 @@ internal sealed class WalletApp : IPhoneApp
             totalHeight += CurrencyRow.HeightFor(section.Entries[entryIndex]);
         }
 
-        var card = GroupCard.Begin(ui, (int)totalHeight, 1f);
+        var card = GroupCard.Begin(ui, totalHeight);
         for (var entryIndex = 0; entryIndex < rowCount; entryIndex++)
         {
             var entry = section.Entries[entryIndex];
-            var contentRect = card.NextRow((int)CurrencyRow.HeightFor(entry));
+            var contentRect = card.NextRow(CurrencyRow.HeightFor(entry));
             var band = new Rect(new Vector2(origin.X, contentRect.Min.Y),
                 new Vector2(origin.X + width, contentRect.Max.Y));
             CurrencyRow.Draw(band, contentRect, entry, textures, ui.Palette,
