@@ -31,7 +31,7 @@ internal sealed class WeatherService
     private readonly IDataManager data;
     private readonly IClientState clientState;
     private readonly Dictionary<byte, WeatherEntry> entries = new();
-    private readonly Dictionary<uint, ZoneWeatherTable> zoneTables = new();
+    private readonly Dictionary<uint, ZoneWeatherTable> tablesByWeatherRate = new();
     private List<WeatherRegionGroup>? regionGroups;
     private string regionGroupsLocale = string.Empty;
 
@@ -212,25 +212,26 @@ internal sealed class WeatherService
 
     private ZoneWeatherTable GetZoneTable(uint territoryId)
     {
-        if (zoneTables.TryGetValue(territoryId, out var cached))
+        var weatherRateRowId = 0u;
+        if (territoryId != 0 && data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territory))
+        {
+            weatherRateRowId = territory.WeatherRate.RowId;
+        }
+
+        if (tablesByWeatherRate.TryGetValue(weatherRateRowId, out var cached))
         {
             return cached;
         }
 
-        var table = BuildZoneTable(territoryId);
-        zoneTables[territoryId] = table;
+        var table = BuildZoneTable(weatherRateRowId);
+        tablesByWeatherRate[weatherRateRowId] = table;
         return table;
     }
 
-    private ZoneWeatherTable BuildZoneTable(uint territoryId)
+    private ZoneWeatherTable BuildZoneTable(uint weatherRateRowId)
     {
         var table = new ZoneWeatherTable();
-        if (territoryId == 0 || !data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territory))
-        {
-            return table;
-        }
-
-        if (!data.GetExcelSheet<WeatherRate>().TryGetRow(territory.WeatherRate.RowId, out var rate))
+        if (!data.GetExcelSheet<WeatherRate>().TryGetRow(weatherRateRowId, out var rate))
         {
             return table;
         }
