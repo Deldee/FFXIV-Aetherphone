@@ -59,7 +59,7 @@ internal sealed class WalletApp : IPhoneApp
     public void OnOpened()
     {
         OnTick();
-        ticker = new FrameworkTicker(framework, RefreshIntervalMilliseconds, OnTick);
+        ticker ??= new FrameworkTicker(framework, RefreshIntervalMilliseconds, OnTick);
     }
 
     public void OnClosed()
