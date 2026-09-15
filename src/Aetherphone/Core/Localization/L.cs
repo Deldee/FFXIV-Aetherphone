@@ -494,8 +494,8 @@ internal static class L
         public static readonly LocString GamesSub = new("storeCopy.gamesSub", "Pocket distractions");
         public static readonly LocString GamesBody = new("storeCopy.gamesBody",
             "A small arcade for queue times, with high scores worth chasing.");
-        public static readonly LocString AetherstreamSub = new("storeCopy.mogcastSub", "Watch videos together");
-        public static readonly LocString AetherstreamBody = new("storeCopy.mogcastBody",
+        public static readonly LocString AetherstreamSub = new("storeCopy.aetherstreamSub", "Watch videos together");
+        public static readonly LocString AetherstreamBody = new("storeCopy.aetherstreamBody",
             "Watch content and show a screen in the world, viewable by your friends and the people around you");
         public static readonly LocString NewsSub = new("storeCopy.newsSub", "Patch notes and posts");
         public static readonly LocString NewsBody = new("storeCopy.newsBody",
@@ -533,8 +533,8 @@ internal static class L
         public static readonly LocString CoinSub = new("storeCopy.coinSub", "Earn by living here");
         public static readonly LocString CoinBody = new("storeCopy.coinBody",
             "Check in, play, and talk to earn Aether Coin, then spend it on frames and badges. Never pay to win.");
-        public static readonly LocString CasinoSub = new("storeCopy.gambaSub", "Gambling from your pocket");
-        public static readonly LocString CasinoBody = new("storeCopy.gambaBody",
+        public static readonly LocString CasinoSub = new("storeCopy.casinoSub", "Gambling from your pocket");
+        public static readonly LocString CasinoBody = new("storeCopy.casinoBody",
             "Gamble your aethercoins with Blackjack, Slots, Scratch and more");
         public static readonly LocString MarketSub = new("storeCopy.marketSub", "Prices, live");
         public static readonly LocString MarketBody = new("storeCopy.marketBody",
