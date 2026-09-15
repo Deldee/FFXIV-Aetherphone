@@ -17,11 +17,15 @@ internal sealed class WeatherService
     private readonly IDataManager data;
     private readonly IClientState clientState;
     private readonly Dictionary<byte, WeatherEntry> entries = new();
-    private readonly List<WeatherEntry> zoneWeathers = new();
-    private readonly List<WeatherChance> chances = new();
-    private uint cachedTerritory = uint.MaxValue;
+    private readonly Dictionary<uint, ZoneWeatherTable> zoneTables = new();
 
     private readonly record struct WeatherChance(byte Id, int Cumulative);
+
+    private sealed class ZoneWeatherTable
+    {
+        public readonly List<WeatherChance> Chances = new();
+        public readonly List<WeatherEntry> Weathers = new();
+    }
 
     public WeatherService(IDataManager data, IClientState clientState)
     {
@@ -29,9 +33,10 @@ internal sealed class WeatherService
         this.clientState = clientState;
     }
 
-    public string CurrentZone()
+    public string CurrentZone() => ZoneName(clientState.TerritoryType);
+
+    public string ZoneName(uint territoryId)
     {
-        var territoryId = clientState.TerritoryType;
         if (territoryId != 0 && data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territory))
         {
             return territory.PlaceName.Value.Name.ExtractText();
@@ -40,11 +45,9 @@ internal sealed class WeatherService
         return string.Empty;
     }
 
-    public IReadOnlyList<WeatherEntry> ZoneWeathers()
-    {
-        RefreshZone();
-        return zoneWeathers;
-    }
+    public IReadOnlyList<WeatherEntry> ZoneWeathers() => ZoneWeathers(clientState.TerritoryType);
+
+    public IReadOnlyList<WeatherEntry> ZoneWeathers(uint territoryId) => GetZoneTable(territoryId).Weathers;
 
     public unsafe WeatherEntry? LiveRenderedWeather()
     {
@@ -57,32 +60,38 @@ internal sealed class WeatherService
         return Entry(environment->ActiveWeather);
     }
 
-    public byte NaturalNow()
+    public byte NaturalNow() => NaturalNow(clientState.TerritoryType);
+
+    public byte NaturalNow(uint territoryId)
     {
-        if (!RefreshZone())
+        var table = GetZoneTable(territoryId);
+        if (table.Chances.Count == 0)
         {
             return 0;
         }
 
         var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        return Resolve(ForecastTarget(nowUnix - nowUnix % RealSecondsPerWindow));
+        return Resolve(table, ForecastTarget(nowUnix - nowUnix % RealSecondsPerWindow));
     }
 
-    public void Forecast(List<WeatherWindow> into, int count)
+    public void Forecast(List<WeatherWindow> into, int count) => Forecast(clientState.TerritoryType, into, count);
+
+    public void Forecast(uint territoryId, List<WeatherWindow> into, int count)
     {
         into.Clear();
-        if (!RefreshZone())
+        var table = GetZoneTable(territoryId);
+        if (table.Chances.Count == 0)
         {
             return;
         }
 
-        var live = LiveRenderedWeather();
+        var live = territoryId == clientState.TerritoryType ? LiveRenderedWeather() : null;
         var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var startUnix = nowUnix - nowUnix % RealSecondsPerWindow;
         for (var index = 0; index < count; index++)
         {
             var timestamp = startUnix + index * RealSecondsPerWindow;
-            var entry = index == 0 && live.HasValue ? live.Value : Entry(Resolve(ForecastTarget(timestamp)));
+            var entry = index == 0 && live.HasValue ? live.Value : Entry(Resolve(table, ForecastTarget(timestamp)));
             var minutes = (int)((timestamp - nowUnix) / 60);
             var windowBell = (int)(timestamp / RealSecondsPerEorzeaHour % 24);
             into.Add(new WeatherWindow(entry, minutes, index == 0, windowBell));
@@ -113,30 +122,29 @@ internal sealed class WeatherService
         return entry;
     }
 
-    private bool RefreshZone()
+    private ZoneWeatherTable GetZoneTable(uint territoryId)
     {
-        var territoryId = clientState.TerritoryType;
-        if (territoryId != cachedTerritory)
+        if (zoneTables.TryGetValue(territoryId, out var cached))
         {
-            cachedTerritory = territoryId;
-            Rebuild(territoryId);
+            return cached;
         }
 
-        return chances.Count > 0;
+        var table = BuildZoneTable(territoryId);
+        zoneTables[territoryId] = table;
+        return table;
     }
 
-    private void Rebuild(uint territoryId)
+    private ZoneWeatherTable BuildZoneTable(uint territoryId)
     {
-        chances.Clear();
-        zoneWeathers.Clear();
+        var table = new ZoneWeatherTable();
         if (territoryId == 0 || !data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territory))
         {
-            return;
+            return table;
         }
 
         if (!data.GetExcelSheet<WeatherRate>().TryGetRow(territory.WeatherRate.RowId, out var rate))
         {
-            return;
+            return table;
         }
 
         var rates = rate.Rate;
@@ -152,19 +160,21 @@ internal sealed class WeatherService
             }
 
             cumulative += chance;
-            chances.Add(new WeatherChance(id, cumulative));
-            if (!KnownInZone(id))
+            table.Chances.Add(new WeatherChance(id, cumulative));
+            if (!ContainsWeather(table.Weathers, id))
             {
-                zoneWeathers.Add(Entry(id));
+                table.Weathers.Add(Entry(id));
             }
         }
+
+        return table;
     }
 
-    private bool KnownInZone(byte id)
+    private static bool ContainsWeather(List<WeatherEntry> weathers, byte id)
     {
-        for (var index = 0; index < zoneWeathers.Count; index++)
+        for (var index = 0; index < weathers.Count; index++)
         {
-            if (zoneWeathers[index].Id == id)
+            if (weathers[index].Id == id)
             {
                 return true;
             }
@@ -173,17 +183,17 @@ internal sealed class WeatherService
         return false;
     }
 
-    private byte Resolve(uint target)
+    private static byte Resolve(ZoneWeatherTable table, uint target)
     {
-        for (var index = 0; index < chances.Count; index++)
+        for (var index = 0; index < table.Chances.Count; index++)
         {
-            if (target < chances[index].Cumulative)
+            if (target < table.Chances[index].Cumulative)
             {
-                return chances[index].Id;
+                return table.Chances[index].Id;
             }
         }
 
-        return chances.Count > 0 ? chances[^1].Id : (byte)0;
+        return table.Chances.Count > 0 ? table.Chances[^1].Id : (byte)0;
     }
 
     internal static uint ForecastTarget(long unixSeconds)
