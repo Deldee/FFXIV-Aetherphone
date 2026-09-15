@@ -37,6 +37,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     private bool scrubbing;
     private bool showingBrowse = true;
     private uint viewedTerritoryId;
+    private bool pendingScrollReset;
 
     public SkywatcherApp(WeatherService weather, WeatherControl control)
     {
@@ -75,12 +76,14 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         viewedTerritoryId = territoryId;
         zone = weather.ZoneName(territoryId);
         weather.Forecast(territoryId, forecast, WindowCount);
+        pendingScrollReset = true;
     }
 
     private void CloseDetail()
     {
         showingBrowse = true;
         Refresh();
+        pendingScrollReset = true;
     }
 
     public void Draw(in PhoneContext context)
@@ -126,6 +129,12 @@ internal sealed partial class SkywatcherApp : IPhoneApp
             {
                 AppSurface.ResetScrollOnNewVisit();
                 var surface = DragScrollHost.Begin(skyKey);
+                if (pendingScrollReset)
+                {
+                    surface.JumpToTop();
+                    pendingScrollReset = false;
+                }
+
                 DrawTab(screen, palette, kind, isDay, hasData, scale);
                 if (scrubbing)
                 {
