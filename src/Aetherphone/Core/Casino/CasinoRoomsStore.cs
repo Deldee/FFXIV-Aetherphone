@@ -678,7 +678,7 @@ internal sealed class CasinoRoomsStore : IDisposable
         room.OnRealtimeConnected(connected);
         if (connected)
         {
-            directoryCadence.RequestImmediate();
+            directoryCadence.RequestAfterReconnect();
             return;
         }
 

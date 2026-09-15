@@ -1756,6 +1756,12 @@ internal static class L
         public static readonly LocString SectionSocial = new("changelog.sectionSocial", "Chirper and Aethergram");
         public static readonly LocString SectionAethergramVelvet = new("changelog.sectionAethergramVelvet", "Aethergram and Velvet");
 
+        public static readonly LocString[] Release1032Phone =
+        {
+            new("changelog.r1032.0",
+                "Fixed an issue where the phone showed 'Too many requests. Retrying in Ns' and froze for a few seconds, most often when opening a chat; communication with the server is now lighter and recovers on its own"),
+        };
+
         public static readonly LocString[] Release1031Linkpearl =
         {
             new("changelog.r1031.0",

@@ -440,7 +440,7 @@ internal sealed class MusterStore : IDisposable
     {
         if (connected)
         {
-            cadence.RequestImmediate();
+            cadence.RequestAfterReconnect();
         }
     }
 

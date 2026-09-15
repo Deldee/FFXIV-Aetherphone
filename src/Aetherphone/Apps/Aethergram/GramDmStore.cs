@@ -42,7 +42,7 @@ internal sealed class GramDmStore : ChatThreadStoreBase<GramMessageDto, GramThre
     {
         if (active)
         {
-            InboxCadence.RequestImmediate();
+            InboxCadence.RequestAfterReconnect();
         }
     }
 

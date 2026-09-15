@@ -48,7 +48,7 @@ internal sealed class DirectMessagesStore : ChatThreadStoreBase<ChatMessageDto, 
     {
         if (active)
         {
-            InboxCadence.RequestImmediate();
+            InboxCadence.RequestAfterReconnect();
         }
     }
 

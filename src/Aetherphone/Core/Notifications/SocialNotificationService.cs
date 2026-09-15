@@ -68,7 +68,7 @@ internal sealed class SocialNotificationService : IDisposable
     {
         if (active)
         {
-            cadence.RequestImmediate();
+            cadence.RequestAfterReconnect();
         }
     }
 

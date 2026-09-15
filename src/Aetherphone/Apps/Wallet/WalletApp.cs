@@ -3,6 +3,7 @@ using Aetherphone.Core.Apps;
 using Aetherphone.Core.Game;
 using Aetherphone.Core.Localization;
 using Aetherphone.Core.Onboarding;
+using Aetherphone.Core.Runtime;
 using Aetherphone.Core.Wallet;
 using Aetherphone.Windows.Components;
 using Dalamud.Bindings.ImGui;
@@ -13,7 +14,7 @@ namespace Aetherphone.Apps.Wallet;
 
 internal sealed class WalletApp : IPhoneApp
 {
-    private const float RefreshIntervalSeconds = 1.5f;
+    private const long RefreshIntervalMilliseconds = 1500;
     private const float SectionGap = 12f;
     private const float BadgeRefreshMillis = 1500f;
 
@@ -40,28 +41,36 @@ internal sealed class WalletApp : IPhoneApp
 
     private readonly GameData gameData;
     private readonly ITextureProvider textures;
+    private readonly IFramework framework;
     private readonly AppSkin ui = new(AppPalettes.Wallet);
     private WalletEntry? gil;
     private WalletSection[] sections = Array.Empty<WalletSection>();
-    private float sinceRefresh;
+    private FrameworkTicker? ticker;
     private int cappedBadge;
     private long nextBadgeTick;
 
-    public WalletApp(GameData gameData, ITextureProvider textures)
+    public WalletApp(GameData gameData, ITextureProvider textures, IFramework framework)
     {
         this.gameData = gameData;
         this.textures = textures;
+        this.framework = framework;
     }
 
-    public void OnOpened() => Rebuild();
+    public void OnOpened()
+    {
+        OnTick();
+        ticker ??= new FrameworkTicker(framework, RefreshIntervalMilliseconds, OnTick);
+    }
 
     public void OnClosed()
     {
+        ticker?.Dispose();
+        ticker = null;
         gil = null;
         sections = Array.Empty<WalletSection>();
     }
 
-    private void Rebuild()
+    private void OnTick()
     {
         if (gameData.LocalPlayer is null)
         {
@@ -70,10 +79,13 @@ internal sealed class WalletApp : IPhoneApp
             return;
         }
 
-        gil = WalletReader.BuildGil(gameData);
-        sections = WalletReader.BuildSections(gameData);
+        if (gil is null)
+        {
+            gil = WalletReader.BuildGil(gameData);
+            sections = WalletReader.BuildSections(gameData);
+        }
+
         WalletReader.RefreshAmounts(gil, sections);
-        sinceRefresh = 0f;
     }
 
     public void Draw(in PhoneContext context)
@@ -88,20 +100,8 @@ internal sealed class WalletApp : IPhoneApp
         var body = new Rect(new Vector2(content.Min.X, content.Min.Y + AppHeader.Height * scale), content.Max);
         if (gil is null)
         {
-            Rebuild();
-        }
-
-        if (gil is null)
-        {
             Typography.DrawCentered(body.Center, Loc.T(L.Wallet.LogInToView), AppPalettes.Wallet.MutedInk);
             return;
-        }
-
-        sinceRefresh += ImGui.GetIO().DeltaTime;
-        if (sinceRefresh >= RefreshIntervalSeconds)
-        {
-            WalletReader.RefreshAmounts(gil, sections);
-            sinceRefresh = 0f;
         }
 
         using (AppSurface.Begin(body))
@@ -168,5 +168,6 @@ internal sealed class WalletApp : IPhoneApp
 
     public void Dispose()
     {
+        ticker?.Dispose();
     }
 }
