@@ -9,6 +9,11 @@ internal readonly record struct WeatherEntry(byte Id, string Name, string Englis
 
 internal readonly record struct WeatherWindow(WeatherEntry Weather, int MinutesFromNow, bool IsCurrent, int StartBell);
 
+internal interface IWeatherChance
+{
+    int Chance { get; }
+}
+
 internal sealed class WeatherService
 {
     private const long RealSecondsPerEorzeaHour = 175;
@@ -19,7 +24,7 @@ internal sealed class WeatherService
     private readonly Dictionary<byte, WeatherEntry> entries = new();
     private readonly Dictionary<uint, ZoneWeatherTable> zoneTables = new();
 
-    private readonly record struct WeatherChance(byte Id, int Cumulative);
+    private readonly record struct WeatherChance(byte Id, int Chance) : IWeatherChance;
 
     private sealed class ZoneWeatherTable
     {
@@ -149,7 +154,6 @@ internal sealed class WeatherService
 
         var rates = rate.Rate;
         var weathers = rate.Weather;
-        var cumulative = 0;
         for (var index = 0; index < rates.Count; index++)
         {
             var id = (byte)weathers[index].RowId;
@@ -159,8 +163,7 @@ internal sealed class WeatherService
                 continue;
             }
 
-            cumulative += chance;
-            table.Chances.Add(new WeatherChance(id, cumulative));
+            table.Chances.Add(new WeatherChance(id, chance));
             if (!ContainsWeather(table.Weathers, id))
             {
                 table.Weathers.Add(Entry(id));
@@ -185,15 +188,24 @@ internal sealed class WeatherService
 
     private static byte Resolve(ZoneWeatherTable table, uint target)
     {
-        for (var index = 0; index < table.Chances.Count; index++)
+        var index = ResolveChanceIndex(table.Chances, target);
+        return index >= 0 ? table.Chances[index].Id : (byte)0;
+    }
+
+    public static int ResolveChanceIndex<TChance>(IReadOnlyList<TChance> chances, uint target)
+        where TChance : IWeatherChance
+    {
+        var cumulative = 0;
+        for (var index = 0; index < chances.Count; index++)
         {
-            if (target < table.Chances[index].Cumulative)
+            cumulative += chances[index].Chance;
+            if (target < cumulative)
             {
-                return table.Chances[index].Id;
+                return index;
             }
         }
 
-        return table.Chances.Count > 0 ? table.Chances[^1].Id : (byte)0;
+        return chances.Count > 0 ? chances.Count - 1 : -1;
     }
 
     internal static uint ForecastTarget(long unixSeconds)

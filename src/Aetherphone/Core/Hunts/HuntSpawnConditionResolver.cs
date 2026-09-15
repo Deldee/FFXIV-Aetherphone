@@ -325,17 +325,8 @@ internal static class HuntSpawnConditionResolver
     private static string ResolveWeatherId(long unixSeconds, HuntWeatherProbability[] probabilities)
     {
         var target = WeatherService.ForecastTarget(unixSeconds);
-        var cumulative = 0;
-        for (var index = 0; index < probabilities.Length; index++)
-        {
-            cumulative += probabilities[index].Chance;
-            if (target < cumulative)
-            {
-                return probabilities[index].Condition;
-            }
-        }
-
-        return probabilities.Length > 0 ? probabilities[^1].Condition : string.Empty;
+        var index = WeatherService.ResolveChanceIndex(probabilities, target);
+        return index >= 0 ? probabilities[index].Condition : string.Empty;
     }
 
     private static long ToEorzeaSeconds(DateTimeOffset at) =>
