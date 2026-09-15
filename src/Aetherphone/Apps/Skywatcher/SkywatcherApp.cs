@@ -35,6 +35,9 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     private float sinceRefresh;
     private SkywatcherTab activeTab;
     private bool scrubbing;
+    private bool showingBrowse = true;
+    private uint viewedTerritoryId;
+    private bool pendingScrollReset;
 
     public SkywatcherApp(WeatherService weather, WeatherControl control)
     {
@@ -46,6 +49,8 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     {
         activeTab = SkywatcherTab.Forecast;
         scrubbing = false;
+        showingBrowse = true;
+        viewedTerritoryId = weather.CurrentTerritoryId;
         Refresh();
     }
 
@@ -55,9 +60,30 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 
     private void Refresh()
     {
-        zone = weather.CurrentZone();
-        weather.Forecast(forecast, WindowCount);
+        if (showingBrowse)
+        {
+            viewedTerritoryId = weather.CurrentTerritoryId;
+        }
+
+        zone = weather.ZoneName(viewedTerritoryId);
+        weather.Forecast(viewedTerritoryId, forecast, WindowCount);
         sinceRefresh = 0f;
+    }
+
+    private void OpenDetail(uint territoryId)
+    {
+        showingBrowse = false;
+        viewedTerritoryId = territoryId;
+        zone = weather.ZoneName(territoryId);
+        weather.Forecast(territoryId, forecast, WindowCount);
+        pendingScrollReset = true;
+    }
+
+    private void CloseDetail()
+    {
+        showingBrowse = true;
+        Refresh();
+        pendingScrollReset = true;
     }
 
     public void Draw(in PhoneContext context)
@@ -81,7 +107,15 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         WeatherSky.Paint(screen, theme.ScreenRounding * scale, palette, kind, isDay);
         WeatherAmbience.Draw(ImGui.GetWindowDrawList(), screen, theme.ScreenRounding * scale, kind, isDay, palette,
             scale, 1f, false);
-        SceneChrome.BackChevron(content, context.Navigation, palette.Ink, scale);
+        if (activeTab == SkywatcherTab.Forecast && !showingBrowse)
+        {
+            DrawDetailBackChevron(content, palette.Ink, scale);
+        }
+        else
+        {
+            SceneChrome.BackChevron(content, context.Navigation, palette.Ink, scale);
+        }
+
         var navRect = new Rect(new Vector2(content.Min.X, content.Max.Y - NavHeight * scale), content.Max);
         var body = new Rect(new Vector2(content.Min.X, content.Min.Y + 40f * scale),
             new Vector2(content.Max.X, navRect.Min.Y));
@@ -95,6 +129,12 @@ internal sealed partial class SkywatcherApp : IPhoneApp
             {
                 AppSurface.ResetScrollOnNewVisit();
                 var surface = DragScrollHost.Begin(skyKey);
+                if (pendingScrollReset)
+                {
+                    surface.JumpToTop();
+                    pendingScrollReset = false;
+                }
+
                 DrawTab(screen, palette, kind, isDay, hasData, scale);
                 if (scrubbing)
                 {
@@ -104,6 +144,20 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         }
 
         DrawBottomNav(navRect, palette, scale);
+    }
+
+    private void DrawDetailBackChevron(Rect content, Vector4 ink, float scale)
+    {
+        var rowCenterY = content.Min.Y + 20f * scale;
+        var hitMin = new Vector2(content.Min.X, content.Min.Y);
+        var hitMax = new Vector2(content.Min.X + 46f * scale, content.Min.Y + 40f * scale);
+        UiAnchors.Report("chrome.back", new Rect(hitMin, hitMax));
+        var hovered = UiInteract.Hover(hitMin, hitMax);
+        var center = new Vector2(content.Min.X + 15f * scale, rowCenterY);
+        if (BackButton.Draw("chrome.back", center, 15f * scale, ink, hovered, scale, shadow: true))
+        {
+            CloseDetail();
+        }
     }
 
     private void DrawTab(Rect screen, in SkyPalette palette, WeatherKind kind, bool isDay, bool hasData, float scale)
@@ -117,6 +171,12 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         if (!hasData)
         {
             DrawEmpty(screen, palette, scale);
+            return;
+        }
+
+        if (showingBrowse)
+        {
+            DrawBrowse(palette, scale);
             return;
         }
 
