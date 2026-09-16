@@ -147,15 +147,6 @@ internal sealed partial class SkywatcherApp : IPhoneApp
                 }
 
                 DrawTab(screen, palette, kind, isDay, hasData, scale);
-                if (hasFavoriteScrollDelta)
-                {
-                    hasFavoriteScrollDelta = false;
-                    if (favoriteScrollDelta != 0f)
-                    {
-                        surface.JumpTo(ImGui.GetScrollY() + favoriteScrollDelta);
-                    }
-                }
-
                 if (scrubbing)
                 {
                     surface.CancelDrag();

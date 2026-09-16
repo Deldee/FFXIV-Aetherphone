@@ -27,10 +27,6 @@ internal sealed partial class SkywatcherApp
     private IReadOnlyList<WeatherRegionGroup>? filteredSourceRegions;
     private string? filteredSearch;
     private bool favoritesSynced;
-    private float favoritesSectionHeight;
-    private bool favoriteToggledPending;
-    private bool hasFavoriteScrollDelta;
-    private float favoriteScrollDelta;
 
     private void SyncFavorites()
     {
@@ -55,6 +51,9 @@ internal sealed partial class SkywatcherApp
     private void ToggleFavorite(uint territoryId)
     {
         EnsureFavoritesSynced();
+        var scale = UiScale.Current;
+        var visibleBefore = VisibleFavoriteCount();
+
         if (favorites.Remove(territoryId))
         {
             configuration.SkywatcherFavorites.Remove(territoryId);
@@ -66,7 +65,41 @@ internal sealed partial class SkywatcherApp
         }
 
         configuration.Save();
-        favoriteToggledPending = true;
+
+        var visibleAfter = VisibleFavoriteCount();
+        var delta = FavoritesSectionHeightFor(visibleAfter, scale) - FavoritesSectionHeightFor(visibleBefore, scale);
+        if (delta != 0f)
+        {
+            ImGui.SetScrollY(ImGui.GetScrollY() + delta);
+        }
+    }
+
+    private int VisibleFavoriteCount()
+    {
+        var stored = configuration.SkywatcherFavorites;
+        var count = 0;
+        for (var index = 0; index < stored.Count; index++)
+        {
+            if (stored[index] != viewedTerritoryId)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private static float FavoritesSectionHeightFor(int visibleCount, float scale)
+    {
+        if (visibleCount == 0)
+        {
+            return 0f;
+        }
+
+        var labelText = Loc.Culture.TextInfo.ToUpper(Loc.T(L.Skywatcher.Favorites));
+        var labelHeight = 12f * scale + Typography.Measure(labelText, TextStyles.FootnoteEmphasized).Y + 6f * scale;
+        var cardsHeight = visibleCount * (FavoriteCardHeight * scale + 6f * scale);
+        return labelHeight + cardsHeight;
     }
 
     private void RefreshRowWeather()
@@ -126,19 +159,7 @@ internal sealed partial class SkywatcherApp
     {
         EnsureFavoritesSynced();
         DrawCurrentAreaPreview(palette, scale);
-
-        var favoritesTop = ImGui.GetCursorPosY();
         DrawFavoritesSection(palette, scale);
-        var favoritesHeight = ImGui.GetCursorPosY() - favoritesTop;
-        if (favoriteToggledPending)
-        {
-            favoriteToggledPending = false;
-            favoriteScrollDelta = favoritesHeight - favoritesSectionHeight;
-            hasFavoriteScrollDelta = true;
-        }
-
-        favoritesSectionHeight = favoritesHeight;
-
         DrawSearchField(palette, scale);
 
         var regions = RefreshedFilteredRegions();
