@@ -16,10 +16,13 @@ internal sealed partial class SkywatcherApp
     private const float ZoneMiniGlyphRadius = 10f;
     private const float ZoneStarRadius = 8f;
     private const float SearchBarHeight = 40f;
+    private const float FavoriteCardHeight = 116f;
+    private const float FavoriteCurrentGlyphRadius = 16f;
     private static readonly Vector4 FavoriteStarFill = new(1f, 0.78f, 0.25f, 1f);
     private readonly HashSet<uint> favorites = new();
     private readonly List<WeatherZoneEntry> favoriteZones = new();
     private readonly Dictionary<uint, WeatherEntry> rowWeather = new();
+    private readonly Dictionary<uint, List<WeatherWindow>> favoriteForecasts = new();
     private readonly List<WeatherRegionGroup> filteredRegions = new();
     private IReadOnlyList<WeatherRegionGroup>? filteredSourceRegions;
     private string? filteredSearch;
@@ -89,6 +92,29 @@ internal sealed partial class SkywatcherApp
         var entry = weather.Entry(weather.NaturalNow(territoryId));
         rowWeather[territoryId] = entry;
         return entry;
+    }
+
+    private void RefreshFavoriteForecasts()
+    {
+        favoriteForecasts.Clear();
+        var stored = configuration.SkywatcherFavorites;
+        for (var index = 0; index < stored.Count; index++)
+        {
+            FavoriteForecast(stored[index]);
+        }
+    }
+
+    private List<WeatherWindow> FavoriteForecast(uint territoryId)
+    {
+        if (favoriteForecasts.TryGetValue(territoryId, out var cached))
+        {
+            return cached;
+        }
+
+        var windows = new List<WeatherWindow>();
+        weather.Forecast(territoryId, windows, PreviewStripCount);
+        favoriteForecasts[territoryId] = windows;
+        return windows;
     }
 
     private void DrawBrowse(in SkyPalette palette, float scale)
@@ -174,23 +200,81 @@ internal sealed partial class SkywatcherApp
         var stored = configuration.SkywatcherFavorites;
         for (var index = 0; index < stored.Count; index++)
         {
-            var zoneName = weather.ZoneName(stored[index]);
+            var territoryId = stored[index];
+            if (territoryId == viewedTerritoryId)
+            {
+                continue;
+            }
+
+            var zoneName = weather.ZoneName(territoryId);
             if (zoneName.Length == 0)
             {
                 continue;
             }
 
-            favoriteZones.Add(new WeatherZoneEntry(stored[index], zoneName));
+            favoriteZones.Add(new WeatherZoneEntry(territoryId, zoneName));
         }
 
-        var visibleFavorites = CountOtherZones(favoriteZones);
-        if (visibleFavorites == 0)
+        if (favoriteZones.Count == 0)
         {
             return;
         }
 
         SectionLabel(Loc.T(L.Skywatcher.Favorites), palette, scale);
-        DrawZoneList(palette, scale, favoriteZones, visibleFavorites);
+        for (var index = 0; index < favoriteZones.Count; index++)
+        {
+            DrawFavoriteCard(palette, scale, favoriteZones[index]);
+        }
+    }
+
+    private void DrawFavoriteCard(in SkyPalette palette, float scale, WeatherZoneEntry entry)
+    {
+        var origin = ImGui.GetCursorScreenPos();
+        var width = ImGui.GetContentRegionAvail().X;
+        var height = FavoriteCardHeight * scale;
+        var card = new Rect(origin, origin + new Vector2(width, height));
+        DrawGlass(card, palette, scale);
+        var inner = card.Inset(12f * scale);
+
+        var starRadius = ZoneStarRadius * scale;
+        var starCenter = new Vector2(inner.Max.X - starRadius, inner.Min.Y + starRadius);
+        var nameMaxWidth = MathF.Max(1f, inner.Width - starRadius * 2f - 10f * scale);
+        var name = Typography.FitText(entry.ZoneName, nameMaxWidth, TextStyles.Headline);
+        Typography.Draw(new Vector2(inner.Min.X, inner.Min.Y), name, palette.Ink, TextStyles.Headline);
+        DrawFavoriteStar(starCenter, starRadius, palette, favorites.Contains(entry.TerritoryId));
+
+        var windows = FavoriteForecast(entry.TerritoryId);
+        if (windows.Count > 0)
+        {
+            var weatherLine = Typography.FitText(windows[0].Weather.Name, nameMaxWidth, TextStyles.Subheadline);
+            Typography.Draw(new Vector2(inner.Min.X, inner.Min.Y + Typography.LineHeight(TextStyles.Headline)),
+                weatherLine, palette.InkSoft, TextStyles.Subheadline);
+            DrawWeatherStrip(inner, palette, scale, windows, FavoriteCurrentGlyphRadius,
+                "skywatcher.favoriteStrip.", (long)entry.TerritoryId * 10);
+        }
+
+        ImGui.SetCursorScreenPos(origin);
+        ImGui.Dummy(new Vector2(width, height));
+        ImGui.Dummy(new Vector2(0f, 6f * scale));
+
+        var starMin = new Vector2(starCenter.X - starRadius - 8f * scale, card.Min.Y);
+        var starMax = new Vector2(card.Max.X, starCenter.Y + starRadius + 8f * scale);
+        var starHovered = UiInteract.Hover(starMin, starMax);
+        if (starHovered)
+        {
+            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+        }
+
+        var starClicked = UiInteract.Click(starMin, starMax, starHovered);
+        var cardClicked = !starHovered && UiInteract.HoverClick(card.Min, card.Max);
+        if (starClicked)
+        {
+            ToggleFavorite(entry.TerritoryId);
+        }
+        else if (cardClicked)
+        {
+            OpenDetail(entry.TerritoryId);
+        }
     }
 
     private void DrawCurrentAreaPreview(in SkyPalette palette, float scale)
@@ -210,7 +294,7 @@ internal sealed partial class SkywatcherApp
             var weatherLine = Typography.FitText(forecast[0].Weather.Name, inner.Width, TextStyles.Subheadline);
             Typography.Draw(new Vector2(inner.Min.X, inner.Min.Y + Typography.LineHeight(TextStyles.Headline)),
                 weatherLine, palette.InkSoft, TextStyles.Subheadline);
-            DrawPreviewStrip(inner, palette, scale);
+            DrawWeatherStrip(inner, palette, scale, forecast, PreviewCurrentGlyphRadius, "skywatcher.preview.", 0);
         }
 
         ImGui.SetCursorScreenPos(origin);
@@ -222,22 +306,23 @@ internal sealed partial class SkywatcherApp
         }
     }
 
-    private void DrawPreviewStrip(Rect inner, in SkyPalette palette, float scale)
+    private void DrawWeatherStrip(Rect inner, in SkyPalette palette, float scale, IReadOnlyList<WeatherWindow> windows,
+        float currentGlyphRadius, string marqueePrefix, long marqueeBase)
     {
-        var count = Math.Min(forecast.Count, PreviewStripCount);
+        var count = Math.Min(windows.Count, PreviewStripCount);
         var columnWidth = inner.Width / count;
         var labelHeight = Typography.LineHeight(TextStyles.Caption2);
         var labelTop = inner.Max.Y - labelHeight;
         var glyphBottom = labelTop - 4f * scale;
         for (var index = 0; index < count; index++)
         {
-            var window = forecast[index];
+            var window = windows[index];
             var columnCenterX = inner.Min.X + columnWidth * (index + 0.5f);
-            var radius = (index == 0 ? PreviewCurrentGlyphRadius : PreviewGlyphRadius) * scale;
+            var radius = (index == 0 ? currentGlyphRadius : PreviewGlyphRadius) * scale;
             var glyphCenter = new Vector2(columnCenterX, glyphBottom - radius);
             DrawMini(window, glyphCenter, radius);
             var columnMaxWidth = MathF.Max(1f, columnWidth - 4f * scale);
-            Marquee.DrawCentered(new MarqueeId("skywatcher.preview.", index), ShortWhen(window), columnCenterX,
+            Marquee.DrawCentered(new MarqueeId(marqueePrefix, marqueeBase + index), ShortWhen(window), columnCenterX,
                 labelTop, columnMaxWidth, TextStyles.Caption2, palette.InkFaint, false);
         }
     }
