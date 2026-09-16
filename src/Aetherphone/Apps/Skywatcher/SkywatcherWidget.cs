@@ -74,12 +74,16 @@ internal sealed class SkywatcherWidget : IHomeWidget
     private void Advance()
     {
         var windowStart = WeatherService.CurrentWindowStartUnix();
-        if (weather.CurrentTerritoryId == viewedTerritoryId && windowStart == lastWindowStartUnix)
+        var territoryId = weather.CurrentTerritoryId;
+        var liveDiverged = territoryId == viewedTerritoryId && forecast.Count > 0 &&
+            weather.LiveRenderedWeather() is { } live && live.Id != forecast[0].Weather.Id;
+
+        if (!liveDiverged && territoryId == viewedTerritoryId && windowStart == lastWindowStartUnix)
         {
             return;
         }
 
-        viewedTerritoryId = weather.CurrentTerritoryId;
+        viewedTerritoryId = territoryId;
         lastWindowStartUnix = windowStart;
         zone = weather.CurrentZone();
         weather.Forecast(forecast, ForecastWindows);
