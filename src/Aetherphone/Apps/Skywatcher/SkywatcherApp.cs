@@ -62,7 +62,9 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     {
     }
 
-    private void Refresh()
+    private void Refresh() => Refresh(WeatherService.CurrentWindowStartUnix());
+
+    private void Refresh(long windowStart)
     {
         if (showingBrowse)
         {
@@ -73,7 +75,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 
         zone = weather.ZoneName(viewedTerritoryId);
         weather.Forecast(viewedTerritoryId, forecast, WindowCount);
-        lastWindowStartUnix = WeatherService.CurrentWindowStartUnix();
+        lastWindowStartUnix = windowStart;
     }
 
     private void OpenDetail(uint territoryId)
@@ -94,10 +96,11 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 
     public void Draw(in PhoneContext context)
     {
+        var windowStart = WeatherService.CurrentWindowStartUnix();
         var zoneChanged = showingBrowse && weather.CurrentTerritoryId != viewedTerritoryId;
-        if (zoneChanged || WeatherService.CurrentWindowStartUnix() != lastWindowStartUnix)
+        if (zoneChanged || windowStart != lastWindowStartUnix)
         {
-            Refresh();
+            Refresh(windowStart);
         }
 
         var scale = UiScale.Current;

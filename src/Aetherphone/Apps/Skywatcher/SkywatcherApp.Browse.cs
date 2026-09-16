@@ -58,6 +58,7 @@ internal sealed partial class SkywatcherApp
         if (favorites.Remove(territoryId))
         {
             configuration.SkywatcherFavorites.Remove(territoryId);
+            favoriteForecasts.Remove(territoryId);
         }
         else
         {
