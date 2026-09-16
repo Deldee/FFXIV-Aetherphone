@@ -15,9 +15,11 @@ internal sealed partial class SkywatcherApp
     private const float ZoneRowHeight = 38f;
     private const float ZoneMiniGlyphRadius = 10f;
     private const float ZoneStarRadius = 8f;
+    private const float SearchBarHeight = 40f;
     private static readonly Vector4 FavoriteStarFill = new(1f, 0.78f, 0.25f, 1f);
     private readonly HashSet<uint> favorites = new();
     private readonly List<WeatherZoneEntry> favoriteZones = new();
+    private readonly List<WeatherZoneEntry> searchMatches = new();
 
     private void SyncFavorites()
     {
@@ -48,21 +50,55 @@ internal sealed partial class SkywatcherApp
     {
         DrawCurrentAreaPreview(palette, scale);
         DrawFavoritesSection(palette, scale);
+        DrawSearchField(palette, scale);
 
         var regions = weather.ZonesByRegion();
         for (var regionIndex = 0; regionIndex < regions.Count; regionIndex++)
         {
             var region = regions[regionIndex];
-            if (CountOtherZones(region.Zones) == 0)
+            var zones = ResolveSearchMatches(region);
+            if (CountOtherZones(zones) == 0)
             {
                 continue;
             }
 
             SectionLabel(region.Region, palette, scale);
-            DrawZoneList(palette, scale, region.Zones);
+            DrawZoneList(palette, scale, zones);
         }
 
         ImGui.Dummy(new Vector2(0f, 8f * scale));
+    }
+
+    private void DrawSearchField(in SkyPalette palette, float scale)
+    {
+        var origin = ImGui.GetCursorScreenPos();
+        var width = ImGui.GetContentRegionAvail().X;
+        var bar = new Rect(origin, origin + new Vector2(width, SearchBarHeight * scale));
+        SearchField.Draw(bar, "##skywatcherSearch", Loc.T(L.Common.Search), ref search, palette.Ink with { W = 0.12f },
+            palette.InkFaint, palette.Ink, palette.Ink with { W = 0.18f }, palette.Ink, 60);
+        ImGui.SetCursorScreenPos(origin);
+        ImGui.Dummy(new Vector2(width, SearchBarHeight * scale));
+        ImGui.Dummy(new Vector2(0f, 6f * scale));
+    }
+
+    private IReadOnlyList<WeatherZoneEntry> ResolveSearchMatches(WeatherRegionGroup region)
+    {
+        if (search.Length == 0 || region.Region.Contains(search, StringComparison.OrdinalIgnoreCase))
+        {
+            return region.Zones;
+        }
+
+        searchMatches.Clear();
+        var zones = region.Zones;
+        for (var index = 0; index < zones.Count; index++)
+        {
+            if (zones[index].ZoneName.Contains(search, StringComparison.OrdinalIgnoreCase))
+            {
+                searchMatches.Add(zones[index]);
+            }
+        }
+
+        return searchMatches;
     }
 
     private void DrawFavoritesSection(in SkyPalette palette, float scale)
