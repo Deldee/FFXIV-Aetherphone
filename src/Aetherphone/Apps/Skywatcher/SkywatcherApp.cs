@@ -32,7 +32,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     private readonly Configuration configuration;
     private readonly List<WeatherWindow> forecast = new();
     private string zone = string.Empty;
-    private float sinceRefresh;
+    private long lastWindowStartUnix = -1;
     private SkywatcherTab activeTab;
     private bool scrubbing;
     private bool showingBrowse = true;
@@ -73,7 +73,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 
         zone = weather.ZoneName(viewedTerritoryId);
         weather.Forecast(viewedTerritoryId, forecast, WindowCount);
-        sinceRefresh = 0f;
+        lastWindowStartUnix = WeatherService.CurrentWindowStartUnix();
     }
 
     private void OpenDetail(uint territoryId)
@@ -94,12 +94,8 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 
     public void Draw(in PhoneContext context)
     {
-        sinceRefresh += ImGui.GetIO().DeltaTime;
-        if (showingBrowse && weather.CurrentTerritoryId != viewedTerritoryId)
-        {
-            Refresh();
-        }
-        else if (sinceRefresh >= WeatherService.RefreshIntervalSeconds)
+        var zoneChanged = showingBrowse && weather.CurrentTerritoryId != viewedTerritoryId;
+        if (zoneChanged || WeatherService.CurrentWindowStartUnix() != lastWindowStartUnix)
         {
             Refresh();
         }

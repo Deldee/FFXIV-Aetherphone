@@ -21,7 +21,6 @@ internal interface IWeatherChance
 
 internal sealed class WeatherService
 {
-    public const float RefreshIntervalSeconds = 60f;
     public const long RealSecondsPerWindow = 1400;
     private const long RealSecondsPerEorzeaHour = 175;
     private const long RealSecondsPerEorzeaDay = 4200;
@@ -190,8 +189,13 @@ internal sealed class WeatherService
             return 0;
         }
 
+        return Resolve(table, ForecastTarget(CurrentWindowStartUnix()));
+    }
+
+    public static long CurrentWindowStartUnix()
+    {
         var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        return Resolve(table, ForecastTarget(nowUnix - nowUnix % RealSecondsPerWindow));
+        return nowUnix - nowUnix % RealSecondsPerWindow;
     }
 
     public void Forecast(List<WeatherWindow> into, int count) => Forecast(clientState.TerritoryType, into, count);
@@ -206,8 +210,8 @@ internal sealed class WeatherService
         }
 
         var live = territoryId == clientState.TerritoryType ? LiveRenderedWeather() : null;
+        var startUnix = CurrentWindowStartUnix();
         var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        var startUnix = nowUnix - nowUnix % RealSecondsPerWindow;
         for (var index = 0; index < count; index++)
         {
             var timestamp = startUnix + index * RealSecondsPerWindow;
