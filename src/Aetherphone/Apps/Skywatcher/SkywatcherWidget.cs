@@ -26,7 +26,7 @@ internal sealed class SkywatcherWidget : IHomeWidget
     private readonly WeatherService weather;
     private readonly List<WeatherWindow> forecast = new();
     private string zone = string.Empty;
-    private float sinceRefresh = WeatherService.RefreshIntervalSeconds;
+    private long lastWindowStartUnix = -1;
     private uint viewedTerritoryId;
 
     public SkywatcherWidget(WeatherService weather)
@@ -41,7 +41,7 @@ internal sealed class SkywatcherWidget : IHomeWidget
 
     public void Draw(in WidgetContext context)
     {
-        Advance(context.Delta);
+        Advance();
         var bell = EorzeaTime.Now();
         var daylight = WeatherSky.Daylight(bell.Hour + bell.Minute / 60f);
         var isDay = daylight >= 0.5f;
@@ -71,18 +71,18 @@ internal sealed class SkywatcherWidget : IHomeWidget
         }
     }
 
-    private void Advance(float delta)
+    private void Advance()
     {
-        sinceRefresh += delta;
-        if (weather.CurrentTerritoryId == viewedTerritoryId && sinceRefresh < WeatherService.RefreshIntervalSeconds)
+        var windowStart = WeatherService.CurrentWindowStartUnix();
+        if (weather.CurrentTerritoryId == viewedTerritoryId && windowStart == lastWindowStartUnix)
         {
             return;
         }
 
         viewedTerritoryId = weather.CurrentTerritoryId;
+        lastWindowStartUnix = windowStart;
         zone = weather.CurrentZone();
         weather.Forecast(forecast, ForecastWindows);
-        sinceRefresh = 0f;
     }
 
     private void DrawSmall(in WidgetContext context, in SkyPalette palette, WeatherKind kind, bool isDay,
