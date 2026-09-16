@@ -22,7 +22,6 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 {
     private const int WindowCount = 8;
     private const int HourlyStripCount = 5;
-    private const float RefreshIntervalSeconds = 60f;
     private const float NavHeight = 60f;
     public string Id => "skywatcher";
     public string DisplayName => Loc.T(L.Apps.Skywatcher);
@@ -100,7 +99,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         {
             Refresh();
         }
-        else if (sinceRefresh >= RefreshIntervalSeconds)
+        else if (sinceRefresh >= WeatherService.RefreshIntervalSeconds)
         {
             Refresh();
         }
@@ -179,15 +178,15 @@ internal sealed partial class SkywatcherApp : IPhoneApp
             return;
         }
 
-        if (!hasData)
-        {
-            DrawEmpty(screen, palette, scale);
-            return;
-        }
-
         if (showingBrowse)
         {
             DrawBrowse(palette, scale);
+            return;
+        }
+
+        if (!hasData)
+        {
+            DrawEmpty(screen, palette, scale);
             return;
         }
 

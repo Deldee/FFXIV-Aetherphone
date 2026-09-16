@@ -21,12 +21,10 @@ internal interface IWeatherChance
 
 internal sealed class WeatherService
 {
+    public const float RefreshIntervalSeconds = 60f;
     public const long RealSecondsPerWindow = 1400;
     private const long RealSecondsPerEorzeaHour = 175;
     private const long RealSecondsPerEorzeaDay = 4200;
-    private const uint EurekaIntendedUse = 41;
-    private const uint FieldOperationIntendedUse = 48;
-    private const uint OccultCrescentIntendedUse = 61;
     private const string UnknownRegionPlaceholder = "???";
     private readonly IDataManager data;
     private readonly IClientState clientState;
@@ -45,6 +43,8 @@ internal sealed class WeatherService
         public readonly List<WeatherChance> Chances = new();
         public readonly List<WeatherEntry> Weathers = new();
     }
+
+    private static readonly ZoneWeatherTable EmptyZoneTable = new();
 
     public WeatherService(IDataManager data, IClientState clientState)
     {
@@ -116,7 +116,7 @@ internal sealed class WeatherService
             return regionGroups;
         }
 
-        var groups = new Dictionary<string, List<WeatherZoneEntry>>();
+        var groups = new Dictionary<string, Dictionary<string, WeatherZoneEntry>>();
         foreach (var territory in data.GetExcelSheet<TerritoryType>(GameSheetLanguage.Current()))
         {
             if (GetZoneTable(territory.RowId).Weathers.Count <= 1)
@@ -133,20 +133,20 @@ internal sealed class WeatherService
             var region = RegionName(territory.RowId);
             if (region.Length == 0)
             {
-                region = IsFieldOps(territory.TerritoryIntendedUse.RowId)
+                region = FieldOperations.IsFieldOperationZone(territory.TerritoryIntendedUse.RowId)
                     ? Loc.T(L.Skywatcher.FieldOpsRegion)
                     : Loc.T(L.Skywatcher.MiscellaneousRegion);
             }
 
             if (!groups.TryGetValue(region, out var zones))
             {
-                zones = new List<WeatherZoneEntry>();
+                zones = new Dictionary<string, WeatherZoneEntry>();
                 groups[region] = zones;
             }
 
-            if (!ContainsZoneName(zones, zoneName))
+            if (!zones.TryGetValue(zoneName, out var existing) || territory.RowId < existing.TerritoryId)
             {
-                zones.Add(new WeatherZoneEntry(territory.RowId, zoneName));
+                zones[zoneName] = new WeatherZoneEntry(territory.RowId, zoneName);
             }
         }
 
@@ -155,7 +155,7 @@ internal sealed class WeatherService
         var built = new List<WeatherRegionGroup>(regionKeys.Count);
         for (var index = 0; index < regionKeys.Count; index++)
         {
-            var zones = groups[regionKeys[index]];
+            var zones = new List<WeatherZoneEntry>(groups[regionKeys[index]].Values);
             zones.Sort(CompareByTerritoryId);
             built.Add(new WeatherRegionGroup(regionKeys[index], zones));
         }
@@ -244,12 +244,12 @@ internal sealed class WeatherService
 
     private ZoneWeatherTable GetZoneTable(uint territoryId)
     {
-        var weatherRateRowId = 0u;
-        if (territoryId != 0 && data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territory))
+        if (territoryId == 0 || !data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territory))
         {
-            weatherRateRowId = territory.WeatherRate.RowId;
+            return EmptyZoneTable;
         }
 
+        var weatherRateRowId = territory.WeatherRate.RowId;
         if (tablesByWeatherRate.TryGetValue(weatherRateRowId, out var cached))
         {
             return cached;
@@ -301,22 +301,6 @@ internal sealed class WeatherService
 
         return false;
     }
-
-    private static bool ContainsZoneName(List<WeatherZoneEntry> zones, string zoneName)
-    {
-        for (var index = 0; index < zones.Count; index++)
-        {
-            if (zones[index].ZoneName == zoneName)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private static bool IsFieldOps(uint territoryIntendedUse) =>
-        territoryIntendedUse is EurekaIntendedUse or FieldOperationIntendedUse or OccultCrescentIntendedUse;
 
     private static int CompareByTerritoryId(WeatherZoneEntry left, WeatherZoneEntry right) =>
         left.TerritoryId.CompareTo(right.TerritoryId);

@@ -12,7 +12,6 @@ namespace Aetherphone.Apps.Skywatcher;
 
 internal sealed class SkywatcherWidget : IHomeWidget
 {
-    private const float RefreshIntervalSeconds = 5f;
     private const int ForecastWindows = 6;
 
     private const float StripTopPadPref = 18f;
@@ -27,7 +26,7 @@ internal sealed class SkywatcherWidget : IHomeWidget
     private readonly WeatherService weather;
     private readonly List<WeatherWindow> forecast = new();
     private string zone = string.Empty;
-    private float sinceRefresh = RefreshIntervalSeconds;
+    private float sinceRefresh = WeatherService.RefreshIntervalSeconds;
 
     public SkywatcherWidget(WeatherService weather)
     {
@@ -74,7 +73,7 @@ internal sealed class SkywatcherWidget : IHomeWidget
     private void Advance(float delta)
     {
         sinceRefresh += delta;
-        if (sinceRefresh < RefreshIntervalSeconds)
+        if (sinceRefresh < WeatherService.RefreshIntervalSeconds)
         {
             return;
         }

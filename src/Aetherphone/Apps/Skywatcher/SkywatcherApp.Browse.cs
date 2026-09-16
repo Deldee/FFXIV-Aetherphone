@@ -1,3 +1,4 @@
+using Aetherphone.Apps.Maps;
 using Aetherphone.Core;
 using Aetherphone.Core.Game;
 using Aetherphone.Core.Localization;
@@ -18,12 +19,12 @@ internal sealed partial class SkywatcherApp
     private const float SearchBarHeight = 40f;
     private const float FavoriteCardHeight = 116f;
     private const float FavoriteCurrentGlyphRadius = 16f;
-    private static readonly Vector4 FavoriteStarFill = new(1f, 0.78f, 0.25f, 1f);
     private readonly HashSet<uint> favorites = new();
     private readonly List<WeatherZoneEntry> favoriteZones = new();
     private readonly Dictionary<uint, WeatherEntry> rowWeather = new();
     private readonly Dictionary<uint, List<WeatherWindow>> favoriteForecasts = new();
     private readonly List<WeatherRegionGroup> filteredRegions = new();
+    private readonly List<List<WeatherZoneEntry>> filteredMatchesPool = new();
     private IReadOnlyList<WeatherRegionGroup>? filteredSourceRegions;
     private string? filteredSearch;
     private bool favoritesSynced;
@@ -62,6 +63,7 @@ internal sealed partial class SkywatcherApp
         {
             favorites.Add(territoryId);
             configuration.SkywatcherFavorites.Add(territoryId);
+            FavoriteForecast(territoryId);
         }
 
         configuration.Save();
@@ -80,13 +82,25 @@ internal sealed partial class SkywatcherApp
         var count = 0;
         for (var index = 0; index < stored.Count; index++)
         {
-            if (stored[index] != viewedTerritoryId)
+            if (TryResolveVisibleFavorite(stored[index], out _))
             {
                 count++;
             }
         }
 
         return count;
+    }
+
+    private bool TryResolveVisibleFavorite(uint territoryId, out string zoneName)
+    {
+        if (territoryId == viewedTerritoryId)
+        {
+            zoneName = string.Empty;
+            return false;
+        }
+
+        zoneName = weather.ZoneName(territoryId);
+        return zoneName.Length > 0;
     }
 
     private static float FavoritesSectionHeightFor(int visibleCount, float scale)
@@ -202,6 +216,7 @@ internal sealed partial class SkywatcherApp
         }
 
         filteredRegions.Clear();
+        var pooledMatches = 0;
         for (var regionIndex = 0; regionIndex < regions.Count; regionIndex++)
         {
             var region = regions[regionIndex];
@@ -217,7 +232,12 @@ internal sealed partial class SkywatcherApp
             {
                 if (zones[index].ZoneName.Contains(search, StringComparison.OrdinalIgnoreCase))
                 {
-                    matches ??= new List<WeatherZoneEntry>();
+                    if (matches == null)
+                    {
+                        matches = RentMatchList(pooledMatches);
+                        pooledMatches++;
+                    }
+
                     matches.Add(zones[index]);
                 }
             }
@@ -233,6 +253,18 @@ internal sealed partial class SkywatcherApp
         return filteredRegions;
     }
 
+    private List<WeatherZoneEntry> RentMatchList(int poolIndex)
+    {
+        while (filteredMatchesPool.Count <= poolIndex)
+        {
+            filteredMatchesPool.Add(new List<WeatherZoneEntry>());
+        }
+
+        var list = filteredMatchesPool[poolIndex];
+        list.Clear();
+        return list;
+    }
+
     private void DrawFavoritesSection(in SkyPalette palette, float scale)
     {
         favoriteZones.Clear();
@@ -240,18 +272,10 @@ internal sealed partial class SkywatcherApp
         for (var index = 0; index < stored.Count; index++)
         {
             var territoryId = stored[index];
-            if (territoryId == viewedTerritoryId)
+            if (TryResolveVisibleFavorite(territoryId, out var zoneName))
             {
-                continue;
+                favoriteZones.Add(new WeatherZoneEntry(territoryId, zoneName));
             }
-
-            var zoneName = weather.ZoneName(territoryId);
-            if (zoneName.Length == 0)
-            {
-                continue;
-            }
-
-            favoriteZones.Add(new WeatherZoneEntry(territoryId, zoneName));
         }
 
         if (favoriteZones.Count == 0)
@@ -280,7 +304,8 @@ internal sealed partial class SkywatcherApp
         var nameMaxWidth = MathF.Max(1f, inner.Width - starRadius * 2f - 10f * scale);
         var name = Typography.FitText(entry.ZoneName, nameMaxWidth, TextStyles.Headline);
         Typography.Draw(new Vector2(inner.Min.X, inner.Min.Y), name, palette.Ink, TextStyles.Headline);
-        DrawFavoriteStar(starCenter, starRadius, palette, favorites.Contains(entry.TerritoryId));
+        DrawFavoriteStar(ImGui.GetWindowDrawList(), starCenter, starRadius, palette,
+            favorites.Contains(entry.TerritoryId));
 
         var windows = FavoriteForecast(entry.TerritoryId);
         if (windows.Count > 0)
@@ -407,7 +432,8 @@ internal sealed partial class SkywatcherApp
             var entryWeather = RowWeather(entry.TerritoryId);
             var nowWindow = new WeatherWindow(entryWeather, 0, true, 0);
             DrawMini(nowWindow, glyphCenter, ZoneMiniGlyphRadius * scale);
-            DrawFavoriteStar(starCenter, ZoneStarRadius * scale, palette, favorites.Contains(entry.TerritoryId));
+            DrawFavoriteStar(drawList, starCenter, ZoneStarRadius * scale, palette,
+                favorites.Contains(entry.TerritoryId));
 
             var starMin = new Vector2(starCenter.X - ZoneStarRadius * scale - 8f * scale, rowTop);
             var starMax = new Vector2(inner.Max.X, rowTop + rowHeight);
@@ -450,36 +476,9 @@ internal sealed partial class SkywatcherApp
         return count;
     }
 
-    private static void DrawFavoriteStar(Vector2 center, float radius, in SkyPalette palette, bool filled)
+    private static void DrawFavoriteStar(ImDrawListPtr drawList, Vector2 center, float radius, in SkyPalette palette,
+        bool filled)
     {
-        var scale = UiScale.Current;
-        var drawList = ImGui.GetWindowDrawList();
-        Span<Vector2> points = stackalloc Vector2[10];
-        var innerRadius = radius * 0.44f;
-        for (var index = 0; index < 10; index++)
-        {
-            var pointRadius = (index & 1) == 0 ? radius : innerRadius;
-            var angle = -MathF.PI / 2f + index * (MathF.PI / 5f);
-            points[index] = new Vector2(center.X + MathF.Cos(angle) * pointRadius,
-                center.Y + MathF.Sin(angle) * pointRadius);
-        }
-
-        if (filled)
-        {
-            var packed = ImGui.GetColorU32(FavoriteStarFill);
-            for (var index = 0; index < 10; index++)
-            {
-                drawList.AddTriangleFilled(center, points[index], points[(index + 1) % 10], packed);
-            }
-
-            return;
-        }
-
-        var line = ImGui.GetColorU32(palette.InkFaint);
-        var thickness = Metrics.Stroke.Thin * scale;
-        for (var index = 0; index < 10; index++)
-        {
-            drawList.AddLine(points[index], points[(index + 1) % 10], line, thickness);
-        }
+        MapGlyphs.Star(drawList, center, radius, filled, MapGlyphs.FavoriteFill, palette.InkFaint, UiScale.Current);
     }
 }
