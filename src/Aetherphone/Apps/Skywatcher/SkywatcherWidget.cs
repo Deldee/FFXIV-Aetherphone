@@ -27,6 +27,7 @@ internal sealed class SkywatcherWidget : IHomeWidget
     private readonly List<WeatherWindow> forecast = new();
     private string zone = string.Empty;
     private float sinceRefresh = WeatherService.RefreshIntervalSeconds;
+    private uint viewedTerritoryId;
 
     public SkywatcherWidget(WeatherService weather)
     {
@@ -73,11 +74,12 @@ internal sealed class SkywatcherWidget : IHomeWidget
     private void Advance(float delta)
     {
         sinceRefresh += delta;
-        if (sinceRefresh < WeatherService.RefreshIntervalSeconds)
+        if (weather.CurrentTerritoryId == viewedTerritoryId && sinceRefresh < WeatherService.RefreshIntervalSeconds)
         {
             return;
         }
 
+        viewedTerritoryId = weather.CurrentTerritoryId;
         zone = weather.CurrentZone();
         weather.Forecast(forecast, ForecastWindows);
         sinceRefresh = 0f;
