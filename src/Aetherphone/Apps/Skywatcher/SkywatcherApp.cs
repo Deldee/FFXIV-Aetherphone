@@ -39,6 +39,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     private bool showingBrowse = true;
     private uint viewedTerritoryId;
     private bool pendingScrollReset;
+    private string search = string.Empty;
 
     public SkywatcherApp(WeatherService weather, WeatherControl control, Configuration configuration)
     {
@@ -53,6 +54,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         scrubbing = false;
         showingBrowse = true;
         viewedTerritoryId = weather.CurrentTerritoryId;
+        search = string.Empty;
         SyncFavorites();
         Refresh();
     }
