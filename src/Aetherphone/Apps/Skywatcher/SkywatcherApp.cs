@@ -98,7 +98,9 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     {
         var windowStart = WeatherService.CurrentWindowStartUnix();
         var zoneChanged = showingBrowse && weather.CurrentTerritoryId != viewedTerritoryId;
-        if (zoneChanged || windowStart != lastWindowStartUnix)
+        var liveDiverged = viewedTerritoryId == weather.CurrentTerritoryId && forecast.Count > 0 &&
+            weather.LiveRenderedWeather() is { } live && live.Id != forecast[0].Weather.Id;
+        if (zoneChanged || liveDiverged || windowStart != lastWindowStartUnix)
         {
             Refresh(windowStart);
         }
