@@ -19,7 +19,10 @@ internal sealed partial class SkywatcherApp
     private static readonly Vector4 FavoriteStarFill = new(1f, 0.78f, 0.25f, 1f);
     private readonly HashSet<uint> favorites = new();
     private readonly List<WeatherZoneEntry> favoriteZones = new();
-    private readonly List<WeatherZoneEntry> searchMatches = new();
+    private readonly Dictionary<uint, WeatherEntry> rowWeather = new();
+    private readonly List<WeatherRegionGroup> filteredRegions = new();
+    private IReadOnlyList<WeatherRegionGroup>? filteredSourceRegions;
+    private string? filteredSearch;
 
     private void SyncFavorites()
     {
@@ -46,24 +49,53 @@ internal sealed partial class SkywatcherApp
         configuration.Save();
     }
 
+    private void RefreshRowWeather()
+    {
+        rowWeather.Clear();
+        var regions = weather.ZonesByRegion();
+        for (var regionIndex = 0; regionIndex < regions.Count; regionIndex++)
+        {
+            var zones = regions[regionIndex].Zones;
+            for (var index = 0; index < zones.Count; index++)
+            {
+                var territoryId = zones[index].TerritoryId;
+                if (!rowWeather.ContainsKey(territoryId))
+                {
+                    rowWeather[territoryId] = weather.Entry(weather.NaturalNow(territoryId));
+                }
+            }
+        }
+    }
+
+    private WeatherEntry RowWeather(uint territoryId)
+    {
+        if (rowWeather.TryGetValue(territoryId, out var cached))
+        {
+            return cached;
+        }
+
+        var entry = weather.Entry(weather.NaturalNow(territoryId));
+        rowWeather[territoryId] = entry;
+        return entry;
+    }
+
     private void DrawBrowse(in SkyPalette palette, float scale)
     {
         DrawCurrentAreaPreview(palette, scale);
         DrawFavoritesSection(palette, scale);
         DrawSearchField(palette, scale);
 
-        var regions = weather.ZonesByRegion();
+        var regions = RefreshedFilteredRegions();
         for (var regionIndex = 0; regionIndex < regions.Count; regionIndex++)
         {
             var region = regions[regionIndex];
-            var zones = ResolveSearchMatches(region);
-            if (CountOtherZones(zones) == 0)
+            if (CountOtherZones(region.Zones) == 0)
             {
                 continue;
             }
 
             SectionLabel(region.Region, palette, scale);
-            DrawZoneList(palette, scale, zones);
+            DrawZoneList(palette, scale, region.Zones);
         }
 
         ImGui.Dummy(new Vector2(0f, 8f * scale));
@@ -82,24 +114,44 @@ internal sealed partial class SkywatcherApp
         ImGui.Dummy(new Vector2(0f, 6f * scale));
     }
 
-    private IReadOnlyList<WeatherZoneEntry> ResolveSearchMatches(WeatherRegionGroup region)
+    private IReadOnlyList<WeatherRegionGroup> RefreshedFilteredRegions()
     {
-        if (search.Length == 0 || region.Region.Contains(search, StringComparison.OrdinalIgnoreCase))
+        var regions = weather.ZonesByRegion();
+        if (ReferenceEquals(filteredSourceRegions, regions) && filteredSearch == search)
         {
-            return region.Zones;
+            return filteredRegions;
         }
 
-        searchMatches.Clear();
-        var zones = region.Zones;
-        for (var index = 0; index < zones.Count; index++)
+        filteredRegions.Clear();
+        for (var regionIndex = 0; regionIndex < regions.Count; regionIndex++)
         {
-            if (zones[index].ZoneName.Contains(search, StringComparison.OrdinalIgnoreCase))
+            var region = regions[regionIndex];
+            if (search.Length == 0 || region.Region.Contains(search, StringComparison.OrdinalIgnoreCase))
             {
-                searchMatches.Add(zones[index]);
+                filteredRegions.Add(region);
+                continue;
+            }
+
+            List<WeatherZoneEntry>? matches = null;
+            var zones = region.Zones;
+            for (var index = 0; index < zones.Count; index++)
+            {
+                if (zones[index].ZoneName.Contains(search, StringComparison.OrdinalIgnoreCase))
+                {
+                    matches ??= new List<WeatherZoneEntry>();
+                    matches.Add(zones[index]);
+                }
+            }
+
+            if (matches != null)
+            {
+                filteredRegions.Add(new WeatherRegionGroup(region.Region, matches));
             }
         }
 
-        return searchMatches;
+        filteredSourceRegions = regions;
+        filteredSearch = search;
+        return filteredRegions;
     }
 
     private void DrawFavoritesSection(in SkyPalette palette, float scale)
@@ -213,7 +265,7 @@ internal sealed partial class SkywatcherApp
             Marquee.DrawLeftAuto(new MarqueeId("skywatcher.zone.", entry.TerritoryId), entry.ZoneName, nameLeft,
                 rowCenterY - nameSize.Y * 0.5f, nameMaxWidth, TextStyles.Body, palette.Ink);
 
-            var entryWeather = weather.Entry(weather.NaturalNow(entry.TerritoryId));
+            var entryWeather = RowWeather(entry.TerritoryId);
             var nowWindow = new WeatherWindow(entryWeather, 0, true, 0);
             DrawMini(nowWindow, glyphCenter, ZoneMiniGlyphRadius * scale);
             DrawFavoriteStar(starCenter, ZoneStarRadius * scale, palette, favorites.Contains(entry.TerritoryId));
