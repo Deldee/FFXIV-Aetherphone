@@ -27,6 +27,10 @@ internal sealed partial class SkywatcherApp
     private IReadOnlyList<WeatherRegionGroup>? filteredSourceRegions;
     private string? filteredSearch;
     private bool favoritesSynced;
+    private float favoritesSectionHeight;
+    private bool favoriteToggledPending;
+    private bool hasFavoriteScrollDelta;
+    private float favoriteScrollDelta;
 
     private void SyncFavorites()
     {
@@ -62,6 +66,7 @@ internal sealed partial class SkywatcherApp
         }
 
         configuration.Save();
+        favoriteToggledPending = true;
     }
 
     private void RefreshRowWeather()
@@ -121,7 +126,19 @@ internal sealed partial class SkywatcherApp
     {
         EnsureFavoritesSynced();
         DrawCurrentAreaPreview(palette, scale);
+
+        var favoritesTop = ImGui.GetCursorPosY();
         DrawFavoritesSection(palette, scale);
+        var favoritesHeight = ImGui.GetCursorPosY() - favoritesTop;
+        if (favoriteToggledPending)
+        {
+            favoriteToggledPending = false;
+            favoriteScrollDelta = favoritesHeight - favoritesSectionHeight;
+            hasFavoriteScrollDelta = true;
+        }
+
+        favoritesSectionHeight = favoritesHeight;
+
         DrawSearchField(palette, scale);
 
         var regions = RefreshedFilteredRegions();
