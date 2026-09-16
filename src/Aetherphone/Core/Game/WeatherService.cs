@@ -210,8 +210,8 @@ internal sealed class WeatherService
         }
 
         var live = territoryId == clientState.TerritoryType ? LiveRenderedWeather() : null;
-        var startUnix = CurrentWindowStartUnix();
         var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var startUnix = nowUnix - nowUnix % RealSecondsPerWindow;
         for (var index = 0; index < count; index++)
         {
             var timestamp = startUnix + index * RealSecondsPerWindow;
