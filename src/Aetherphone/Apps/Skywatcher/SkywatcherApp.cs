@@ -68,6 +68,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         if (showingBrowse)
         {
             viewedTerritoryId = weather.CurrentTerritoryId;
+            RefreshRowWeather();
         }
 
         zone = weather.ZoneName(viewedTerritoryId);
