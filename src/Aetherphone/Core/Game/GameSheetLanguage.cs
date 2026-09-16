@@ -11,6 +11,6 @@ internal static class GameSheetLanguage
         "en" => ClientLanguage.English,
         "fr" => ClientLanguage.French,
         "ja" => ClientLanguage.Japanese,
-        _ => Plugin.DataManager.Language,
+        _ => ClientLanguage.English,
     };
 }
