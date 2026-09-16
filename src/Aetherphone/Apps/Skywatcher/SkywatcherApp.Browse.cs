@@ -89,13 +89,14 @@ internal sealed partial class SkywatcherApp
         for (var regionIndex = 0; regionIndex < regions.Count; regionIndex++)
         {
             var region = regions[regionIndex];
-            if (CountOtherZones(region.Zones) == 0)
+            var visibleZones = CountOtherZones(region.Zones);
+            if (visibleZones == 0)
             {
                 continue;
             }
 
             SectionLabel(region.Region, palette, scale);
-            DrawZoneList(palette, scale, region.Zones);
+            DrawZoneList(palette, scale, region.Zones, visibleZones);
         }
 
         ImGui.Dummy(new Vector2(0f, 8f * scale));
@@ -169,13 +170,14 @@ internal sealed partial class SkywatcherApp
             favoriteZones.Add(new WeatherZoneEntry(stored[index], zoneName));
         }
 
-        if (CountOtherZones(favoriteZones) == 0)
+        var visibleFavorites = CountOtherZones(favoriteZones);
+        if (visibleFavorites == 0)
         {
             return;
         }
 
         SectionLabel(Loc.T(L.Skywatcher.Favorites), palette, scale);
-        DrawZoneList(palette, scale, favoriteZones);
+        DrawZoneList(palette, scale, favoriteZones, visibleFavorites);
     }
 
     private void DrawCurrentAreaPreview(in SkyPalette palette, float scale)
@@ -227,12 +229,12 @@ internal sealed partial class SkywatcherApp
         }
     }
 
-    private void DrawZoneList(in SkyPalette palette, float scale, IReadOnlyList<WeatherZoneEntry> zones)
+    private void DrawZoneList(in SkyPalette palette, float scale, IReadOnlyList<WeatherZoneEntry> zones,
+        int visibleCount)
     {
         var origin = ImGui.GetCursorScreenPos();
         var width = ImGui.GetContentRegionAvail().X;
         var rowHeight = ZoneRowHeight * scale;
-        var visibleCount = CountOtherZones(zones);
         var card = new Rect(origin, origin + new Vector2(width, visibleCount * rowHeight + 10f * scale));
         DrawGlass(card, palette, scale);
         var inner = card.Inset(5f * scale);
