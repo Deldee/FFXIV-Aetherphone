@@ -30,6 +30,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     public int BadgeCount => 0;
     private readonly WeatherService weather;
     private readonly WeatherControl control;
+    private readonly Configuration configuration;
     private readonly List<WeatherWindow> forecast = new();
     private string zone = string.Empty;
     private float sinceRefresh;
@@ -39,10 +40,11 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     private uint viewedTerritoryId;
     private bool pendingScrollReset;
 
-    public SkywatcherApp(WeatherService weather, WeatherControl control)
+    public SkywatcherApp(WeatherService weather, WeatherControl control, Configuration configuration)
     {
         this.weather = weather;
         this.control = control;
+        this.configuration = configuration;
     }
 
     public void OnOpened()
@@ -51,6 +53,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         scrubbing = false;
         showingBrowse = true;
         viewedTerritoryId = weather.CurrentTerritoryId;
+        SyncFavorites();
         Refresh();
     }
 
