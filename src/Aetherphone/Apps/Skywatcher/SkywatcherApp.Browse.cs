@@ -12,8 +12,8 @@ internal sealed partial class SkywatcherApp
     private const float PreviewCurrentGlyphRadius = 20f;
     private const float PreviewGlyphRadius = 14f;
     private const float ZoneRowHeight = 38f;
-    private const float ZoneWeatherColumnWidth = 92f;
     private const float ZoneMiniGlyphRadius = 10f;
+    private const float ZoneStarRadius = 8f;
 
     private void DrawBrowse(in SkyPalette palette, float scale)
     {
@@ -112,23 +112,20 @@ internal sealed partial class SkywatcherApp
                     1f);
             }
 
-            var nameMaxWidth = MathF.Max(1f, inner.Width - 24f * scale - ZoneWeatherColumnWidth * scale);
-            var name = Typography.FitText(entry.ZoneName, nameMaxWidth, TextStyles.Body);
-            var nameSize = Typography.Measure(name);
-            Typography.Draw(new Vector2(inner.Min.X + 12f * scale, rowCenterY - nameSize.Y * 0.5f), name, palette.Ink);
+            var starCenter = new Vector2(inner.Max.X - 10f * scale - ZoneStarRadius * scale, rowCenterY);
+            var glyphCenter = new Vector2(starCenter.X - ZoneStarRadius * scale - 10f * scale - ZoneMiniGlyphRadius * scale,
+                rowCenterY);
+
+            var nameLeft = inner.Min.X + 12f * scale;
+            var nameMaxWidth = MathF.Max(1f, glyphCenter.X - ZoneMiniGlyphRadius * scale - 10f * scale - nameLeft);
+            var nameSize = Typography.Measure(entry.ZoneName, TextStyles.Body);
+            Marquee.DrawLeftAuto(new MarqueeId("skywatcher.zone.", entry.TerritoryId), entry.ZoneName, nameLeft,
+                rowCenterY - nameSize.Y * 0.5f, nameMaxWidth, TextStyles.Body, palette.Ink);
 
             var entryWeather = weather.Entry(weather.NaturalNow(entry.TerritoryId));
             var nowWindow = new WeatherWindow(entryWeather, 0, true, 0);
-            var glyphCenter = new Vector2(inner.Max.X - ZoneWeatherColumnWidth * scale + ZoneMiniGlyphRadius * scale,
-                rowCenterY);
             DrawMini(nowWindow, glyphCenter, ZoneMiniGlyphRadius * scale);
-            var weatherNameLeft = glyphCenter.X + ZoneMiniGlyphRadius * scale + 8f * scale;
-            var weatherNameMaxWidth = MathF.Max(1f, inner.Max.X - 10f * scale - weatherNameLeft);
-            var weatherName = Typography.FitText(entryWeather.Name, weatherNameMaxWidth, 1f, FontWeight.Regular);
-            var weatherNameSize = Typography.Measure(weatherName);
-            Typography.Draw(
-                new Vector2(inner.Max.X - 10f * scale - weatherNameSize.X, rowCenterY - weatherNameSize.Y * 0.5f),
-                weatherName, palette.InkSoft);
+            DrawFavoriteStar(starCenter, ZoneStarRadius * scale, palette);
             if (UiInteract.HoverClick(new Vector2(inner.Min.X, rowTop), new Vector2(inner.Max.X, rowTop + rowHeight)))
             {
                 OpenDetail(entry.TerritoryId);
@@ -153,5 +150,27 @@ internal sealed partial class SkywatcherApp
         }
 
         return count;
+    }
+
+    private static void DrawFavoriteStar(Vector2 center, float radius, in SkyPalette palette)
+    {
+        var scale = UiScale.Current;
+        var drawList = ImGui.GetWindowDrawList();
+        Span<Vector2> points = stackalloc Vector2[10];
+        var innerRadius = radius * 0.44f;
+        for (var index = 0; index < 10; index++)
+        {
+            var pointRadius = (index & 1) == 0 ? radius : innerRadius;
+            var angle = -MathF.PI / 2f + index * (MathF.PI / 5f);
+            points[index] = new Vector2(center.X + MathF.Cos(angle) * pointRadius,
+                center.Y + MathF.Sin(angle) * pointRadius);
+        }
+
+        var line = ImGui.GetColorU32(palette.InkFaint);
+        var thickness = Metrics.Stroke.Thin * scale;
+        for (var index = 0; index < 10; index++)
+        {
+            drawList.AddLine(points[index], points[(index + 1) % 10], line, thickness);
+        }
     }
 }
