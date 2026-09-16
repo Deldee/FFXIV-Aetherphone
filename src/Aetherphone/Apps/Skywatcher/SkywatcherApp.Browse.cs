@@ -1,5 +1,6 @@
 using Aetherphone.Core;
 using Aetherphone.Core.Game;
+using Aetherphone.Core.Localization;
 using Aetherphone.Windows.Components;
 using Dalamud.Bindings.ImGui;
 
@@ -14,10 +15,39 @@ internal sealed partial class SkywatcherApp
     private const float ZoneRowHeight = 38f;
     private const float ZoneMiniGlyphRadius = 10f;
     private const float ZoneStarRadius = 8f;
+    private static readonly Vector4 FavoriteStarFill = new(1f, 0.78f, 0.25f, 1f);
+    private readonly HashSet<uint> favorites = new();
+    private readonly List<WeatherZoneEntry> favoriteZones = new();
+
+    private void SyncFavorites()
+    {
+        favorites.Clear();
+        var stored = configuration.SkywatcherFavorites;
+        for (var index = 0; index < stored.Count; index++)
+        {
+            favorites.Add(stored[index]);
+        }
+    }
+
+    private void ToggleFavorite(uint territoryId)
+    {
+        if (favorites.Remove(territoryId))
+        {
+            configuration.SkywatcherFavorites.Remove(territoryId);
+        }
+        else
+        {
+            favorites.Add(territoryId);
+            configuration.SkywatcherFavorites.Add(territoryId);
+        }
+
+        configuration.Save();
+    }
 
     private void DrawBrowse(in SkyPalette palette, float scale)
     {
         DrawCurrentAreaPreview(palette, scale);
+        DrawFavoritesSection(palette, scale);
 
         var regions = weather.ZonesByRegion();
         for (var regionIndex = 0; regionIndex < regions.Count; regionIndex++)
@@ -33,6 +63,30 @@ internal sealed partial class SkywatcherApp
         }
 
         ImGui.Dummy(new Vector2(0f, 8f * scale));
+    }
+
+    private void DrawFavoritesSection(in SkyPalette palette, float scale)
+    {
+        favoriteZones.Clear();
+        var stored = configuration.SkywatcherFavorites;
+        for (var index = 0; index < stored.Count; index++)
+        {
+            var zoneName = weather.ZoneName(stored[index]);
+            if (zoneName.Length == 0)
+            {
+                continue;
+            }
+
+            favoriteZones.Add(new WeatherZoneEntry(stored[index], zoneName));
+        }
+
+        if (CountOtherZones(favoriteZones) == 0)
+        {
+            return;
+        }
+
+        SectionLabel(Loc.T(L.Skywatcher.Favorites), palette, scale);
+        DrawZoneList(palette, scale, favoriteZones);
     }
 
     private void DrawCurrentAreaPreview(in SkyPalette palette, float scale)
@@ -125,8 +179,24 @@ internal sealed partial class SkywatcherApp
             var entryWeather = weather.Entry(weather.NaturalNow(entry.TerritoryId));
             var nowWindow = new WeatherWindow(entryWeather, 0, true, 0);
             DrawMini(nowWindow, glyphCenter, ZoneMiniGlyphRadius * scale);
-            DrawFavoriteStar(starCenter, ZoneStarRadius * scale, palette);
-            if (UiInteract.HoverClick(new Vector2(inner.Min.X, rowTop), new Vector2(inner.Max.X, rowTop + rowHeight)))
+            DrawFavoriteStar(starCenter, ZoneStarRadius * scale, palette, favorites.Contains(entry.TerritoryId));
+
+            var starMin = new Vector2(starCenter.X - ZoneStarRadius * scale - 8f * scale, rowTop);
+            var starMax = new Vector2(inner.Max.X, rowTop + rowHeight);
+            var starHovered = UiInteract.Hover(starMin, starMax);
+            if (starHovered)
+            {
+                ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+            }
+
+            var starClicked = UiInteract.Click(starMin, starMax, starHovered);
+            var rowClicked = !starHovered &&
+                UiInteract.HoverClick(new Vector2(inner.Min.X, rowTop), new Vector2(inner.Max.X, rowTop + rowHeight));
+            if (starClicked)
+            {
+                ToggleFavorite(entry.TerritoryId);
+            }
+            else if (rowClicked)
             {
                 OpenDetail(entry.TerritoryId);
             }
@@ -152,7 +222,7 @@ internal sealed partial class SkywatcherApp
         return count;
     }
 
-    private static void DrawFavoriteStar(Vector2 center, float radius, in SkyPalette palette)
+    private static void DrawFavoriteStar(Vector2 center, float radius, in SkyPalette palette, bool filled)
     {
         var scale = UiScale.Current;
         var drawList = ImGui.GetWindowDrawList();
@@ -164,6 +234,17 @@ internal sealed partial class SkywatcherApp
             var angle = -MathF.PI / 2f + index * (MathF.PI / 5f);
             points[index] = new Vector2(center.X + MathF.Cos(angle) * pointRadius,
                 center.Y + MathF.Sin(angle) * pointRadius);
+        }
+
+        if (filled)
+        {
+            var packed = ImGui.GetColorU32(FavoriteStarFill);
+            for (var index = 0; index < 10; index++)
+            {
+                drawList.AddTriangleFilled(center, points[index], points[(index + 1) % 10], packed);
+            }
+
+            return;
         }
 
         var line = ImGui.GetColorU32(palette.InkFaint);
