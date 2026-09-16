@@ -23,6 +23,7 @@ internal sealed partial class SkywatcherApp
     private readonly List<WeatherRegionGroup> filteredRegions = new();
     private IReadOnlyList<WeatherRegionGroup>? filteredSourceRegions;
     private string? filteredSearch;
+    private bool favoritesSynced;
 
     private void SyncFavorites()
     {
@@ -32,10 +33,21 @@ internal sealed partial class SkywatcherApp
         {
             favorites.Add(stored[index]);
         }
+
+        favoritesSynced = true;
+    }
+
+    private void EnsureFavoritesSynced()
+    {
+        if (!favoritesSynced)
+        {
+            SyncFavorites();
+        }
     }
 
     private void ToggleFavorite(uint territoryId)
     {
+        EnsureFavoritesSynced();
         if (favorites.Remove(territoryId))
         {
             configuration.SkywatcherFavorites.Remove(territoryId);
@@ -81,6 +93,7 @@ internal sealed partial class SkywatcherApp
 
     private void DrawBrowse(in SkyPalette palette, float scale)
     {
+        EnsureFavoritesSynced();
         DrawCurrentAreaPreview(palette, scale);
         DrawFavoritesSection(palette, scale);
         DrawSearchField(palette, scale);
