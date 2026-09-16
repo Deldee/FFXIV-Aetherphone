@@ -71,6 +71,7 @@ internal sealed partial class SkywatcherApp
 
     private void DrawSearchField(in SkyPalette palette, float scale)
     {
+        ImGui.Dummy(new Vector2(0f, 10f * scale));
         var origin = ImGui.GetCursorScreenPos();
         var width = ImGui.GetContentRegionAvail().X;
         var bar = new Rect(origin, origin + new Vector2(width, SearchBarHeight * scale));
