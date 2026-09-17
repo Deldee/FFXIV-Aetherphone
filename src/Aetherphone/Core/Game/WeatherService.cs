@@ -16,6 +16,7 @@ internal sealed class WeatherService
     private readonly IDataManager data;
     private readonly IClientState clientState;
     private readonly Dictionary<byte, WeatherEntry> entries = new();
+    private SheetLanguageGate entriesGate;
     private readonly List<WeatherEntry> zoneWeathers = new();
     private readonly List<WeatherChance> chances = new();
     private uint cachedTerritory = uint.MaxValue;
@@ -31,12 +32,15 @@ internal sealed class WeatherService
     public string CurrentZone()
     {
         var territoryId = clientState.TerritoryType;
-        if (territoryId != 0 && data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territory))
+        if (territoryId == 0 || !data.GetLocalizedSheet<TerritoryType>().TryGetRow(territoryId, out var territory) ||
+            territory.PlaceName.RowId == 0)
         {
-            return territory.PlaceName.Value.Name.ExtractText();
+            return string.Empty;
         }
 
-        return string.Empty;
+        return data.GetLocalizedSheet<PlaceName>().TryGetRow(territory.PlaceName.RowId, out var placeName)
+            ? placeName.Name.ExtractText()
+            : string.Empty;
     }
 
     public IReadOnlyList<WeatherEntry> ZoneWeathers()
@@ -90,13 +94,20 @@ internal sealed class WeatherService
 
     public WeatherEntry Entry(byte id)
     {
+        var gate = GameSheetLanguage.CurrentGate();
+        if (entriesGate != gate)
+        {
+            entries.Clear();
+            entriesGate = gate;
+        }
+
         if (entries.TryGetValue(id, out var cached))
         {
             return cached;
         }
 
         var name = string.Empty;
-        if (data.GetExcelSheet<Weather>().TryGetRow(id, out var row))
+        if (data.GetLocalizedSheet<Weather>().TryGetRow(id, out var row))
         {
             name = row.Name.ExtractText();
         }
