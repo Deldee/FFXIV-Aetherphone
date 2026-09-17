@@ -15,8 +15,13 @@ internal enum SheetLanguageOverride
     Japanese,
 }
 
+internal readonly record struct SheetLanguageGate(bool PreferPhoneLocale, string LocaleCode);
+
 internal static class GameSheetLanguage
 {
+    public static SheetLanguageGate CurrentGate() =>
+        new(Plugin.Cfg.PreferPhoneLocaleForGameData, Loc.Current.Code);
+
     public static ClientLanguage? Resolve(SheetLanguageOverride overrideLanguage = SheetLanguageOverride.None)
     {
         if (overrideLanguage != SheetLanguageOverride.None)
