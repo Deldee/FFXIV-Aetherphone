@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
+using Aetherphone.Core.Game;
 using Aetherphone.Core.Net;
 using Dalamud.Plugin.Services;
 using Lumina.Excel.Sheets;
@@ -310,7 +311,7 @@ internal sealed class CollectionsCatalogService : IDisposable
     {
         var ids = new HashSet<int>();
         var total = 0;
-        foreach (var row in dataManager.GetExcelSheet<Mount>())
+        foreach (var row in dataManager.GetLocalizedSheet<Mount>())
         {
             if (row.Singular == "" || row.Order == -1)
             {
@@ -331,7 +332,7 @@ internal sealed class CollectionsCatalogService : IDisposable
     {
         var ids = new HashSet<int>();
         var total = 0;
-        foreach (var row in dataManager.GetExcelSheet<Companion>())
+        foreach (var row in dataManager.GetLocalizedSheet<Companion>())
         {
             if (row.Singular == "")
             {
@@ -352,7 +353,7 @@ internal sealed class CollectionsCatalogService : IDisposable
     {
         var ids = new HashSet<int>();
         var total = 0;
-        foreach (var row in dataManager.GetExcelSheet<EmoteSheet>())
+        foreach (var row in dataManager.GetLocalizedSheet<EmoteSheet>())
         {
             if (row.Name == "" || row.Icon == 0 || row.UnlockLink == 0)
             {
@@ -373,7 +374,7 @@ internal sealed class CollectionsCatalogService : IDisposable
     {
         var ids = new HashSet<int>();
         var total = 0;
-        foreach (var row in dataManager.GetExcelSheet<Orchestrion>())
+        foreach (var row in dataManager.GetLocalizedSheet<Orchestrion>())
         {
             if (row.Name == "" || row.Name == "0")
             {
@@ -394,7 +395,7 @@ internal sealed class CollectionsCatalogService : IDisposable
     {
         var ids = new HashSet<int>();
         var seen = new HashSet<int>();
-        foreach (var row in dataManager.GetExcelSheet<CharaMakeCustomize>())
+        foreach (var row in dataManager.GetLocalizedSheet<CharaMakeCustomize>())
         {
             if (!row.IsPurchasable || row.Icon == HiddenHairstyleIcon)
             {
@@ -420,7 +421,7 @@ internal sealed class CollectionsCatalogService : IDisposable
     {
         var ids = new HashSet<int>();
         var total = 0;
-        foreach (var row in dataManager.GetExcelSheet<Glasses>())
+        foreach (var row in dataManager.GetLocalizedSheet<Glasses>())
         {
             if (row.Icon == 0 || !row.Style.IsValid || row.Name != row.Style.Value.Name)
             {
@@ -441,7 +442,7 @@ internal sealed class CollectionsCatalogService : IDisposable
     {
         var ids = new HashSet<int>();
         var total = 0;
-        foreach (var row in dataManager.GetExcelSheet<TripleTriadCard>())
+        foreach (var row in dataManager.GetLocalizedSheet<TripleTriadCard>())
         {
             if (row.Name == "" || row.Name == "0")
             {
