@@ -247,9 +247,7 @@ internal sealed partial class HuntsApp
     }
 
     private string ResolveMobLabel(HuntMobDefinition? def, string mobId) =>
-        def?.Name.GetValueOrDefault(configuration.Language)
-        ?? def?.Name.GetValueOrDefault("en")
-        ?? Prettify(mobId);
+        def is not null ? HuntMobNames.NameFor(def.NameId) ?? Prettify(mobId) : Prettify(mobId);
 
     private HuntWindowStatus ResolveDisplayStatus(HuntWindowDto window, HuntMobDefinition? mob, DateTimeOffset now)
     {
