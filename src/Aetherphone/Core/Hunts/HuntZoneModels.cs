@@ -7,8 +7,8 @@ internal sealed class HuntZoneDefinition
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;
+    [JsonPropertyName("territoryId")]
+    public uint TerritoryId { get; set; }
 
     [JsonPropertyName("map")]
     public HuntZoneMap Map { get; set; } = new();
@@ -28,8 +28,8 @@ internal sealed class HuntPoiEntry
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
-    [JsonPropertyName("name")]
-    public Dictionary<string, string>? Name { get; set; }
+    [JsonPropertyName("nameId")]
+    public uint NameId { get; set; }
 
     [JsonPropertyName("type")]
     public string Type { get; set; } = string.Empty;

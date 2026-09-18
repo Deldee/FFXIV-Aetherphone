@@ -570,8 +570,7 @@ internal sealed partial class HuntsApp
         }
     }
 
-    private string ResolvePoiLabel(HuntPoiEntry poi) =>
-        poi.Name?.GetValueOrDefault(configuration.Language) ?? poi.Name?.GetValueOrDefault("en") ?? string.Empty;
+    private static string ResolvePoiLabel(HuntPoiEntry poi) => HuntPoiNames.NameFor(poi.NameId) ?? string.Empty;
 
     private bool DrawNavigateButton(HuntsView view, float scale, int? confirmedPoiId)
     {
