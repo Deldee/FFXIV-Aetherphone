@@ -4,19 +4,16 @@ namespace Aetherphone.Core.Hunts;
 
 internal static class HuntMobLore
 {
-    private static HuntMobTextCatalog? descriptions;
+    private static HuntMobDescriptionCatalog? descriptions;
     private static HuntMobTextCatalog? tips;
 
-    public static void Initialize(HuntMobTextCatalog descriptionCatalog, HuntMobTextCatalog tipCatalog)
+    public static void Initialize(HuntMobDescriptionCatalog descriptionCatalog, HuntMobTextCatalog tipCatalog)
     {
         descriptions = descriptionCatalog;
         tips = tipCatalog;
     }
 
-    public static string? DescriptionFor(string mobId) => descriptions?.TextFor(mobId, HuntUiLanguage.Key());
-
-    public static bool DescriptionIsFallback(string mobId) =>
-        descriptions is not null && !descriptions.HasNativeText(mobId, Loc.Current.Code);
+    public static string? DescriptionFor(string mobId) => descriptions?.DescriptionFor(mobId);
 
     public static string? TipFor(string mobId) => tips?.TextFor(mobId, Loc.Current.Code);
 

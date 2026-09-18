@@ -54,20 +54,23 @@ internal static class GameSheetLanguage
     }
 
     public static ExcelSheet<T> GetLocalizedSheet<T>(this IDataManager data,
-        SheetLanguageOverride overrideLanguage = SheetLanguageOverride.None) where T : struct, IExcelRow<T>
+        SheetLanguageOverride overrideLanguage = SheetLanguageOverride.None, string? sheetName = null)
+        where T : struct, IExcelRow<T>
     {
         if (Resolve(overrideLanguage) is not { } language)
         {
-            return data.GetExcelSheet<T>();
+            return data.GetExcelSheet<T>(name: sheetName);
         }
 
         try
         {
-            return data.GetExcelSheet<T>(language);
+            return data.GetExcelSheet<T>(language, sheetName);
         }
         catch (UnsupportedLanguageException)
         {
-            return language == ClientLanguage.English ? data.GetExcelSheet<T>() : data.GetExcelSheet<T>(ClientLanguage.English);
+            return language == ClientLanguage.English
+                ? data.GetExcelSheet<T>(name: sheetName)
+                : data.GetExcelSheet<T>(ClientLanguage.English, sheetName);
         }
     }
 }
