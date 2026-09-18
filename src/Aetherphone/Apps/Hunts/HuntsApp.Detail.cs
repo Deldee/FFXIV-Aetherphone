@@ -46,7 +46,7 @@ internal sealed partial class HuntsApp
     private string detailMapZoneId = string.Empty;
     private readonly List<HuntPoiEntry> detailMapAetherytePoints = new();
     private readonly Dictionary<(uint TerritoryId, string ZoneId), string> zoneLabelCache = new();
-    private string zoneLabelCacheLocale = string.Empty;
+    private SheetLanguageGate zoneLabelCacheGate;
     private readonly PhotoZoomView detailMapZoom = new();
     private bool detailMapHovered;
     private bool detailMapPendingFocus;
@@ -415,11 +415,11 @@ internal sealed partial class HuntsApp
 
     private string ResolveZoneLabel(string zoneId, uint territoryId)
     {
-        var locale = HuntUiLanguage.Key();
-        if (zoneLabelCacheLocale != locale)
+        var gate = GameSheetLanguage.CurrentGate();
+        if (zoneLabelCacheGate != gate)
         {
             zoneLabelCache.Clear();
-            zoneLabelCacheLocale = locale;
+            zoneLabelCacheGate = gate;
         }
 
         var key = (territoryId, zoneId);
@@ -428,22 +428,21 @@ internal sealed partial class HuntsApp
             return cached;
         }
 
-        var label = ResolveLiveZoneName(territoryId) is { Length: > 0 } name ? name : Prettify(zoneId);
+        var label = ResolveLiveZoneName(territoryId, gate) is { Length: > 0 } name ? name : Prettify(zoneId);
         zoneLabelCache[key] = label;
         return label;
     }
 
-    private static string? ResolveLiveZoneName(uint territoryId)
+    private static string? ResolveLiveZoneName(uint territoryId, SheetLanguageGate gate)
     {
         if (territoryId == 0 ||
-            !Plugin.DataManager.GetExcelSheet<TerritoryType>(HuntUiLanguage.SheetLanguage())
-                .TryGetRow(territoryId, out var territory) || territory.PlaceName.RowId == 0)
+            !Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territory) ||
+            territory.PlaceName.RowId == 0)
         {
             return null;
         }
 
-        return Plugin.DataManager.GetExcelSheet<PlaceName>(HuntUiLanguage.SheetLanguage())
-            .TryGetRow(territory.PlaceName.RowId, out var placeName)
+        return Plugin.DataManager.GetLocalizedSheet<PlaceName>(gate).TryGetRow(territory.PlaceName.RowId, out var placeName)
             ? placeName.Name.ExtractText()
             : null;
     }
@@ -912,15 +911,12 @@ internal sealed partial class HuntsApp
         Squircle.Fill(drawList, new Vector2(origin.X, panelTop), new Vector2(origin.X + width, panelBottom),
             Metrics.Radius.Sm * scale, ImGui.GetColorU32(Palette.WithAlpha(ui.Palette.BackdropBottom, LoreBodyAlpha)));
 
-        var displayLocale = HuntUiLanguage.Key();
-        var searchLocale = HuntClientLanguage.Key();
         for (var index = 0; index < rewards.Count; index++)
         {
             var column = index % columns;
             var row = index / columns;
             var tileMin = new Vector2(bodyLeft + column * (iconSize + tileGap), tileTop + row * (tileHeight + tileGap));
-            DrawRewardTile(drawList, tileMin, iconSize, captionHeight, rewards[index], displayLocale, searchLocale,
-                scale);
+            DrawRewardTile(drawList, tileMin, iconSize, captionHeight, rewards[index], scale);
         }
 
         ImGui.SetCursorScreenPos(origin);
@@ -991,12 +987,12 @@ internal sealed partial class HuntsApp
     }
 
     private void DrawRewardTile(ImDrawListPtr drawList, Vector2 iconMin, float iconSize, float captionHeight,
-        HuntMobRewardEntry entry, string displayLocale, string searchLocale, float scale)
+        HuntMobRewardEntry entry, float scale)
     {
         var iconMax = iconMin + new Vector2(iconSize, iconSize);
         var radius = 9f * scale;
-        var searchName = rewardCatalog.ItemNameFor(entry.ItemId, searchLocale);
-        var iconId = HuntRewardIcons.ResolveIconId(entry.ItemId, searchName);
+        var itemRowId = rewardCatalog.ItemRowIdFor(entry.ItemId);
+        var iconId = itemRowId is { } iconRowId ? HuntRewardItems.IconIdFor(iconRowId) : 0u;
         GameIconTile.Draw(drawList, Plugin.TextureProvider, iconId, iconMin, iconMax, radius, scale,
             ImGui.GetColorU32(Palette.WithAlpha(ui.TitleInk, 0.06f)), edgeStroke: true);
 
@@ -1008,7 +1004,7 @@ internal sealed partial class HuntsApp
             Typography.Draw(drawList, captionPosition, captionText, ui.TitleInk, TextStyles.FootnoteEmphasized);
         }
 
-        var displayName = rewardCatalog.ItemNameFor(entry.ItemId, displayLocale);
+        var displayName = itemRowId is { } nameRowId ? HuntRewardItems.NameFor(nameRowId) : null;
         if (displayName is not null)
         {
             var tileMax = new Vector2(iconMax.X, iconMax.Y + 4f * scale + captionHeight);
