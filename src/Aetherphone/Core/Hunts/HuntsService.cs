@@ -1218,7 +1218,7 @@ internal sealed class HuntsService : IDisposable
 
     private string ResolveMobName(string mobId) =>
         mobCatalog.Find(mobId) is { } def
-            ? def.Name.GetValueOrDefault(Loc.Current.Code) ?? def.Name.GetValueOrDefault("en") ?? Prettify(mobId)
+            ? HuntMobNames.NameFor(def.NameId) ?? Prettify(mobId)
             : Prettify(mobId);
 
     private static string Prettify(string slug)

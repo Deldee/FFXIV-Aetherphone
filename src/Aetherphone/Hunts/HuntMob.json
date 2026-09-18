@@ -1,11 +1,7 @@
- {
+{
   "behemoth": {
     "id": "behemoth",
-    "name": {
-      "en": "Behemoth",
-      "ja": "ベヒーモス",
-      "fr": "Béhémoth"
-    },
+    "nameId": 655,
     "rank": "F",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -56,10 +52,7 @@
   },
   "odin": {
     "id": "odin",
-    "name": {
-      "en": "Odin",
-      "ja": "オーディン"
-    },
+    "nameId": 887,
     "rank": "F",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -112,12 +105,7 @@
   },
   "white_joker": {
     "id": "white_joker",
-    "name": {
-      "en": "White Joker",
-      "ja": "ホワイトジョーカー",
-      "fr": "Joker blanc",
-      "de": "Weißer Joker"
-    },
+    "nameId": 2919,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -159,12 +147,7 @@
   },
   "stinging_sophie": {
     "id": "stinging_sophie",
-    "name": {
-      "en": "Stinging Sophie",
-      "ja": "スティンギング・ソフィー",
-      "fr": "Sophie la dardante",
-      "de": "Stinkige Sophie"
-    },
+    "nameId": 2920,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -218,12 +201,7 @@
   },
   "monarch_ogrefly": {
     "id": "monarch_ogrefly",
-    "name": {
-      "en": "Monarch Ogrefly",
-      "ja": "モナーク・オーガフライ",
-      "fr": "Agrion ogre monarque",
-      "de": "Monarch Ogerlibelle"
-    },
+    "nameId": 2921,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -270,10 +248,7 @@
   },
   "phecda": {
     "id": "phecda",
-    "name": {
-      "en": "Phecda",
-      "ja": "フェクダ"
-    },
+    "nameId": 2922,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -311,12 +286,7 @@
   },
   "sewer_syrup": {
     "id": "sewer_syrup",
-    "name": {
-      "en": "Sewer Syrup",
-      "ja": "スェアーシロップ",
-      "fr": "Syrop d'égout",
-      "de": "Abwasser-Sirup"
-    },
+    "nameId": 2923,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -357,10 +327,7 @@
   },
   "ovjang": {
     "id": "ovjang",
-    "name": {
-      "en": "Ovjang",
-      "ja": "アヴゼン"
-    },
+    "nameId": 2924,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -402,11 +369,7 @@
   },
   "gatling": {
     "id": "gatling",
-    "name": {
-      "en": "Gatling",
-      "ja": "ガトリングス",
-      "fr": "Acanthor"
-    },
+    "nameId": 2925,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -458,12 +421,7 @@
   },
   "albin_the_ashen": {
     "id": "albin_the_ashen",
-    "name": {
-      "en": "Albin the Ashen",
-      "ja": "死灰のアルビン",
-      "fr": "Albin le blafard",
-      "de": "Albin Aschfahl"
-    },
+    "nameId": 2926,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -524,12 +482,7 @@
   },
   "flame_sergeant_dalvag": {
     "id": "flame_sergeant_dalvag",
-    "name": {
-      "en": "Flame Sergeant Dalvag",
-      "ja": "不滅のフェランド闘軍曹",
-      "fr": "Sergent-major Dalvag",
-      "de": "Dalvag"
-    },
+    "nameId": 2927,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -565,10 +518,7 @@
   },
   "skogs_fru": {
     "id": "skogs_fru",
-    "name": {
-      "en": "Skogs Fru",
-      "ja": "スコッグ・フリュー"
-    },
+    "nameId": 2928,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -611,10 +561,7 @@
   },
   "barbastelle": {
     "id": "barbastelle",
-    "name": {
-      "en": "Barbastelle",
-      "ja": "バーバステル"
-    },
+    "nameId": 2929,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -653,11 +600,7 @@
   },
   "bloody_mary": {
     "id": "bloody_mary",
-    "name": {
-      "en": "Bloody Mary",
-      "ja": "ブラッディ・マリー",
-      "fr": "Mary la sanglante"
-    },
+    "nameId": 2930,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -701,12 +644,7 @@
   },
   "dark_helmet": {
     "id": "dark_helmet",
-    "name": {
-      "en": "Dark Helmet",
-      "ja": "ダークヘルメット",
-      "fr": "Casque noir",
-      "de": "Dunkelhelm"
-    },
+    "nameId": 2931,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -748,10 +686,7 @@
   },
   "myradrosh": {
     "id": "myradrosh",
-    "name": {
-      "en": "Myradrosh",
-      "ja": "ミラドロッシュ"
-    },
+    "nameId": 2932,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -787,10 +722,7 @@
   },
   "vuokho": {
     "id": "vuokho",
-    "name": {
-      "en": "Vuokho",
-      "ja": "ヴオコー"
-    },
+    "nameId": 2933,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -832,10 +764,7 @@
   },
   "naul": {
     "id": "naul",
-    "name": {
-      "en": "Naul",
-      "ja": "ナウル"
-    },
+    "nameId": 2934,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -914,12 +843,7 @@
   },
   "leech_king": {
     "id": "leech_king",
-    "name": {
-      "en": "Leech King",
-      "ja": "リーチキング",
-      "fr": "Roi des sangsues",
-      "de": "Egelkönig"
-    },
+    "nameId": 2935,
     "rank": "B",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -968,10 +892,7 @@
   },
   "forneus": {
     "id": "forneus",
-    "name": {
-      "en": "Forneus",
-      "ja": "ファルネウス"
-    },
+    "nameId": 2936,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1023,12 +944,7 @@
   },
   "melt": {
     "id": "melt",
-    "name": {
-      "en": "Melt",
-      "ja": "メルティゼリー",
-      "fr": "Fondu",
-      "de": "Schmelze"
-    },
+    "nameId": 2937,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1092,12 +1008,7 @@
   },
   "ghede_ti_malice": {
     "id": "ghede_ti_malice",
-    "name": {
-      "en": "Ghede Ti Malice",
-      "ja": "ゲーデ",
-      "fr": "Guédé Ti-Malice",
-      "de": "Ghede Titus Häme"
-    },
+    "nameId": 2938,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1154,10 +1065,7 @@
   },
   "girtab": {
     "id": "girtab",
-    "name": {
-      "en": "Girtab",
-      "ja": "ギルタブ"
-    },
+    "nameId": 2939,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1206,10 +1114,7 @@
   },
   "alectryon": {
     "id": "alectryon",
-    "name": {
-      "en": "Alectryon",
-      "ja": "アレクトリオン"
-    },
+    "nameId": 2940,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1260,11 +1165,7 @@
   },
   "sabotender_bailarina": {
     "id": "sabotender_bailarina",
-    "name": {
-      "en": "Sabotender Bailarina",
-      "ja": "サボテンダー・バイラリーナ",
-      "fr": "Pampa ballerine"
-    },
+    "nameId": 2941,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1316,10 +1217,7 @@
   },
   "maahas": {
     "id": "maahas",
-    "name": {
-      "en": "Maahes",
-      "ja": "マヘス"
-    },
+    "nameId": 2942,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1381,10 +1279,7 @@
   },
   "zanigoh": {
     "id": "zanigoh",
-    "name": {
-      "en": "Zanig'oh",
-      "ja": "ザニゴ"
-    },
+    "nameId": 2943,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1455,12 +1350,7 @@
   },
   "dalvags_final_flame": {
     "id": "dalvags_final_flame",
-    "name": {
-      "en": "Dalvag's Final Flame",
-      "ja": "ファイナルフレイム",
-      "fr": "Dernière flamme de Dalvag",
-      "de": "Letzte Flamme Dalvags"
-    },
+    "nameId": 2944,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1506,10 +1396,7 @@
   },
   "vogaal_ja": {
     "id": "vogaal_ja",
-    "name": {
-      "en": "Vogaal Ja",
-      "ja": "醜男のヴォガージャ"
-    },
+    "nameId": 2945,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1562,10 +1449,7 @@
   },
   "unktehi": {
     "id": "unktehi",
-    "name": {
-      "en": "Unktehi",
-      "ja": "ウンクテヒ"
-    },
+    "nameId": 2946,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1614,12 +1498,7 @@
   },
   "hellsclaw": {
     "id": "hellsclaw",
-    "name": {
-      "en": "Hellsclaw",
-      "ja": "魔導ヘルズクロー",
-      "fr": "Griffe des enfers magitek",
-      "de": "Höllenklaue"
-    },
+    "nameId": 2947,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1669,10 +1548,7 @@
   },
   "nahn": {
     "id": "nahn",
-    "name": {
-      "en": "Nahn",
-      "ja": "ナン"
-    },
+    "nameId": 2948,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1724,10 +1600,7 @@
   },
   "marberry": {
     "id": "marberry",
-    "name": {
-      "en": "Marberry",
-      "ja": "マーベリー"
-    },
+    "nameId": 2949,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1773,10 +1646,7 @@
   },
   "cornu": {
     "id": "cornu",
-    "name": {
-      "en": "Cornu",
-      "ja": "コンヌ"
-    },
+    "nameId": 2950,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1828,10 +1698,7 @@
   },
   "marraco": {
     "id": "marraco",
-    "name": {
-      "en": "Marraco",
-      "ja": "マラク"
-    },
+    "nameId": 2951,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1920,10 +1787,7 @@
   },
   "kurrea": {
     "id": "kurrea",
-    "name": {
-      "en": "Kurrea",
-      "ja": "クーレア"
-    },
+    "nameId": 2952,
     "rank": "A",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -1982,10 +1846,7 @@
   },
   "laideronnette": {
     "id": "laideronnette",
-    "name": {
-      "en": "Laideronnette",
-      "ja": "レドロネット"
-    },
+    "nameId": 2953,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2085,10 +1946,7 @@
   },
   "wulgaru": {
     "id": "wulgaru",
-    "name": {
-      "en": "Wulgaru",
-      "ja": "ウルガル"
-    },
+    "nameId": 2954,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2156,12 +2014,7 @@
   },
   "mindflayer": {
     "id": "mindflayer",
-    "name": {
-      "en": "Mindflayer",
-      "ja": "マインドフレア",
-      "fr": "Flagelleur Mental",
-      "de": "Seelenbrenner"
-    },
+    "nameId": 2955,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2251,12 +2104,7 @@
   },
   "thousand_cast_theda": {
     "id": "thousand_cast_theda",
-    "name": {
-      "en": "Thousand-cast Theda",
-      "ja": "サウザンドキャスト・セダ",
-      "fr": "Theda la Tripoteuse",
-      "de": "Tausendzahn-Theda"
-    },
+    "nameId": 2956,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2323,11 +2171,7 @@
   },
   "zona_seeker": {
     "id": "zona_seeker",
-    "name": {
-      "en": "Zona Seeker",
-      "ja": "ゾーナ・シーカー",
-      "de": "Zona Sucher"
-    },
+    "nameId": 2957,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2411,10 +2255,7 @@
   },
   "brontes": {
     "id": "brontes",
-    "name": {
-      "en": "Brontes",
-      "ja": "ブロンテス"
-    },
+    "nameId": 2958,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2471,12 +2312,7 @@
   },
   "lampalagua": {
     "id": "lampalagua",
-    "name": {
-      "en": "Lampalagua",
-      "ja": "バルウール",
-      "fr": "Balaur",
-      "de": "Balaur"
-    },
+    "nameId": 2959,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2541,10 +2377,7 @@
   },
   "nunyunuwi": {
     "id": "nunyunuwi",
-    "name": {
-      "en": "Nunyunuwi",
-      "ja": "ヌニュヌウィ"
-    },
+    "nameId": 558,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2608,10 +2441,7 @@
   },
   "minhocao": {
     "id": "minhocao",
-    "name": {
-      "en": "Minhocao",
-      "ja": "ミニョーカオン"
-    },
+    "nameId": 2961,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2661,11 +2491,7 @@
   },
   "croque_mitaine": {
     "id": "croque_mitaine",
-    "name": {
-      "en": "Croque-mitaine",
-      "ja": "クロック・ミテーヌ",
-      "de": "Croque Mitaine"
-    },
+    "nameId": 2962,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2736,12 +2562,7 @@
   },
   "croakadile": {
     "id": "croakadile",
-    "name": {
-      "en": "Croakadile",
-      "ja": "ケロゲロス",
-      "fr": "Croabéros",
-      "de": "Quakquak"
-    },
+    "nameId": 2963,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2824,12 +2645,7 @@
   },
   "the_garlok": {
     "id": "the_garlok",
-    "name": {
-      "en": "The Garlok",
-      "ja": "ガーロック",
-      "fr": "Garlok",
-      "de": "Garlok"
-    },
+    "nameId": 2964,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2930,10 +2746,7 @@
   },
   "bonnacon": {
     "id": "bonnacon",
-    "name": {
-      "en": "Bonnacon",
-      "ja": "ボナコン"
-    },
+    "nameId": 2965,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -2994,10 +2807,7 @@
   },
   "nandi": {
     "id": "nandi",
-    "name": {
-      "en": "Nandi",
-      "ja": "ナンディ"
-    },
+    "nameId": 2966,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -3048,12 +2858,7 @@
   },
   "chernobog": {
     "id": "chernobog",
-    "name": {
-      "en": "Chernobog",
-      "ja": "チェルノボーグ",
-      "fr": "Czernobog",
-      "de": "Czernobog"
-    },
+    "nameId": 2967,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -3109,10 +2914,7 @@
   },
   "safat": {
     "id": "safat",
-    "name": {
-      "en": "Safat",
-      "ja": "サファト"
-    },
+    "nameId": 2968,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -3205,12 +3007,7 @@
   },
   "agrippa_the_mighty": {
     "id": "agrippa_the_mighty",
-    "name": {
-      "en": "Agrippa the Mighty",
-      "ja": "アグリッパ",
-      "fr": "Agrippa",
-      "de": "Agrippa"
-    },
+    "nameId": 2969,
     "rank": "S",
     "expansionId": "a_realm_reborn",
     "zoneIds": [
@@ -3257,11 +3054,7 @@
   },
   "noctilucale": {
     "id": "noctilucale",
-    "name": {
-      "en": "Noctilucale",
-      "ja": "ノクチルカ",
-      "de": "Nocticula"
-    },
+    "nameId": 3783,
     "rank": "F",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3302,12 +3095,7 @@
   },
   "coeurlregina": {
     "id": "coeurlregina",
-    "name": {
-      "en": "Coeurlregina",
-      "ja": "クァールレギナ",
-      "fr": "Regina coeurl",
-      "de": "Coeurl-Königin"
-    },
+    "nameId": 3789,
     "rank": "F",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3401,12 +3189,7 @@
   },
   "alteci": {
     "id": "alteci",
-    "name": {
-      "en": "Alteci",
-      "ja": "アルティック",
-      "fr": "Altek",
-      "de": "Artic"
-    },
+    "nameId": 4350,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3437,10 +3220,7 @@
   },
   "kreutzet": {
     "id": "kreutzet",
-    "name": {
-      "en": "Kreutzet",
-      "ja": "クルーゼ"
-    },
+    "nameId": 4351,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3471,12 +3251,7 @@
   },
   "gnath_cometdrone": {
     "id": "gnath_cometdrone",
-    "name": {
-      "en": "Gnath Cometdrone",
-      "ja": "グナース・コメットドローン",
-      "fr": "Gnathe myrmicomète",
-      "de": "Gnath-Kometdrohne"
-    },
+    "nameId": 4352,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3504,12 +3279,7 @@
   },
   "thextera": {
     "id": "thextera",
-    "name": {
-      "en": "Thextera",
-      "ja": "テクスタ",
-      "fr": "Texta",
-      "de": "Dexter"
-    },
+    "nameId": 4353,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3537,10 +3307,7 @@
   },
   "pterygotus": {
     "id": "pterygotus",
-    "name": {
-      "en": "Pterygotus",
-      "ja": "プテリゴトゥス"
-    },
+    "nameId": 4354,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3570,12 +3337,7 @@
   },
   "false_gigantopithecus": {
     "id": "false_gigantopithecus",
-    "name": {
-      "en": "False Gigantopithecus",
-      "ja": "ブラクキ",
-      "fr": "Gigantopithèque",
-      "de": "Gigantopithecus"
-    },
+    "nameId": 4355,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3605,10 +3367,7 @@
   },
   "scitalis": {
     "id": "scitalis",
-    "name": {
-      "en": "Scitalis",
-      "ja": "スキタリス"
-    },
+    "nameId": 4356,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3637,12 +3396,7 @@
   },
   "the_scarecrow": {
     "id": "the_scarecrow",
-    "name": {
-      "en": "The Scarecrow",
-      "ja": "スケアクロウ",
-      "fr": "Dracosaure Primus",
-      "de": "Tyranno"
-    },
+    "nameId": 4357,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3673,10 +3427,7 @@
   },
   "squonk": {
     "id": "squonk",
-    "name": {
-      "en": "Squonk",
-      "ja": "スクオンク"
-    },
+    "nameId": 4358,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3708,12 +3459,7 @@
   },
   "sanu_vali_of_dancing_wings": {
     "id": "sanu_vali_of_dancing_wings",
-    "name": {
-      "en": "Sanu Vali of Dancing Wings",
-      "ja": "舞手のサヌバリ",
-      "fr": "Sanu Vali",
-      "de": "Sanu Vali die Tanzende Schwinge"
-    },
+    "nameId": 4359,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3745,11 +3491,7 @@
   },
   "lycidas": {
     "id": "lycidas",
-    "name": {
-      "en": "Lycidas",
-      "ja": "リュキダス",
-      "de": "Lykidas"
-    },
+    "nameId": 4360,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3778,10 +3520,7 @@
   },
   "omni": {
     "id": "omni",
-    "name": {
-      "en": "Omni",
-      "ja": "オムニ"
-    },
+    "nameId": 4361,
     "rank": "B",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3810,10 +3549,7 @@
   },
   "mirka": {
     "id": "mirka",
-    "name": {
-      "en": "Mirka",
-      "ja": "ミルカ"
-    },
+    "nameId": 4362,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3866,10 +3602,7 @@
   },
   "lyuba": {
     "id": "lyuba",
-    "name": {
-      "en": "Lyuba",
-      "ja": "リューバ"
-    },
+    "nameId": 4363,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3922,12 +3655,7 @@
   },
   "pylraster": {
     "id": "pylraster",
-    "name": {
-      "en": "Pylraster",
-      "ja": "パイルラスタ",
-      "fr": "Pirlasta",
-      "de": "Xhauron"
-    },
+    "nameId": 4364,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -3971,12 +3699,7 @@
   },
   "lord_of_the_wyverns": {
     "id": "lord_of_the_wyverns",
-    "name": {
-      "en": "Lord of the Wyverns",
-      "ja": "ワイバーンロード",
-      "fr": "Seigneur des wyvernes",
-      "de": "Wyvern-Lord"
-    },
+    "nameId": 4365,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4020,12 +3743,7 @@
   },
   "slipkinx_steeljoints": {
     "id": "slipkinx_steeljoints",
-    "name": {
-      "en": "Slipkinx Steeljoints",
-      "ja": "機兵のスリップキンクス",
-      "fr": "Slipkinx Joints-d'acier",
-      "de": "Rutschfix Stahlscharnier"
-    },
+    "nameId": 4366,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4070,10 +3788,7 @@
   },
   "stolas": {
     "id": "stolas",
-    "name": {
-      "en": "Stolas",
-      "ja": "ストラス"
-    },
+    "nameId": 4367,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4119,10 +3834,7 @@
   },
   "bune": {
     "id": "bune",
-    "name": {
-      "en": "Bune",
-      "ja": "ブネ"
-    },
+    "nameId": 4368,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4165,10 +3877,7 @@
   },
   "agathos": {
     "id": "agathos",
-    "name": {
-      "en": "Agathos",
-      "ja": "アガトス"
-    },
+    "nameId": 4369,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4212,12 +3921,7 @@
   },
   "enkelados": {
     "id": "enkelados",
-    "name": {
-      "en": "Enkelados",
-      "ja": "エンケドラス",
-      "fr": "Enkélados",
-      "de": "Engedoras"
-    },
+    "nameId": 4370,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4266,10 +3970,7 @@
   },
   "sisiutl": {
     "id": "sisiutl",
-    "name": {
-      "en": "Sisiutl",
-      "ja": "シシウトゥル"
-    },
+    "nameId": 4371,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4318,10 +4019,7 @@
   },
   "campacti": {
     "id": "campacti",
-    "name": {
-      "en": "Campacti",
-      "ja": "キャムパクティ"
-    },
+    "nameId": 4372,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4370,12 +4068,7 @@
   },
   "stench_blossom": {
     "id": "stench_blossom",
-    "name": {
-      "en": "Stench Blossom",
-      "ja": "センチブロッサム",
-      "fr": "Fleur nauséabonde",
-      "de": "Pestwurz"
-    },
+    "nameId": 4373,
     "rank": "A",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4424,12 +4117,7 @@
   },
   "kaiser_behemoth": {
     "id": "kaiser_behemoth",
-    "name": {
-      "en": "Kaiser Behemoth",
-      "ja": "カイザーベヒーモス",
-      "fr": "Béhémoth Empereur",
-      "de": "Kaiser-Behemoth"
-    },
+    "nameId": 4374,
     "rank": "S",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4481,12 +4169,7 @@
   },
   "senmurv": {
     "id": "senmurv",
-    "name": {
-      "en": "Senmurv",
-      "ja": "セーンムルウ",
-      "fr": "Sênmurw",
-      "de": "Simurgh"
-    },
+    "nameId": 4375,
     "rank": "S",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4538,12 +4221,7 @@
   },
   "the_pale_rider": {
     "id": "the_pale_rider",
-    "name": {
-      "en": "The Pale Rider",
-      "ja": "ペイルライダー",
-      "fr": "Cavalier Pâle",
-      "de": "Bleicher Reiter"
-    },
+    "nameId": 4376,
     "rank": "S",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4598,12 +4276,7 @@
   },
   "gandarewa": {
     "id": "gandarewa",
-    "name": {
-      "en": "Gandarewa",
-      "ja": "ガンダルヴァ",
-      "fr": "Gandharva",
-      "de": "Gandalva"
-    },
+    "nameId": 4377,
     "rank": "S",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4684,12 +4357,7 @@
   },
   "bird_of_paradise": {
     "id": "bird_of_paradise",
-    "name": {
-      "en": "Bird of Paradise",
-      "ja": "極楽鳥",
-      "fr": "Oiseau de Paradis",
-      "de": "Paradiesvogel"
-    },
+    "nameId": 4378,
     "rank": "S",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4748,10 +4416,7 @@
   },
   "leucrotta": {
     "id": "leucrotta",
-    "name": {
-      "en": "Leucrotta",
-      "ja": "レウクロッタ"
-    },
+    "nameId": 4380,
     "rank": "S",
     "expansionId": "heavensward",
     "zoneIds": [
@@ -4804,10 +4469,7 @@
   },
   "okina": {
     "id": "okina",
-    "name": {
-      "en": "Okina",
-      "ja": "オキナ"
-    },
+    "nameId": 5984,
     "rank": "S",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -4858,10 +4520,7 @@
   },
   "gamma": {
     "id": "gamma",
-    "name": {
-      "en": "Gamma",
-      "ja": "ガンマ"
-    },
+    "nameId": 5985,
     "rank": "S",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -4916,10 +4575,7 @@
   },
   "orghana": {
     "id": "orghana",
-    "name": {
-      "en": "Orghana",
-      "ja": "オルガナ"
-    },
+    "nameId": 5986,
     "rank": "S",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -4971,10 +4627,7 @@
   },
   "udumbara": {
     "id": "udumbara",
-    "name": {
-      "en": "Udumbara",
-      "ja": "ウドンゲ"
-    },
+    "nameId": 5987,
     "rank": "S",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5015,12 +4668,7 @@
   },
   "bone_crawler": {
     "id": "bone_crawler",
-    "name": {
-      "en": "Bone Crawler",
-      "ja": "ボーンクローラー",
-      "fr": "Mangeur D'os",
-      "de": "Knochenkriecher"
-    },
+    "nameId": 5988,
     "rank": "S",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5064,12 +4712,7 @@
   },
   "salt_and_light": {
     "id": "salt_and_light",
-    "name": {
-      "en": "Salt and Light",
-      "ja": "ソルト・アンド・ライト",
-      "fr": "Salaclux",
-      "de": "Salzlicht"
-    },
+    "nameId": 5989,
     "rank": "S",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5111,10 +4754,7 @@
   },
   "orcus": {
     "id": "orcus",
-    "name": {
-      "en": "Orcus",
-      "ja": "オルクス"
-    },
+    "nameId": 5990,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5151,10 +4791,7 @@
   },
   "erle": {
     "id": "erle",
-    "name": {
-      "en": "Erle",
-      "ja": "アール"
-    },
+    "nameId": 5991,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5190,10 +4827,7 @@
   },
   "vochstein": {
     "id": "vochstein",
-    "name": {
-      "en": "Vochstein",
-      "ja": "バックスタイン"
-    },
+    "nameId": 5992,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5239,10 +4873,7 @@
   },
   "aqrabuamelu": {
     "id": "aqrabuamelu",
-    "name": {
-      "en": "Aqrabuamelu",
-      "ja": "アクラブアメル"
-    },
+    "nameId": 5993,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5284,10 +4915,7 @@
   },
   "mahisha": {
     "id": "mahisha",
-    "name": {
-      "en": "Mahisha",
-      "ja": "マヒシャ"
-    },
+    "nameId": 5994,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5326,10 +4954,7 @@
   },
   "luminare": {
     "id": "luminare",
-    "name": {
-      "en": "Luminare",
-      "ja": "ルミナーレ"
-    },
+    "nameId": 5995,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5370,10 +4995,7 @@
   },
   "funa_yurei": {
     "id": "funa_yurei",
-    "name": {
-      "en": "Funa Yurei",
-      "ja": "船幽霊"
-    },
+    "nameId": 5996,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5411,10 +5033,7 @@
   },
   "oni_yumemi": {
     "id": "oni_yumemi",
-    "name": {
-      "en": "Oni Yumemi",
-      "ja": "オニユメミ"
-    },
+    "nameId": 5997,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5452,10 +5071,7 @@
   },
   "gajasura": {
     "id": "gajasura",
-    "name": {
-      "en": "Gajasura",
-      "ja": "ガジャースラ"
-    },
+    "nameId": 5998,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5492,10 +5108,7 @@
   },
   "angada": {
     "id": "angada",
-    "name": {
-      "en": "Angada",
-      "ja": "アンガダ"
-    },
+    "nameId": 5999,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5532,10 +5145,7 @@
   },
   "girimekhala": {
     "id": "girimekhala",
-    "name": {
-      "en": "Girimekhala",
-      "ja": "ギリメカラ"
-    },
+    "nameId": 6000,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5582,10 +5192,7 @@
   },
   "sum": {
     "id": "sum",
-    "name": {
-      "en": "Sum",
-      "ja": "ソム"
-    },
+    "nameId": 6001,
     "rank": "A",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5632,12 +5239,7 @@
   },
   "gauki_strongblade": {
     "id": "gauki_strongblade",
-    "name": {
-      "en": "Gauki Strongblade",
-      "ja": "剣豪ガウキ",
-      "fr": "Gauki la Lame forte",
-      "de": "Gauki Starkklinge"
-    },
+    "nameId": 6002,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5663,10 +5265,7 @@
   },
   "guhuo_niao": {
     "id": "guhuo_niao",
-    "name": {
-      "en": "Guhuo Niao",
-      "ja": "姑獲鳥"
-    },
+    "nameId": 6003,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5692,10 +5291,7 @@
   },
   "deidar": {
     "id": "deidar",
-    "name": {
-      "en": "Deidar",
-      "ja": "デイダラ"
-    },
+    "nameId": 6004,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5721,12 +5317,7 @@
   },
   "gyorai_quickstrike": {
     "id": "gyorai_quickstrike",
-    "name": {
-      "en": "Gyorai Quickstrike",
-      "ja": "雷撃のギョライ",
-      "fr": "Gyorai le Vif",
-      "de": "Gyorai Schnellschlag"
-    },
+    "nameId": 6005,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5752,10 +5343,7 @@
   },
   "kurma": {
     "id": "kurma",
-    "name": {
-      "en": "Kurma",
-      "ja": "クールマ"
-    },
+    "nameId": 6006,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5783,10 +5371,7 @@
   },
   "aswang": {
     "id": "aswang",
-    "name": {
-      "en": "Aswang",
-      "ja": "アスワング"
-    },
+    "nameId": 6007,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5814,12 +5399,7 @@
   },
   "shadow_dweller_yamini": {
     "id": "shadow_dweller_yamini",
-    "name": {
-      "en": "Shadow-dweller Yamini",
-      "ja": "宵闇のヤミニ",
-      "fr": "Yamini la Nocturne",
-      "de": "Schattenkauer-Yamini"
-    },
+    "nameId": 6008,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5845,10 +5425,7 @@
   },
   "ouzelum": {
     "id": "ouzelum",
-    "name": {
-      "en": "Ouzelum",
-      "ja": "オゼルム"
-    },
+    "nameId": 6009,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5880,10 +5457,7 @@
   },
   "gwas_y_neidr": {
     "id": "gwas_y_neidr",
-    "name": {
-      "en": "Gwas-y-neidr",
-      "ja": "グアス・ア・ニードル"
-    },
+    "nameId": 6010,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5911,11 +5485,7 @@
   },
   "buccaboo": {
     "id": "buccaboo",
-    "name": {
-      "en": "Buccaboo",
-      "ja": "ブッカブー",
-      "fr": "Bucca-boo"
-    },
+    "nameId": 6011,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5943,10 +5513,7 @@
   },
   "manes": {
     "id": "manes",
-    "name": {
-      "en": "Manes",
-      "ja": "マネス"
-    },
+    "nameId": 6012,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -5974,10 +5541,7 @@
   },
   "kiwa": {
     "id": "kiwa",
-    "name": {
-      "en": "Kiwa",
-      "ja": "キワ"
-    },
+    "nameId": 6013,
     "rank": "B",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -6002,12 +5566,7 @@
   },
   "tamamo_gozen": {
     "id": "tamamo_gozen",
-    "name": {
-      "en": "Tamamo Gozen",
-      "ja": "玉藻御前",
-      "fr": "Tamamo-no-Gozen",
-      "de": "Tamamo no Gozen"
-    },
+    "nameId": 6290,
     "rank": "F",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -6046,10 +5605,7 @@
   },
   "ixion": {
     "id": "ixion",
-    "name": {
-      "en": "Ixion",
-      "ja": "イクシオン"
-    },
+    "nameId": 6392,
     "rank": "F",
     "expansionId": "stormblood",
     "zoneIds": [
@@ -6088,10 +5644,7 @@
   },
   "archaeotania": {
     "id": "archaeotania",
-    "name": {
-      "en": "Archaeotania",
-      "ja": "アルケオタニア"
-    },
+    "nameId": 8234,
     "rank": "F",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6142,10 +5695,7 @@
   },
   "aglaope": {
     "id": "aglaope",
-    "name": {
-      "en": "Aglaope",
-      "ja": "アグラオペ"
-    },
+    "nameId": 8653,
     "rank": "S",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6211,12 +5761,7 @@
   },
   "the_mudman": {
     "id": "the_mudman",
-    "name": {
-      "en": "The Mudman",
-      "ja": "泥人",
-      "fr": "Tas de boue",
-      "de": "Matschklops"
-    },
+    "nameId": 8654,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6261,12 +5806,7 @@
   },
   "o_poorest_pauldia": {
     "id": "o_poorest_pauldia",
-    "name": {
-      "en": "O Poorest Pauldia",
-      "ja": "ポールディア",
-      "fr": "Pauldia",
-      "de": "Gepeinigter Pauldia"
-    },
+    "nameId": 8655,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6311,11 +5851,7 @@
   },
   "domovoi": {
     "id": "domovoi",
-    "name": {
-      "en": "Domovoi",
-      "ja": "ドモヴォーイ",
-      "fr": "Domovoï"
-    },
+    "nameId": 8656,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6345,10 +5881,7 @@
   },
   "vulpangue": {
     "id": "vulpangue",
-    "name": {
-      "en": "Vulpangue",
-      "ja": "ヴルパングエ"
-    },
+    "nameId": 8657,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6373,11 +5906,7 @@
   },
   "formidable": {
     "id": "formidable",
-    "name": {
-      "en": "Formidable",
-      "ja": "フォーミダブル",
-      "de": "Formidabel"
-    },
+    "nameId": 8822,
     "rank": "F",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6416,10 +5945,7 @@
   },
   "ixtab": {
     "id": "ixtab",
-    "name": {
-      "en": "Ixtab",
-      "ja": "イシュタム"
-    },
+    "nameId": 5025,
     "rank": "S",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6483,10 +6009,7 @@
   },
   "supay": {
     "id": "supay",
-    "name": {
-      "en": "Supay",
-      "ja": "スペイ"
-    },
+    "nameId": 8891,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6530,12 +6053,7 @@
   },
   "grassman": {
     "id": "grassman",
-    "name": {
-      "en": "Grassman",
-      "ja": "グラスマン",
-      "fr": "Sasquatch arboricole",
-      "de": "Grasmann"
-    },
+    "nameId": 8892,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6576,12 +6094,7 @@
   },
   "mindmaker": {
     "id": "mindmaker",
-    "name": {
-      "en": "Mindmaker",
-      "ja": "マインドメーカー",
-      "fr": "Maître-penseur",
-      "de": "Freigeist"
-    },
+    "nameId": 8893,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6609,10 +6122,7 @@
   },
   "pachamama": {
     "id": "pachamama",
-    "name": {
-      "en": "Pachamama",
-      "ja": "パチャママ"
-    },
+    "nameId": 8894,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6638,10 +6148,7 @@
   },
   "gunitt": {
     "id": "gunitt",
-    "name": {
-      "en": "Gunitt",
-      "ja": "グニット"
-    },
+    "nameId": 8895,
     "rank": "S",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6705,11 +6212,7 @@
   },
   "rusalka": {
     "id": "rusalka",
-    "name": {
-      "en": "Rusalka",
-      "ja": "ルサルカ",
-      "fr": "Roussalka"
-    },
+    "nameId": 8896,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6755,10 +6258,7 @@
   },
   "baal": {
     "id": "baal",
-    "name": {
-      "en": "Baal",
-      "ja": "バール"
-    },
+    "nameId": 8897,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6804,12 +6304,7 @@
   },
   "gilshs_aath_swiftclaw": {
     "id": "gilshs_aath_swiftclaw",
-    "name": {
-      "en": "Gilshs Aath Swiftclaw",
-      "ja": "手掴のギウスィー・アース",
-      "fr": "Gilshs Aath l'étrangleur",
-      "de": "Gilshs Aath"
-    },
+    "nameId": 8898,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6836,12 +6331,7 @@
   },
   "deacon": {
     "id": "deacon",
-    "name": {
-      "en": "Deacon",
-      "ja": "ディーコン",
-      "fr": "Diacre",
-      "de": "Diakon"
-    },
+    "nameId": 8899,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6869,10 +6359,7 @@
   },
   "tarchia": {
     "id": "tarchia",
-    "name": {
-      "en": "Tarchia",
-      "ja": "タルキア"
-    },
+    "nameId": 8900,
     "rank": "S",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6937,12 +6424,7 @@
   },
   "maliktender": {
     "id": "maliktender",
-    "name": {
-      "en": "Maliktender",
-      "ja": "マリクテンダー",
-      "fr": "Malikpampa",
-      "de": "Malikkaktor"
-    },
+    "nameId": 8901,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -6980,10 +6462,7 @@
   },
   "sugaar": {
     "id": "sugaar",
-    "name": {
-      "en": "Sugaar",
-      "ja": "シュガール"
-    },
+    "nameId": 8902,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7029,12 +6508,7 @@
   },
   "worm_of_the_well": {
     "id": "worm_of_the_well",
-    "name": {
-      "en": "Worm of the Well",
-      "ja": "ウェルウォーム",
-      "fr": "Verpuy",
-      "de": "Wurm des Brunnens"
-    },
+    "nameId": 8903,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7062,12 +6536,7 @@
   },
   "juggler_hecatomb": {
     "id": "juggler_hecatomb",
-    "name": {
-      "en": "Juggler Hecatomb",
-      "ja": "ジャグラー・ヘカトゥーム",
-      "fr": "Jongleur hécatombe",
-      "de": "Gaukler Hecatomb"
-    },
+    "nameId": 8904,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7095,11 +6564,7 @@
   },
   "tyger": {
     "id": "tyger",
-    "name": {
-      "en": "Tyger",
-      "ja": "ティガー",
-      "fr": "Tygre"
-    },
+    "nameId": 8905,
     "rank": "S",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7163,10 +6628,7 @@
   },
   "nuckelavee": {
     "id": "nuckelavee",
-    "name": {
-      "en": "Nuckelavee",
-      "ja": "ナックラヴィー"
-    },
+    "nameId": 8906,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7201,10 +6663,7 @@
   },
   "nariphon": {
     "id": "nariphon",
-    "name": {
-      "en": "Nariphon",
-      "ja": "ナリーポン"
-    },
+    "nameId": 8907,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7251,11 +6710,7 @@
   },
   "la_velue": {
     "id": "la_velue",
-    "name": {
-      "en": "La Velue",
-      "ja": "ラ・ヴェリュ",
-      "fr": "Velue"
-    },
+    "nameId": 8908,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7283,10 +6738,7 @@
   },
   "itzpapalotl": {
     "id": "itzpapalotl",
-    "name": {
-      "en": "Itzpapalotl",
-      "ja": "イツパパロツル"
-    },
+    "nameId": 8909,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7314,12 +6766,7 @@
   },
   "forgiven_pedantry": {
     "id": "forgiven_pedantry",
-    "name": {
-      "en": "Forgiven Pedantry",
-      "ja": "フォーギヴン・ペダントリー",
-      "fr": "Pédanterie Pardonnée",
-      "de": "Geläuterte Pedanterie"
-    },
+    "nameId": 8910,
     "rank": "S",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7385,12 +6832,7 @@
   },
   "lil_murderer": {
     "id": "lil_murderer",
-    "name": {
-      "en": "Li'l Murderer",
-      "ja": "リルマーダー",
-      "fr": "Traître",
-      "de": "Kleiner Mörder"
-    },
+    "nameId": 8911,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7436,10 +6878,7 @@
   },
   "huracan": {
     "id": "huracan",
-    "name": {
-      "en": "Huracan",
-      "ja": "フラカン"
-    },
+    "nameId": 8912,
     "rank": "A",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7478,10 +6917,7 @@
   },
   "coquecigrue": {
     "id": "coquecigrue",
-    "name": {
-      "en": "Coquecigrue",
-      "ja": "コクシグルー"
-    },
+    "nameId": 8913,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7510,12 +6946,7 @@
   },
   "indomitable": {
     "id": "indomitable",
-    "name": {
-      "en": "Indomitable",
-      "ja": "インドミタブル",
-      "fr": "Indomptable",
-      "de": "Unbezähmbar"
-    },
+    "nameId": 8914,
     "rank": "B",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7541,12 +6972,7 @@
   },
   "forgiven_rebellion": {
     "id": "forgiven_rebellion",
-    "name": {
-      "en": "Forgiven Rebellion",
-      "ja": "フォーギヴン・リベリオン",
-      "fr": "Rébellion Pardonnée",
-      "de": "Geläuterte Rebellion"
-    },
+    "nameId": 8915,
     "rank": "SS",
     "expansionId": "shadowbringers",
     "zoneIds": [
@@ -7617,10 +7043,7 @@
   },
   "daivadipa": {
     "id": "daivadipa",
-    "name": {
-      "en": "Daivadipa",
-      "ja": "ダイヴァディーパ"
-    },
+    "nameId": 10269,
     "rank": "F",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -7659,11 +7082,7 @@
   },
   "chi": {
     "id": "chi",
-    "name": {
-      "en": "Chi",
-      "ja": "カイ",
-      "fr": "Khi"
-    },
+    "nameId": 10400,
     "rank": "F",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -7702,10 +7121,7 @@
   },
   "ker": {
     "id": "ker",
-    "name": {
-      "en": "Ker",
-      "ja": "ケール"
-    },
+    "nameId": 10615,
     "rank": "SS",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -7776,12 +7192,7 @@
   },
   "burfurlur_the_canny": {
     "id": "burfurlur_the_canny",
-    "name": {
-      "en": "Burfurlur the Canny",
-      "ja": "ブーフールー",
-      "fr": "Burfurlur",
-      "de": "Burfurlur der Gerissene"
-    },
+    "nameId": 10617,
     "rank": "S",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -7880,10 +7291,7 @@
   },
   "sphatika": {
     "id": "sphatika",
-    "name": {
-      "en": "Sphatika",
-      "ja": "スパティカ"
-    },
+    "nameId": 10618,
     "rank": "S",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -7939,10 +7347,7 @@
   },
   "armstrong": {
     "id": "armstrong",
-    "name": {
-      "en": "Armstrong",
-      "ja": "アームストロング"
-    },
+    "nameId": 10619,
     "rank": "S",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -7999,11 +7404,7 @@
   },
   "ruminator": {
     "id": "ruminator",
-    "name": {
-      "en": "Ruminator",
-      "ja": "ルミネイター",
-      "de": "Grübler"
-    },
+    "nameId": 10620,
     "rank": "S",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8061,10 +7462,7 @@
   },
   "ophioneus": {
     "id": "ophioneus",
-    "name": {
-      "en": "Ophioneus",
-      "ja": "オピオネウス"
-    },
+    "nameId": 10621,
     "rank": "S",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8122,12 +7520,7 @@
   },
   "narrow_rift": {
     "id": "narrow_rift",
-    "name": {
-      "en": "Narrow-rift",
-      "ja": "ナロー＝リフト",
-      "fr": "Rift-étroit",
-      "de": "Enger Riss"
-    },
+    "nameId": 10622,
     "rank": "S",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8184,10 +7577,7 @@
   },
   "storsie": {
     "id": "storsie",
-    "name": {
-      "en": "Storsie",
-      "ja": "ストーシー"
-    },
+    "nameId": 10623,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8226,11 +7616,7 @@
   },
   "hulder": {
     "id": "hulder",
-    "name": {
-      "en": "Hulder",
-      "ja": "フルドラ",
-      "fr": "Huldre"
-    },
+    "nameId": 10624,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8269,10 +7655,7 @@
   },
   "yilan": {
     "id": "yilan",
-    "name": {
-      "en": "Yilan",
-      "ja": "ユラン"
-    },
+    "nameId": 10625,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8310,10 +7693,7 @@
   },
   "sugriva": {
     "id": "sugriva",
-    "name": {
-      "en": "Sugriva",
-      "ja": "スグリーヴァ"
-    },
+    "nameId": 10626,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8351,10 +7731,7 @@
   },
   "minerva": {
     "id": "minerva",
-    "name": {
-      "en": "Minerva",
-      "ja": "ミネルウァ"
-    },
+    "nameId": 10627,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8392,11 +7769,7 @@
   },
   "aegeiros": {
     "id": "aegeiros",
-    "name": {
-      "en": "Aegeiros",
-      "ja": "アイゲイロス",
-      "fr": "Ægeiros"
-    },
+    "nameId": 10628,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8434,12 +7807,7 @@
   },
   "lunatender_queen": {
     "id": "lunatender_queen",
-    "name": {
-      "en": "Lunatender Queen",
-      "ja": "ルナテンダー・クイーン",
-      "fr": "Pampa sélénienne reine",
-      "de": "Lunatender-Königin"
-    },
+    "nameId": 10629,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8478,12 +7846,7 @@
   },
   "mousse_princess": {
     "id": "mousse_princess",
-    "name": {
-      "en": "Mousse Princess",
-      "ja": "ムースプリンセス",
-      "fr": "Princess mousse",
-      "de": "Mousse-Prinzessin"
-    },
+    "nameId": 10630,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8522,10 +7885,7 @@
   },
   "gurangatch": {
     "id": "gurangatch",
-    "name": {
-      "en": "Gurangatch",
-      "ja": "グランガチ"
-    },
+    "nameId": 10631,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8565,10 +7925,7 @@
   },
   "petalodus": {
     "id": "petalodus",
-    "name": {
-      "en": "Petalodus",
-      "ja": "ペタロドゥス"
-    },
+    "nameId": 10632,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8608,10 +7965,7 @@
   },
   "fan_ail": {
     "id": "fan_ail",
-    "name": {
-      "en": "Fan Ail",
-      "ja": "ファン・アイル"
-    },
+    "nameId": 10633,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8649,12 +8003,7 @@
   },
   "arch_eta": {
     "id": "arch_eta",
-    "name": {
-      "en": "Arch-Eta",
-      "ja": "アーチイータ",
-      "fr": "Arch-Êta",
-      "de": "Erz-Eta"
-    },
+    "nameId": 10634,
     "rank": "A",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8692,12 +8041,7 @@
   },
   "green_archon": {
     "id": "green_archon",
-    "name": {
-      "en": "Green Archon",
-      "ja": "草賢人",
-      "fr": "Preux feuillu",
-      "de": "Grüner Exeget"
-    },
+    "nameId": 10635,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8721,12 +8065,7 @@
   },
   "u_u_u_u": {
     "id": "u_u_u_u",
-    "name": {
-      "en": "Ü-u-ü-u",
-      "ja": "ウーヴウーヴ",
-      "fr": "Ü-u-ü-u",
-      "de": "Ü-u-ü-u"
-    },
+    "nameId": 10636,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8751,10 +8090,7 @@
   },
   "vajrakumara": {
     "id": "vajrakumara",
-    "name": {
-      "en": "Vajrakumara",
-      "ja": "ヴァジュラクマーラ"
-    },
+    "nameId": 10637,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8778,10 +8114,7 @@
   },
   "iravati": {
     "id": "iravati",
-    "name": {
-      "en": "Iravati",
-      "ja": "イラーヴァティ"
-    },
+    "nameId": 10638,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8805,12 +8138,7 @@
   },
   "warmonger": {
     "id": "warmonger",
-    "name": {
-      "en": "Warmonger",
-      "ja": "ウォーモンガー",
-      "fr": "Belliciste",
-      "de": "Kriegstreiber"
-    },
+    "nameId": 10639,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8834,12 +8162,7 @@
   },
   "emperors_rose": {
     "id": "emperors_rose",
-    "name": {
-      "en": "Emperor's Rose",
-      "ja": "エンペラーズローズ",
-      "fr": "Rosier de l'empereur",
-      "de": "Rose des Kaisers"
-    },
+    "nameId": 10640,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8863,12 +8186,7 @@
   },
   "daphnia_magna": {
     "id": "daphnia_magna",
-    "name": {
-      "en": "Daphnia Magna",
-      "ja": "ダフニアマグナ",
-      "fr": "Magna daphnie",
-      "de": "Daphnia Magna"
-    },
+    "nameId": 10641,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8892,12 +8210,7 @@
   },
   "genesis_rock": {
     "id": "genesis_rock",
-    "name": {
-      "en": "Genesis Rock",
-      "ja": "ジェネシスロック",
-      "fr": "Pierre de la genèse",
-      "de": "Genesisfels"
-    },
+    "nameId": 10642,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8921,10 +8234,7 @@
   },
   "yumcax": {
     "id": "yumcax",
-    "name": {
-      "en": "Yumcax",
-      "ja": "ユムカクス"
-    },
+    "nameId": 10643,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8949,12 +8259,7 @@
   },
   "shockmaw": {
     "id": "shockmaw",
-    "name": {
-      "en": "Shockmaw",
-      "ja": "ショックモー",
-      "fr": "Choc-gueule",
-      "de": "Schockschlund"
-    },
+    "nameId": 10644,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -8978,12 +8283,7 @@
   },
   "level_cheater": {
     "id": "level_cheater",
-    "name": {
-      "en": "Level Cheater",
-      "ja": "レベルチーター",
-      "fr": "Tricheniveau",
-      "de": "Stufenschummler"
-    },
+    "nameId": 10645,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -9007,10 +8307,7 @@
   },
   "oskh_rhei": {
     "id": "oskh_rhei",
-    "name": {
-      "en": "Oskh Rhei",
-      "ja": "オスク・レイ"
-    },
+    "nameId": 10646,
     "rank": "B",
     "expansionId": "endwalker",
     "zoneIds": [
@@ -9034,10 +8331,7 @@
   },
   "ttokrrone": {
     "id": "ttokrrone",
-    "name": {
-      "en": "Ttokrrone",
-      "ja": "トクローネ"
-    },
+    "nameId": 12733,
     "rank": "F",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9076,12 +8370,7 @@
   },
   "mica_the_magical_mu": {
     "id": "mica_the_magical_mu",
-    "name": {
-      "en": "Mica the Magical Mu",
-      "ja": "マイカ・ザ・ムー",
-      "fr": "Mica le mu",
-      "de": "Mica das Magische Mu"
-    },
+    "nameId": 13049,
     "rank": "F",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9120,12 +8409,7 @@
   },
   "mad_maguey": {
     "id": "mad_maguey",
-    "name": {
-      "en": "Mad Maguey",
-      "ja": "マッドマゲイ",
-      "fr": "Pita dément",
-      "de": "Aggressive Agave"
-    },
+    "nameId": 13144,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9149,10 +8433,7 @@
   },
   "chupacabra": {
     "id": "chupacabra",
-    "name": {
-      "en": "Chupacabra",
-      "ja": "チュパカブラ"
-    },
+    "nameId": 851,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9176,12 +8457,7 @@
   },
   "the_slammer": {
     "id": "the_slammer",
-    "name": {
-      "en": "The Slammer",
-      "ja": "ラムヘッド",
-      "fr": "Le Marteleur",
-      "de": "Rammkopf"
-    },
+    "nameId": 13146,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9205,10 +8481,7 @@
   },
   "goozoabekbe": {
     "id": "goozoabekbe",
-    "name": {
-      "en": "Go'ozoabek'be",
-      "ja": "ゴーゾアックベ"
-    },
+    "nameId": 13147,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9232,12 +8505,7 @@
   },
   "leafscourge_hadoll_ja": {
     "id": "leafscourge_hadoll_ja",
-    "name": {
-      "en": "Leafscourge Hadoll Ja",
-      "ja": "緑葉のハドージャ",
-      "fr": "Hadoll Ja le foufeuillu",
-      "de": "Blattgeißel Hadoll Ja"
-    },
+    "nameId": 13148,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9261,10 +8529,7 @@
   },
   "xtyiinbek": {
     "id": "xtyiinbek",
-    "name": {
-      "en": "Xty'iinbek",
-      "ja": "シュティーンベク"
-    },
+    "nameId": 13149,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9288,12 +8553,7 @@
   },
   "nopalitender_fabuloso": {
     "id": "nopalitender_fabuloso",
-    "name": {
-      "en": "Nopalitender Fabuloso",
-      "ja": "ノパルテンダー・ファビュローソー",
-      "fr": "Pampa de barbarie fabuleux",
-      "de": "Feigenkaktor Fabuloso"
-    },
+    "nameId": 13150,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9317,10 +8577,7 @@
   },
   "uktena": {
     "id": "uktena",
-    "name": {
-      "en": "Uktena",
-      "ja": "ウクテナ"
-    },
+    "nameId": 13151,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9344,12 +8601,7 @@
   },
   "gallowsbeak": {
     "id": "gallowsbeak",
-    "name": {
-      "en": "Gallowsbeak",
-      "ja": "ギャロウズビーク",
-      "fr": "Gibec",
-      "de": "Galgenschnabel"
-    },
+    "nameId": 13152,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9373,10 +8625,7 @@
   },
   "gargant": {
     "id": "gargant",
-    "name": {
-      "en": "Gargant",
-      "ja": "ガルガント"
-    },
+    "nameId": 13153,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9400,12 +8649,7 @@
   },
   "jewel_bearer": {
     "id": "jewel_bearer",
-    "name": {
-      "en": "Jewel Bearer",
-      "ja": "ジュエルベアラー",
-      "fr": "Porte-joyaux",
-      "de": "Juwelenträger"
-    },
+    "nameId": 13154,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9429,12 +8673,7 @@
   },
   "13th_child": {
     "id": "13th_child",
-    "name": {
-      "en": "13th Child",
-      "ja": "サーティーンス・チャイルド",
-      "fr": "Treizième enfant",
-      "de": "Dreizehntes Kind"
-    },
+    "nameId": 13155,
     "rank": "B",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9458,12 +8697,7 @@
   },
   "queen_hawk": {
     "id": "queen_hawk",
-    "name": {
-      "en": "Queen Hawk",
-      "ja": "クイーンホーク",
-      "fr": "Reine des guêpes",
-      "de": "Falkenkönigin"
-    },
+    "nameId": 13361,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9499,11 +8733,7 @@
   },
   "nechuciho": {
     "id": "nechuciho",
-    "name": {
-      "en": "Nechuciho",
-      "ja": "ネチュキホ",
-      "fr": "Nechukiho"
-    },
+    "nameId": 13362,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9539,12 +8769,7 @@
   },
   "the_raintriller": {
     "id": "the_raintriller",
-    "name": {
-      "en": "The Raintriller",
-      "ja": "レイントリラー",
-      "fr": "Le Trilleur de pluie",
-      "de": "Regentriller"
-    },
+    "nameId": 13442,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9581,10 +8806,7 @@
   },
   "pkuucha": {
     "id": "pkuucha",
-    "name": {
-      "en": "Pkuucha",
-      "ja": "プクーチャ"
-    },
+    "nameId": 13443,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9621,12 +8843,7 @@
   },
   "starcrier": {
     "id": "starcrier",
-    "name": {
-      "en": "Starcrier",
-      "ja": "幻煌鳥",
-      "fr": "Furopluminescent",
-      "de": "Sternschreier"
-    },
+    "nameId": 12692,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9662,10 +8879,7 @@
   },
   "rrax_yitya": {
     "id": "rrax_yitya",
-    "name": {
-      "en": "Rrax Yity'a",
-      "ja": "ラシュイチャ"
-    },
+    "nameId": 12753,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9701,10 +8915,7 @@
   },
   "yehehetoauapyo": {
     "id": "yehehetoauapyo",
-    "name": {
-      "en": "Yehehetoaua'pyo",
-      "ja": "エヘヘトーワポ"
-    },
+    "nameId": 13400,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9741,10 +8952,7 @@
   },
   "keheniheyamewi": {
     "id": "keheniheyamewi",
-    "name": {
-      "en": "Keheniheyamewi",
-      "ja": "ケヘニヘヤメウィ"
-    },
+    "nameId": 13401,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9781,10 +8989,7 @@
   },
   "heshuala": {
     "id": "heshuala",
-    "name": {
-      "en": "Heshuala",
-      "ja": "ヘシュワラ"
-    },
+    "nameId": 13157,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9820,11 +9025,7 @@
   },
   "urna_variabilis": {
     "id": "urna_variabilis",
-    "name": {
-      "en": "Urna Variabilis",
-      "ja": "ヴァリアポッド",
-      "fr": "Pod variant"
-    },
+    "nameId": 13158,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9860,12 +9061,7 @@
   },
   "sally_the_sweeper": {
     "id": "sally_the_sweeper",
-    "name": {
-      "en": "Sally the Sweeper",
-      "ja": "サリー・ザ・スイーパー",
-      "fr": "Sally la balayeuse",
-      "de": "Sally die Fegerin"
-    },
+    "nameId": 13435,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9900,12 +9096,7 @@
   },
   "cats_eye": {
     "id": "cats_eye",
-    "name": {
-      "en": "Cat's Eye",
-      "ja": "キャッツアイ",
-      "fr": "Œil-de-chat",
-      "de": "Katzenauge"
-    },
+    "nameId": 13436,
     "rank": "A",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -9940,12 +9131,7 @@
   },
   "kirlirger_the_abhorrent": {
     "id": "kirlirger_the_abhorrent",
-    "name": {
-      "en": "Kirlirger the Abhorrent",
-      "ja": "厭忌のキーリーゲー",
-      "fr": "Kirlirger l'abominable",
-      "de": "Kirlirger der Abscheuliche"
-    },
+    "nameId": 13360,
     "rank": "S",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -10063,10 +9249,7 @@
   },
   "ihnuxokiy": {
     "id": "ihnuxokiy",
-    "name": {
-      "en": "Ihnuxokiy",
-      "ja": "イヌショキー"
-    },
+    "nameId": 13444,
     "rank": "S",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -10122,10 +9305,7 @@
   },
   "neyoozoteel": {
     "id": "neyoozoteel",
-    "name": {
-      "en": "Neyoozoteel",
-      "ja": "ネヨーゾテール"
-    },
+    "nameId": 12754,
     "rank": "S",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -10181,10 +9361,7 @@
   },
   "sansheya": {
     "id": "sansheya",
-    "name": {
-      "en": "Sansheya",
-      "ja": "サンシェヤ"
-    },
+    "nameId": 13399,
     "rank": "S",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -10239,12 +9416,7 @@
   },
   "atticus_the_primogenitor": {
     "id": "atticus_the_primogenitor",
-    "name": {
-      "en": "Atticus the Primogenitor",
-      "ja": "先駆けのアティカス",
-      "fr": "Atticus le primogéniteur",
-      "de": "Atticus der Primogenitor"
-    },
+    "nameId": 13156,
     "rank": "S",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -10298,12 +9470,7 @@
   },
   "the_forecaster": {
     "id": "the_forecaster",
-    "name": {
-      "en": "The Forecaster",
-      "ja": "ウェザーリポーター",
-      "fr": "Monsieur météo",
-      "de": "Wetterreporter"
-    },
+    "nameId": 13437,
     "rank": "S",
     "expansionId": "dawntrail",
     "zoneIds": [
@@ -10357,12 +9524,7 @@
   },
   "arch_aethereater": {
     "id": "arch_aethereater",
-    "name": {
-      "en": "Arch Aethereater",
-      "ja": "ロード・オブ・クリスタライザー",
-      "fr": "Seigneur des cristallisateurs",
-      "de": "Herr der Kristallisation"
-    },
+    "nameId": 13406,
     "rank": "SS",
     "expansionId": "dawntrail",
     "zoneIds": [

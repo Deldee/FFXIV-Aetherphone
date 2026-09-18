@@ -7,8 +7,8 @@ internal sealed class HuntMobDefinition
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("name")]
-    public Dictionary<string, string> Name { get; set; } = new();
+    [JsonPropertyName("nameId")]
+    public uint NameId { get; set; }
 
     [JsonPropertyName("rank")]
     public string Rank { get; set; } = string.Empty;
