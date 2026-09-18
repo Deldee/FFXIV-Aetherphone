@@ -18,8 +18,8 @@ public sealed class HuntMobPhaseTests
         var window = Assert.Single(behemoth!.Windows);
         Assert.Equal(2, window.Phases.Length);
         Assert.All(window.Phases, phase => Assert.Null(phase.MobId));
-        Assert.Equal("Behold Now Behemoth", window.Phases[0].Name?["en"]);
-        Assert.Equal("He Taketh It with His Eyes", window.Phases[1].Name?["en"]);
+        Assert.Equal(505u, window.Phases[0].NameId);
+        Assert.Equal(506u, window.Phases[1].NameId);
     }
 
     [Fact]

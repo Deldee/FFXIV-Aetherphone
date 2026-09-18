@@ -29,10 +29,12 @@ internal sealed class HuntMobDescriptionCatalog
         }
     }
 
-    public string? DescriptionFor(string mobId)
+    public string? DescriptionFor(string mobId, HuntMobDefinition? def)
     {
+        var fatePhaseNameIds = def is not null ? FatePhaseNameIds(def) : null;
         loader.EnsureLoaded();
-        if (!byMobId.TryGetValue(mobId, out var reference))
+        var hasCatalogReference = byMobId.TryGetValue(mobId, out var reference);
+        if (fatePhaseNameIds is null && !hasCatalogReference)
         {
             return null;
         }
@@ -49,9 +51,55 @@ internal sealed class HuntMobDescriptionCatalog
             return cached;
         }
 
-        var resolved = ResolveText(reference);
+        string? resolved;
+        if (fatePhaseNameIds is { Count: > 0 })
+        {
+            resolved = ResolveFromFatePhases(fatePhaseNameIds);
+        }
+        else if (hasCatalogReference)
+        {
+            resolved = ResolveText(reference!);
+        }
+        else
+        {
+            resolved = null;
+        }
+
         resolvedCache[mobId] = resolved;
         return resolved;
+    }
+
+    private static List<uint>? FatePhaseNameIds(HuntMobDefinition def)
+    {
+        List<uint>? nameIds = null;
+        foreach (var window in def.Windows)
+        {
+            foreach (var phase in window.Phases)
+            {
+                if (phase.NameId == 0)
+                {
+                    continue;
+                }
+
+                (nameIds ??= new List<uint>()).Add(phase.NameId);
+            }
+        }
+
+        return nameIds;
+    }
+
+    private static string? ResolveFromFatePhases(List<uint> fateRowIds)
+    {
+        List<string>? parts = null;
+        foreach (var rowId in fateRowIds)
+        {
+            if (ResolveText(new HuntMobDescriptionReference { Sheet = "Fate", Row = rowId }) is { Length: > 0 } text)
+            {
+                (parts ??= new List<string>()).Add(text);
+            }
+        }
+
+        return parts is null ? null : string.Join(" ", parts);
     }
 
     private static string? ResolveText(HuntMobDescriptionReference reference)

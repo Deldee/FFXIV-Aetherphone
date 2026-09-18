@@ -23,24 +23,14 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Behold Now Behemoth",
-              "ja": "伝説の魔獣「ベヒーモス」",
-              "fr": "Défi: l'ire du béhémoth",
-              "de": "Der legendäre Behemoth"
-            },
+            "nameId": 505,
             "zonePoiIds": [
               491
             ],
             "timeLimit": 30
           },
           {
-            "name": {
-              "en": "He Taketh It with His Eyes",
-              "ja": "手負いの魔獣「ベヒーモス」",
-              "fr": "Défi: contre-traque",
-              "de": "Kein Weg zurück"
-            },
+            "nameId": 506,
             "zonePoiIds": [
               471
             ],
@@ -77,12 +67,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Steel Reign",
-              "ja": "古の闘神「オーディン」",
-              "fr": "Défi: le Chevalier des ombres",
-              "de": "Der dunkle Reiter"
-            },
+            "nameId": 196,
             "zonePoiIds": [
               322,
               333,
@@ -3076,12 +3061,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Prey Online",
-              "ja": "太古の脅威：ノクチルカ撃滅戦",
-              "fr": "Proto-Ultima: la menace surgie du passé",
-              "de": "Ultima: Ein Prototyp tankt auf"
-            },
+            "nameId": 877,
             "zonePoiIds": [
               725,
               733,
@@ -3117,12 +3097,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Long Live The Coeurl",
-              "ja": "雷獣の女王「クァールレギナ」",
-              "fr": "Défi: mort à la reine des coeurls",
-              "de": "Angriff der Königin"
-            },
+            "nameId": 902,
             "zonePoiIds": [
               624
             ],
@@ -3143,12 +3118,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Coeurls Chase Boys",
-              "ja": "逆襲の女王「クァールレギナ」",
-              "fr": "Défi: du coeurl à l'ouvrage",
-              "de": "Rückkehr der Königin"
-            },
+            "nameId": 903,
             "zonePoiIds": [
               621,
               627
@@ -3170,12 +3140,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Coeurls Chase Boys Chase Coeurls",
-              "ja": "幻影の女王「クァールレギナ」",
-              "fr": "Défi: coeurls brisés",
-              "de": "Entmachtung der Königin"
-            },
+            "nameId": 905,
             "zonePoiIds": [
               612,
               615,
@@ -5586,12 +5551,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Foxy Lady",
-              "ja": "九尾の妖狐「玉藻御前」",
-              "fr": "Défi: la renarde fait surface",
-              "de": "Fuchsige Dame"
-            },
+            "nameId": 1106,
             "zonePoiIds": [
               803,
               806,
@@ -5625,12 +5585,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "A Horse Outside",
-              "ja": "伝説の雷馬「イクシオン」",
-              "fr": "Défi: l'étalon survolté",
-              "de": "Höllenross"
-            },
+            "nameId": 1103,
             "zonePoiIds": [
               844,
               848,
@@ -5666,24 +5621,14 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Nothing Like a Trappin' Life",
-              "ja": "厄災のアルケオタニア：決戦の下準備",
-              "fr": "L'annonciatrice du chaos: les rets de Zumshs",
-              "de": "Schrecken der Tiefsee Archaeotania: Köder"
-            },
+            "nameId": 1431,
             "zonePoiIds": [
               1046
             ],
             "timeLimit": 30
           },
           {
-            "name": {
-              "en": "The Head, the Tail, the Whole Damned Thing",
-              "ja": "厄災のアルケオタニア：深海の討伐戦",
-              "fr": "L'annonciatrice du chaos: bataille au sommet des fonds",
-              "de": "Schrecken der Tiefsee Archaeotania: Die Bestie"
-            },
+            "nameId": 1432,
             "zonePoiIds": [
               1048
             ],
@@ -5928,12 +5873,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "A Finale Most Formidable",
-              "ja": "激闘フォーミダブル：切り札起動",
-              "fr": "Formidable: l'arme secrète",
-              "de": "Ein formidabler Kampf: Der Gigant"
-            },
+            "nameId": 1464,
             "zonePoiIds": [
               933
             ],
@@ -7065,12 +7005,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Devout Pilgrims vs. Daivadipa",
-              "ja": "ムリガ信仰：偽りの神",
-              "fr": "Le culte des Mrga: le faux dieu",
-              "de": "Im Dienste der Mrga: Blasphemie"
-            },
+            "nameId": 1763,
             "zonePoiIds": [
               1087
             ],
@@ -7104,12 +7039,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Omicron Recall: Killing Order",
-              "ja": "カイのメモリーより：侵略兵器の破壊",
-              "fr": "Mémoire vive: arrêter le processus",
-              "de": "Aus dem Speicher von: Zerstörung"
-            },
+            "nameId": 1855,
             "zonePoiIds": [
               1132
             ],
@@ -8353,12 +8283,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "The Serpentlord Seethes",
-              "ja": "トクローネ：荒野の死闘",
-              "fr": "Ttokrrone: lutte ensablée",
-              "de": "In den sandigen Schlund"
-            },
+            "nameId": 1871,
             "zonePoiIds": [
               1229
             ],
@@ -8392,12 +8317,7 @@
         },
         "phases": [
           {
-            "name": {
-              "en": "Mascot Murder",
-              "ja": "マイカ・ザ・ムー：大団円",
-              "fr": "Mica le mu: le grand final",
-              "de": "Mordendes Maskottchen"
-            },
+            "nameId": 1922,
             "zonePoiIds": [
               1267
             ],
