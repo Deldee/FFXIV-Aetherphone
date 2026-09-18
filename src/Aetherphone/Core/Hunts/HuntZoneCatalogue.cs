@@ -1,8 +1,4 @@
-using Aetherphone.Core.Game;
 using Aetherphone.Core.Maps;
-using Dalamud.Game;
-using Lumina.Excel.Exceptions;
-using Lumina.Excel.Sheets;
 
 namespace Aetherphone.Core.Hunts;
 
@@ -11,7 +7,6 @@ internal sealed class HuntZoneCatalog
     private readonly HuntJsonCatalogLoader<Dictionary<string, HuntZoneDefinition>> loader;
     private Dictionary<string, HuntZoneDefinition> byId = new();
     private Dictionary<int, (string ZoneId, HuntPoiEntry Poi)> poisById = new();
-    private Dictionary<string, uint>? territoryIdByPlaceName;
     private Dictionary<uint, string>? zoneIdByTerritory;
 
     public HuntZoneCatalog(FileInfo source)
@@ -49,18 +44,7 @@ internal sealed class HuntZoneCatalog
         return ToGameCoordinate(resolved.Poi, zone.Map);
     }
 
-    public uint ResolveTerritoryId(string zoneId)
-    {
-        var zone = FindZone(zoneId);
-        var name = zone?.Name;
-        if (string.IsNullOrEmpty(name))
-        {
-            return 0u;
-        }
-
-        var lookup = territoryIdByPlaceName ??= BuildTerritoryIdLookup();
-        return lookup.TryGetValue(name, out var territoryId) ? territoryId : 0u;
-    }
+    public uint ResolveTerritoryId(string zoneId) => FindZone(zoneId)?.TerritoryId ?? 0u;
 
     public string? ZoneIdForTerritory(uint territoryId)
     {
@@ -97,38 +81,6 @@ internal sealed class HuntZoneCatalog
         }
 
         poisById = index;
-    }
-
-    private static Dictionary<string, uint> BuildTerritoryIdLookup()
-    {
-        var lookup = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
-        var englishLanguage = GameSheetLanguage.Resolve(SheetLanguageOverride.English) ?? ClientLanguage.English;
-        Lumina.Excel.ExcelSheet<TerritoryType> sheet;
-        try
-        {
-            sheet = Plugin.DataManager.GetExcelSheet<TerritoryType>(englishLanguage);
-        }
-        catch (UnsupportedLanguageException exception)
-        {
-            AepLog.Warning(exception, "Hunts zone-to-territory lookup unavailable: client has no English TerritoryType sheet");
-            return lookup;
-        }
-
-        foreach (var territory in sheet)
-        {
-            if (territory.PlaceName.RowId == 0)
-            {
-                continue;
-            }
-
-            var name = territory.PlaceName.Value.Name.ExtractText();
-            if (name.Length > 0 && !lookup.ContainsKey(name))
-            {
-                lookup[name] = territory.RowId;
-            }
-        }
-
-        return lookup;
     }
 
     private static (float X, float Y) ToGameCoordinate(HuntPoiEntry poi, HuntZoneMap map)

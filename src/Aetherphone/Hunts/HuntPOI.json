@@ -1,16 +1,11 @@
- {
+{
   "middle_la_noscea": {
     "id": "middle_la_noscea",
-    "name": "Middle La Noscea",
+    "territoryId": 134,
     "pois": [
       {
         "id": 3,
-        "name": {
-          "en": "Summerford Farms",
-          "ja": "サマーフォード庄",
-          "fr": "Vergers d'Estival",
-          "de": "Sommerfurt-Höfe"
-        },
+        "nameId": 184,
         "type": "aetheryte",
         "location": "1252,767"
       },
@@ -138,16 +133,11 @@
   },
   "lower_la_noscea": {
     "id": "lower_la_noscea",
-    "name": "Lower La Noscea",
+    "territoryId": 135,
     "pois": [
       {
         "id": 35,
-        "name": {
-          "en": "Moraby Drydocks",
-          "ja": "モラビー造船廠",
-          "fr": "Chantier naval de Moraby",
-          "de": "Moraby-Trockendocks"
-        },
+        "nameId": 337,
         "type": "aetheryte",
         "location": "1179,1697"
       },
@@ -255,27 +245,17 @@
   },
   "eastern_la_noscea": {
     "id": "eastern_la_noscea",
-    "name": "Eastern La Noscea",
+    "territoryId": 137,
     "pois": [
       {
         "id": 59,
-        "name": {
-          "en": "Wineport",
-          "ja": "ワインポート",
-          "fr": "Port-aux-Vins",
-          "de": "Weinhafen"
-        },
+        "nameId": 216,
         "type": "aetheryte",
         "location": "1005,1027"
       },
       {
         "id": 62,
-        "name": {
-          "en": "Costa del Sol",
-          "ja": "コスタ・デル・ソル",
-          "fr": "Costa del Sol",
-          "de": "Sonnenküste"
-        },
+        "nameId": 206,
         "type": "aetheryte",
         "location": "1513,1492"
       },
@@ -443,27 +423,17 @@
   },
   "western_la_noscea": {
     "id": "western_la_noscea",
-    "name": "Western La Noscea",
+    "territoryId": 138,
     "pois": [
       {
         "id": 98,
-        "name": {
-          "en": "Aleport",
-          "ja": "エールポート",
-          "fr": "Port-aux-Ales",
-          "de": "Bierhafens"
-        },
+        "nameId": 223,
         "type": "aetheryte",
         "location": "1284,1242"
       },
       {
         "id": 102,
-        "name": {
-          "en": "Swiftperch",
-          "ja": "スウィフトパーチ入植地",
-          "fr": "Le Martinet",
-          "de": "Tölpelturm-Siedlung"
-        },
+        "nameId": 218,
         "type": "aetheryte",
         "location": "1675,1537"
       },
@@ -586,16 +556,11 @@
   },
   "upper_la_noscea": {
     "id": "upper_la_noscea",
-    "name": "Upper La Noscea",
+    "territoryId": 139,
     "pois": [
       {
         "id": 128,
-        "name": {
-          "en": "Camp Bronze Lake",
-          "ja": "キャンプ・ブロンズレイク",
-          "fr": "Camp du lac d'Airain",
-          "de": "Camp Bronzesee"
-        },
+        "nameId": 239,
         "type": "aetheryte",
         "location": "1511,1096"
       },
@@ -688,16 +653,11 @@
   },
   "western_thanalan": {
     "id": "western_thanalan",
-    "name": "Western Thanalan",
+    "territoryId": 140,
     "pois": [
       {
         "id": 149,
-        "name": {
-          "en": "Horizon",
-          "ja": "ホライズン",
-          "fr": "Horizon",
-          "de": "Horizont"
-        },
+        "nameId": 271,
         "type": "aetheryte",
         "location": "1091,796"
       },
@@ -815,16 +775,11 @@
   },
   "central_thanalan": {
     "id": "central_thanalan",
-    "name": "Central Thanalan",
+    "territoryId": 141,
     "pois": [
       {
         "id": 177,
-        "name": {
-          "en": "Black Brush Station",
-          "ja": "ブラックブラッシュ停留所",
-          "fr": "Gare de Roncenoire",
-          "de": "Kohlenstaub-Bahnhof"
-        },
+        "nameId": 290,
         "type": "aetheryte",
         "location": "1007,857"
       },
@@ -947,16 +902,11 @@
   },
   "eastern_thanalan": {
     "id": "eastern_thanalan",
-    "name": "Eastern Thanalan",
+    "territoryId": 145,
     "pois": [
       {
         "id": 206,
-        "name": {
-          "en": "Camp Drybone",
-          "ja": "キャンプ・ドライボーン",
-          "fr": "Camp des Os desséchés",
-          "de": "Camp Knochenbleich"
-        },
+        "nameId": 300,
         "type": "aetheryte",
         "location": "637,1166"
       },
@@ -1134,26 +1084,17 @@
   },
   "southern_thanalan": {
     "id": "southern_thanalan",
-    "name": "Southern Thanalan",
+    "territoryId": 146,
     "pois": [
       {
         "id": 245,
-        "name": {
-          "en": "Little Ala Mhigo",
-          "ja": "リトルアラミゴ",
-          "fr": "Petite Ala Mhigo",
-          "de": "Klein-Ala Mhigo"
-        },
+        "nameId": 313,
         "type": "aetheryte",
         "location": "864,608"
       },
       {
         "id": 246,
-        "name": {
-          "en": "Forgotten Springs",
-          "ja": "忘れられたオアシス",
-          "de": "Die Vergessene Oase"
-        },
+        "nameId": 323,
         "type": "aetheryte",
         "location": "697,1429"
       },
@@ -1371,27 +1312,17 @@
   },
   "northern_thanalan": {
     "id": "northern_thanalan",
-    "name": "Northern Thanalan",
+    "territoryId": 147,
     "pois": [
       {
         "id": 290,
-        "name": {
-          "en": "Ceruleum Processing Plant",
-          "ja": "青燐精製所",
-          "fr": "Usine de céruleum",
-          "de": "Erdseim-Fabrik"
-        },
+        "nameId": 331,
         "type": "aetheryte",
         "location": "997,993"
       },
       {
         "id": 291,
-        "name": {
-          "en": "Camp Bluefog",
-          "ja": "キャンプ・ブルーフォグ",
-          "fr": "Camp de Brumebleue",
-          "de": "Camp Blauer Dunst"
-        },
+        "nameId": 325,
         "type": "aetheryte",
         "location": "1045,1477"
       },
@@ -1484,16 +1415,11 @@
   },
   "central_shroud": {
     "id": "central_shroud",
-    "name": "Central Shroud",
+    "territoryId": 148,
     "pois": [
       {
         "id": 314,
-        "name": {
-          "en": "Bentbranch Meadows",
-          "ja": "ベントブランチ牧場",
-          "fr": "Ranch de Brancharquée",
-          "de": "Gut Zwieselgrund"
-        },
+        "nameId": 94,
         "type": "aetheryte",
         "location": "1036,1059"
       },
@@ -1626,16 +1552,11 @@
   },
   "east_shroud": {
     "id": "east_shroud",
-    "name": "East Shroud",
+    "territoryId": 152,
     "pois": [
       {
         "id": 344,
-        "name": {
-          "en": "The Hawthorne Hut",
-          "ja": "ホウソーン家の山塞",
-          "fr": "Hutte des Hawthorne",
-          "de": "Jagdhütte der Hawthornes"
-        },
+        "nameId": 107,
         "type": "aetheryte",
         "location": "837,1321"
       },
@@ -1833,27 +1754,17 @@
   },
   "south_shroud": {
     "id": "south_shroud",
-    "name": "South Shroud",
+    "territoryId": 153,
     "pois": [
       {
         "id": 387,
-        "name": {
-          "en": "Quarrymill",
-          "ja": "クォーリーミル",
-          "fr": "Moulin de la Carrière",
-          "de": "Mühlenbruch"
-        },
+        "nameId": 129,
         "type": "aetheryte",
         "location": "1202,955"
       },
       {
         "id": 388,
-        "name": {
-          "en": "Camp Tranquil",
-          "ja": "キャンプ・トランキル",
-          "fr": "Camp des Sentes tranquilles",
-          "de": "Camp Seelenruhe"
-        },
+        "nameId": 123,
         "type": "aetheryte",
         "location": "794,1379"
       },
@@ -2021,16 +1932,11 @@
   },
   "north_shroud": {
     "id": "north_shroud",
-    "name": "North Shroud",
+    "territoryId": 154,
     "pois": [
       {
         "id": 424,
-        "name": {
-          "en": "Fallgourd Float",
-          "ja": "フォールゴウド",
-          "fr": "Radeau de la Calebasse",
-          "de": "Herbstkürbis-See"
-        },
+        "nameId": 140,
         "type": "aetheryte",
         "location": "981,1255"
       },
@@ -2153,16 +2059,11 @@
   },
   "coerthas_central_highlands": {
     "id": "coerthas_central_highlands",
-    "name": "Coerthas Central Highlands",
+    "territoryId": 155,
     "pois": [
       {
         "id": 450,
-        "name": {
-          "en": "Camp Dragonhead",
-          "ja": "キャンプ・ドラゴンヘッド",
-          "fr": "Camp de la Tête du dragon",
-          "de": "Camp Drachenkopf"
-        },
+        "nameId": 388,
         "type": "aetheryte",
         "location": "1247,789"
       },
@@ -2480,16 +2381,11 @@
   },
   "mor_dhona": {
     "id": "mor_dhona",
-    "name": "Mor Dhona",
+    "territoryId": 156,
     "pois": [
       {
         "id": 516,
-        "name": {
-          "en": "Revenant's Toll",
-          "ja": "レヴナンツトール",
-          "fr": "Glas de revenants",
-          "de": "Geisterzoll"
-        },
+        "nameId": 411,
         "type": "aetheryte",
         "location": "1064,356"
       },
@@ -2667,16 +2563,11 @@
   },
   "outer_la_noscea": {
     "id": "outer_la_noscea",
-    "name": "Outer La Noscea",
+    "territoryId": 180,
     "pois": [
       {
         "id": 553,
-        "name": {
-          "en": "Camp Overlook",
-          "ja": "キャンプ・オーバールック",
-          "fr": "Camp du Guet",
-          "de": "Camp Ausblick"
-        },
+        "nameId": 237,
         "type": "aetheryte",
         "location": "906,811"
       },
@@ -2799,19 +2690,14 @@
   },
   "coerthas_western_highlands": {
     "id": "coerthas_western_highlands",
-    "name": "Coerthas Western Highlands",
+    "territoryId": 397,
     "map": {
       "sizeFactor": 95
     },
     "pois": [
       {
         "id": 580,
-        "name": {
-          "en": "Falcon's Nest",
-          "ja": "ファルコンネスト",
-          "fr": "Nid du faucon",
-          "de": "Falkenhorst"
-        },
+        "nameId": 2204,
         "type": "aetheryte",
         "location": "1475,1697"
       },
@@ -2939,30 +2825,20 @@
   },
   "the_dravanian_forelands": {
     "id": "the_dravanian_forelands",
-    "name": "The Dravanian Forelands",
+    "territoryId": 398,
     "map": {
       "sizeFactor": 95
     },
     "pois": [
       {
         "id": 608,
-        "name": {
-          "en": "Anyx Trine",
-          "ja": "不浄の三塔",
-          "fr": "Annexe Trine",
-          "de": "Trinär-Annex"
-        },
+        "nameId": 2025,
         "type": "aetheryte",
         "location": "734,1052"
       },
       {
         "id": 609,
-        "name": {
-          "en": "Tailfeather",
-          "ja": "テイルフェザー",
-          "fr": "La Penne",
-          "de": "Fiederhag"
-        },
+        "nameId": 2018,
         "type": "aetheryte",
         "location": "1530,1052"
       },
@@ -3100,7 +2976,7 @@
   },
   "the_dravanian_hinterlands": {
     "id": "the_dravanian_hinterlands",
-    "name": "The Dravanian Hinterlands",
+    "territoryId": 399,
     "map": {
       "sizeFactor": 95
     },
@@ -3219,30 +3095,20 @@
   },
   "the_churning_mists": {
     "id": "the_churning_mists",
-    "name": "The Churning Mists",
+    "territoryId": 400,
     "map": {
       "sizeFactor": 95
     },
     "pois": [
       {
         "id": 664,
-        "name": {
-          "en": "Zenith",
-          "ja": "白亜の宮殿",
-          "fr": "Zénith",
-          "de": "Kreidetempel"
-        },
+        "nameId": 2046,
         "type": "aetheryte",
         "location": "468,1321"
       },
       {
         "id": 665,
-        "name": {
-          "en": "Moghome",
-          "ja": "モグモグホーム",
-          "fr": "Nid-Mog",
-          "de": "Moglingen"
-        },
+        "nameId": 2042,
         "type": "aetheryte",
         "location": "1276,1582"
       },
@@ -3360,30 +3226,20 @@
   },
   "the_sea_of_clouds": {
     "id": "the_sea_of_clouds",
-    "name": "The Sea of Clouds",
+    "territoryId": 401,
     "map": {
       "sizeFactor": 95
     },
     "pois": [
       {
         "id": 690,
-        "name": {
-          "en": "Ok' Zundu",
-          "ja": "オク・ズンド",
-          "fr": "Ok' Zundu",
-          "de": "Ok' Zundu"
-        },
+        "nameId": 2123,
         "type": "aetheryte",
         "location": "441,629"
       },
       {
         "id": 694,
-        "name": {
-          "en": "Camp Cloudtop",
-          "ja": "キャンプ・クラウドトップ",
-          "fr": "Camp de Cime-des-nuages",
-          "de": "Camp Wolkengipfel"
-        },
+        "nameId": 2116,
         "type": "aetheryte",
         "location": "439,1543"
       },
@@ -3521,19 +3377,14 @@
   },
   "azys_lla": {
     "id": "azys_lla",
-    "name": "Azys Lla",
+    "territoryId": 402,
     "map": {
       "sizeFactor": 95
     },
     "pois": [
       {
         "id": 723,
-        "name": {
-          "en": "Helix",
-          "ja": "ポート・ヘリックス",
-          "fr": "Hélice",
-          "de": "Helix"
-        },
+        "nameId": 2131,
         "type": "aetheryte",
         "location": "337,459"
       },
@@ -3656,27 +3507,17 @@
   },
   "the_fringes": {
     "id": "the_fringes",
-    "name": "The Fringes",
+    "territoryId": 612,
     "pois": [
       {
         "id": 749,
-        "name": {
-          "en": "Castrum Oriens",
-          "ja": "カストルム・オリエンス",
-          "fr": "Castrum Oriens",
-          "de": "Castrum Oriens"
-        },
+        "nameId": 111,
         "type": "aetheryte",
         "location": "394,514"
       },
       {
         "id": 750,
-        "name": {
-          "en": "The Peering Stones",
-          "ja": "ピーリングストーンズ",
-          "fr": "Rochers d'aguet",
-          "de": "Die Spähenden Steine"
-        },
+        "nameId": 2634,
         "type": "aetheryte",
         "location": "1439,1270"
       },
@@ -3784,27 +3625,17 @@
   },
   "the_ruby_sea": {
     "id": "the_ruby_sea",
-    "name": "The Ruby Sea",
+    "territoryId": 613,
     "pois": [
       {
         "id": 773,
-        "name": {
-          "en": "Onokoro",
-          "ja": "オノコロ島",
-          "fr": "Onokoro",
-          "de": "Onokoro"
-        },
+        "nameId": 2773,
         "type": "aetheryte",
         "location": "1111,440"
       },
       {
         "id": 775,
-        "name": {
-          "en": "Tamamizu",
-          "ja": "碧のタマミズ",
-          "fr": "Tamamizu",
-          "de": "Tanamizu"
-        },
+        "nameId": 2769,
         "type": "aetheryte",
         "location": "1382,761"
       },
@@ -3882,27 +3713,17 @@
   },
   "yanxia": {
     "id": "yanxia",
-    "name": "Yanxia",
+    "territoryId": 614,
     "pois": [
       {
         "id": 795,
-        "name": {
-          "en": "The House of the Fierce",
-          "ja": "烈士庵",
-          "fr": "Cercle des Intrépides",
-          "de": "Klause der Grimmigen"
-        },
+        "nameId": 2805,
         "type": "aetheryte",
         "location": "1270,622"
       },
       {
         "id": 796,
-        "name": {
-          "en": "Namai",
-          "ja": "ナマイ村",
-          "fr": "Namai",
-          "de": "Namai"
-        },
+        "nameId": 2793,
         "type": "aetheryte",
         "location": "1456,933"
       },
@@ -3995,27 +3816,17 @@
   },
   "the_peaks": {
     "id": "the_peaks",
-    "name": "The Peaks",
+    "territoryId": 620,
     "pois": [
       {
         "id": 816,
-        "name": {
-          "en": "Ala Gannha",
-          "ja": "アラガーナ",
-          "fr": "Ala Gannha",
-          "de": "Ala Gannha"
-        },
+        "nameId": 2646,
         "type": "aetheryte",
         "location": "1138,276"
       },
       {
         "id": 819,
-        "name": {
-          "en": "Ala Ghiri",
-          "ja": "アラギリ",
-          "fr": "Ala Ghiri",
-          "de": "Ala Ghiri"
-        },
+        "nameId": 2660,
         "type": "aetheryte",
         "location": "752,1772"
       },
@@ -4113,27 +3924,17 @@
   },
   "the_lochs": {
     "id": "the_lochs",
-    "name": "The Lochs",
+    "territoryId": 621,
     "pois": [
       {
         "id": 838,
-        "name": {
-          "en": "Porta Praetoria",
-          "ja": "ポルタ・プレトリア",
-          "fr": "Porta Praetoria",
-          "de": "Porta Praetoria"
-        },
+        "nameId": 2670,
         "type": "aetheryte",
         "location": "371,1007"
       },
       {
         "id": 840,
-        "name": {
-          "en": "The Ala Mhigan Quarter",
-          "ja": "アラミガン・クォーター",
-          "fr": "Faubourg mhigois",
-          "de": "Mhigisches Wohnviertel"
-        },
+        "nameId": 2610,
         "type": "aetheryte",
         "location": "1636,1680"
       },
@@ -4251,38 +4052,23 @@
   },
   "the_azim_steppe": {
     "id": "the_azim_steppe",
-    "name": "The Azim Steppe",
+    "territoryId": 622,
     "pois": [
       {
         "id": 863,
-        "name": {
-          "en": "The Dawn Throne",
-          "ja": "明けの玉座",
-          "fr": "Trône de l'Aube",
-          "de": "Morgenthron"
-        },
+        "nameId": 2822,
         "type": "aetheryte",
         "location": "1102,1060"
       },
       {
         "id": 864,
-        "name": {
-          "en": "Dhoro Iloh",
-          "ja": "ドーロ・イロー",
-          "fr": "Dhoro Iloh",
-          "de": "Dhoro Iloh"
-        },
+        "nameId": 2850,
         "type": "aetheryte",
         "location": "269,1140"
       },
       {
         "id": 865,
-        "name": {
-          "en": "Reunion",
-          "ja": "再会の市",
-          "fr": "Ralliement",
-          "de": "Reunion"
-        },
+        "nameId": 2814,
         "type": "aetheryte",
         "location": "1579,1363"
       },
@@ -4380,27 +4166,17 @@
   },
   "lakeland": {
     "id": "lakeland",
-    "name": "Lakeland",
+    "territoryId": 813,
     "pois": [
       {
         "id": 888,
-        "name": {
-          "en": "The Ostall Imperative",
-          "ja": "オスタル厳命城",
-          "fr": "L'Impératif d'Ostall",
-          "de": "Ostalls Befehl"
-        },
+        "nameId": 3057,
         "type": "aetheryte",
         "location": "288,793"
       },
       {
         "id": 889,
-        "name": {
-          "en": "Fort Jobb",
-          "ja": "ジョッブ砦",
-          "fr": "Fort Jobb",
-          "de": "Jobb-Feste"
-        },
+        "nameId": 3044,
         "type": "aetheryte",
         "location": "1777,994"
       },
@@ -4523,38 +4299,23 @@
   },
   "kholusia": {
     "id": "kholusia",
-    "name": "Kholusia",
+    "territoryId": 814,
     "pois": [
       {
         "id": 915,
-        "name": {
-          "en": "Tomra",
-          "ja": "トメラの村",
-          "fr": "Tomra",
-          "de": "Tomra"
-        },
+        "nameId": 3105,
         "type": "aetheryte",
         "location": "597,399"
       },
       {
         "id": 916,
-        "name": {
-          "en": "Stilltide",
-          "ja": "スティルタイド",
-          "fr": "Douceonde",
-          "de": "Stillwasser"
-        },
+        "nameId": 3075,
         "type": "aetheryte",
         "location": "1692,1312"
       },
       {
         "id": 918,
-        "name": {
-          "en": "Wright",
-          "ja": "ライト村",
-          "fr": "Cherpant",
-          "de": "Werfting"
-        },
+        "nameId": 3094,
         "type": "aetheryte",
         "location": "780,1409"
       },
@@ -4677,38 +4438,23 @@
   },
   "amh_araeng": {
     "id": "amh_araeng",
-    "name": "Amh Araeng",
+    "territoryId": 815,
     "pois": [
       {
         "id": 947,
-        "name": {
-          "en": "Mord Souq",
-          "ja": "モルド・スーク",
-          "fr": "Mord Souq",
-          "de": "Mordh Souq"
-        },
+        "nameId": 3122,
         "type": "aetheryte",
         "location": "1270,803"
       },
       {
         "id": 948,
-        "name": {
-          "en": "Twine",
-          "ja": "トゥワイン",
-          "fr": "Queues-liées",
-          "de": "Pfotenschlag"
-        },
+        "nameId": 3135,
         "type": "aetheryte",
         "location": "512,811"
       },
       {
         "id": 950,
-        "name": {
-          "en": "The Inn at Journey's Head",
-          "ja": "旅立ちの宿",
-          "fr": "Auberge du Grand Départ",
-          "de": "Ruhstatt vor der Langen Reise"
-        },
+        "nameId": 3129,
         "type": "aetheryte",
         "location": "1422,1332"
       },
@@ -4831,38 +4577,23 @@
   },
   "il_mheg": {
     "id": "il_mheg",
-    "name": "Il Mheg",
+    "territoryId": 816,
     "pois": [
       {
         "id": 974,
-        "name": {
-          "en": "Pla Enni",
-          "ja": "プラ・エンニ茸窟",
-          "fr": "Pla Enni",
-          "de": "Pla Enni"
-        },
+        "nameId": 3156,
         "type": "aetheryte",
         "location": "951,166"
       },
       {
         "id": 975,
-        "name": {
-          "en": "Wolekdorf",
-          "ja": "ヴォレクドルフ",
-          "fr": "Wolekdorf",
-          "de": "Wolekdorf"
-        },
+        "nameId": 3157,
         "type": "aetheryte",
         "location": "1404,336"
       },
       {
         "id": 976,
-        "name": {
-          "en": "Lydha Lran",
-          "ja": "リダ・ラーン",
-          "fr": "Lydha Lran",
-          "de": "Lydha Lran"
-        },
+        "nameId": 3147,
         "type": "aetheryte",
         "location": "679,1536"
       },
@@ -4980,27 +4711,17 @@
   },
   "the_raktika_greatwood": {
     "id": "the_raktika_greatwood",
-    "name": "The Rak'tika Greatwood",
+    "territoryId": 817,
     "pois": [
       {
         "id": 1000,
-        "name": {
-          "en": "Fanow",
-          "ja": "ファノヴの里",
-          "fr": "Fanow",
-          "de": "Fanow"
-        },
+        "nameId": 3179,
         "type": "aetheryte",
         "location": "1406,829"
       },
       {
         "id": 1001,
-        "name": {
-          "en": "Slitherbough",
-          "ja": "スリザーバウ",
-          "fr": "Serpentige",
-          "de": "Schlangenzweig"
-        },
+        "nameId": 3170,
         "type": "aetheryte",
         "location": "920,1320"
       },
@@ -5108,27 +4829,17 @@
   },
   "the_tempest": {
     "id": "the_tempest",
-    "name": "The Tempest",
+    "territoryId": 818,
     "pois": [
       {
         "id": 1024,
-        "name": {
-          "en": "The Ondo Cups",
-          "ja": "オンドの潮溜まり",
-          "fr": "Baïne",
-          "de": "Ondo-Becken"
-        },
+        "nameId": 3195,
         "type": "aetheryte",
         "location": "1586,825"
       },
       {
         "id": 1025,
-        "name": {
-          "en": "The Macarenses Angle",
-          "ja": "マカレンサス広場",
-          "fr": "Carré macarien",
-          "de": "Macarenses-Forum"
-        },
+        "nameId": 3205,
         "type": "aetheryte",
         "location": "882,1241"
       },
@@ -5256,38 +4967,23 @@
   },
   "labyrinthos": {
     "id": "labyrinthos",
-    "name": "Labyrinthos",
+    "territoryId": 956,
     "pois": [
       {
         "id": 1051,
-        "name": {
-          "en": "The Archeion",
-          "ja": "アルケイオン保管院",
-          "fr": "Archéion",
-          "de": "Archeion"
-        },
+        "nameId": 3833,
         "type": "aetheryte",
         "location": "1465,545"
       },
       {
         "id": 1052,
-        "name": {
-          "en": "Sharlayan Hamlet",
-          "ja": "リトルシャーレアン",
-          "fr": "Petite Sharlayan",
-          "de": "Klein-Sharlayan"
-        },
+        "nameId": 3850,
         "type": "aetheryte",
         "location": "1029,975"
       },
       {
         "id": 1053,
-        "name": {
-          "en": "Aporia",
-          "ja": "アポリア本部",
-          "fr": "L'Aporie",
-          "de": "Aporia"
-        },
+        "nameId": 3852,
         "type": "aetheryte",
         "location": "298,1322"
       },
@@ -5375,38 +5071,23 @@
   },
   "thavnair": {
     "id": "thavnair",
-    "name": "Thavnair",
+    "territoryId": 957,
     "pois": [
       {
         "id": 1070,
-        "name": {
-          "en": "Palaka's Stand",
-          "ja": "パーラカの里",
-          "fr": "Écoute des Palaka",
-          "de": "Palakas Ruh"
-        },
+        "nameId": 3894,
         "type": "aetheryte",
         "location": "1423,780"
       },
       {
         "id": 1071,
-        "name": {
-          "en": "The Great Work",
-          "ja": "デミールの遺烈郷",
-          "fr": "Le Grand Œuvre",
-          "de": "Daemirs Werk"
-        },
+        "nameId": 3886,
         "type": "aetheryte",
         "location": "497,1068"
       },
       {
         "id": 1072,
-        "name": {
-          "en": "Yedlihmad",
-          "ja": "イェドリマン",
-          "fr": "Yedlihmad",
-          "de": "Yedlihmad"
-        },
+        "nameId": 3880,
         "type": "aetheryte",
         "location": "1219,1662"
       },
@@ -5494,27 +5175,17 @@
   },
   "garlemald": {
     "id": "garlemald",
-    "name": "Garlemald",
+    "territoryId": 958,
     "pois": [
       {
         "id": 1088,
-        "name": {
-          "en": "Tertium",
-          "ja": "テルティウム駅",
-          "fr": "Gare de Tertium",
-          "de": "Tertium"
-        },
+        "nameId": 3915,
         "type": "aetheryte",
         "location": "1549,851"
       },
       {
         "id": 1089,
-        "name": {
-          "en": "Camp Broken Glass",
-          "ja": "キャンプ・ブロークングラス",
-          "fr": "Camp Bris-de-glace",
-          "de": "Camp Splitterglas"
-        },
+        "nameId": 3903,
         "type": "aetheryte",
         "location": "617,1514"
       },
@@ -5597,27 +5268,17 @@
   },
   "mare_lamentorum": {
     "id": "mare_lamentorum",
-    "name": "Mare Lamentorum",
+    "territoryId": 959,
     "pois": [
       {
         "id": 1105,
-        "name": {
-          "en": "Bestways Burrow",
-          "ja": "ベストウェイ・バロー",
-          "fr": "Halot de Bestway",
-          "de": "Bestways Rast"
-        },
+        "nameId": 3966,
         "type": "aetheryte",
         "location": "1025,527"
       },
       {
         "id": 1106,
-        "name": {
-          "en": "Sinus Lacrimarum",
-          "ja": "涙の入江",
-          "fr": "Sinus Lacrimarum",
-          "de": "Sinus Lacrimarum"
-        },
+        "nameId": 3949,
         "type": "aetheryte",
         "location": "440,1687"
       },
@@ -5700,38 +5361,23 @@
   },
   "ultima_thule": {
     "id": "ultima_thule",
-    "name": "Ultima Thule",
+    "territoryId": 960,
     "pois": [
       {
         "id": 1123,
-        "name": {
-          "en": "Abode of the Ea",
-          "ja": "イーアの里",
-          "fr": "Demeure des Éas",
-          "de": "Domizil der Ea"
-        },
+        "nameId": 3978,
         "type": "aetheryte",
         "location": "1090,380"
       },
       {
         "id": 1124,
-        "name": {
-          "en": "Reah Tahra",
-          "ja": "リア・ターラ",
-          "fr": "Reah Tahra",
-          "de": "Reah Tahra"
-        },
+        "nameId": 3973,
         "type": "aetheryte",
         "location": "481,1306"
       },
       {
         "id": 1125,
-        "name": {
-          "en": "Base Omicron",
-          "ja": "オミクロンベース",
-          "fr": "Base des Omicrons",
-          "de": "Omikron-Basis"
-        },
+        "nameId": 3983,
         "type": "aetheryte",
         "location": "1515,1365"
       },
@@ -5819,38 +5465,23 @@
   },
   "elpis": {
     "id": "elpis",
-    "name": "Elpis",
+    "territoryId": 961,
     "pois": [
       {
         "id": 1141,
-        "name": {
-          "en": "Poieten Oikos",
-          "ja": "ポイエテーン・オイコス",
-          "fr": "Poièten Oïkos",
-          "de": "Poieten Oikos"
-        },
+        "nameId": 3938,
         "type": "aetheryte",
         "location": "484,809"
       },
       {
         "id": 1142,
-        "name": {
-          "en": "Anagnorisis",
-          "ja": "アナグノリシス天測園",
-          "fr": "L'Anagnorisis",
-          "de": "Anagnorisis"
-        },
+        "nameId": 3928,
         "type": "aetheryte",
         "location": "1176,1160"
       },
       {
         "id": 1143,
-        "name": {
-          "en": "The Twelve Wonders",
-          "ja": "十二節の園",
-          "fr": "Les Douze Merveilles",
-          "de": "Die Zwölf Gärten"
-        },
+        "nameId": 3929,
         "type": "aetheryte",
         "location": "380,1565"
       },
@@ -5938,25 +5569,17 @@
   },
   "urqopacha": {
     "id": "urqopacha",
-    "name": "Urqopacha",
+    "territoryId": 1187,
     "pois": [
       {
         "id": 1162,
-        "name": {
-          "en": "Wachunpelo",
-          "ja": "ワチュン・ペロ"
-        },
+        "nameId": 4550,
         "type": "aetheryte",
         "location": "1349,604"
       },
       {
         "id": 1164,
-        "name": {
-          "en": "Worlar's Echo",
-          "ja": "ウォーラーの残響",
-          "fr": "L'Écho de Worlar",
-          "de": "Worlars Echo"
-        },
+        "nameId": 4562,
         "type": "aetheryte",
         "location": "1489,1663"
       },
@@ -6039,47 +5662,29 @@
   },
   "kozamauka": {
     "id": "kozamauka",
-    "name": "Kozama'uka",
+    "territoryId": 1188,
     "pois": [
       {
         "id": 1180,
-        "name": {
-          "en": "Ok'hanu",
-          "ja": "オック・ハヌ"
-        },
+        "nameId": 4582,
         "type": "aetheryte",
         "location": "854,544"
       },
       {
         "id": 1273,
-        "name": {
-          "en": "Dock Poga",
-          "ja": "ポガ停船所",
-          "fr": "Embarcadère de Poga",
-          "de": "Poga-Dock"
-        },
+        "nameId": 4595,
         "type": "aetheryte",
         "location": "1810,788"
       },
       {
         "id": 1181,
-        "name": {
-          "en": "Many Fires",
-          "ja": "朋友の灯火",
-          "fr": "Maints-Feux",
-          "de": "Viele Flammen"
-        },
+        "nameId": 4598,
         "type": "aetheryte",
         "location": "1558,1229"
       },
       {
         "id": 1182,
-        "name": {
-          "en": "Earthenshire",
-          "ja": "アースンシャイア",
-          "fr": "La Fournée",
-          "de": "Irdehalde"
-        },
+        "nameId": 4603,
         "type": "aetheryte",
         "location": "544,1339"
       },
@@ -6162,23 +5767,17 @@
   },
   "yak_tel": {
     "id": "yak_tel",
-    "name": "Yak T'el",
+    "territoryId": 1189,
     "pois": [
       {
         "id": 1199,
-        "name": {
-          "en": "Iq Br'aax",
-          "ja": "イクブラーシャ"
-        },
+        "nameId": 4614,
         "type": "aetheryte",
         "location": "624,594"
       },
       {
         "id": 1200,
-        "name": {
-          "en": "Mamook",
-          "ja": "マムーク"
-        },
+        "nameId": 4625,
         "type": "aetheryte",
         "location": "1738,1553"
       },
@@ -6261,34 +5860,23 @@
   },
   "shaaloani": {
     "id": "shaaloani",
-    "name": "Shaaloani",
+    "territoryId": 1190,
     "pois": [
       {
         "id": 1216,
-        "name": {
-          "en": "Mehwahhetsoan",
-          "ja": "メワヘイゾーン"
-        },
+        "nameId": 4664,
         "type": "aetheryte",
         "location": "1329,465"
       },
       {
         "id": 1217,
-        "name": {
-          "en": "Sheshenewezi Springs",
-          "ja": "シェシェネ青燐泉",
-          "fr": "Sources de Sheshenewezi",
-          "de": "Sheshenewezi-Quellen"
-        },
+        "nameId": 4667,
         "type": "aetheryte",
         "location": "729,914"
       },
       {
         "id": 1218,
-        "name": {
-          "en": "Hhusatahwi",
-          "ja": "フーサタイ宿場町"
-        },
+        "nameId": 4659,
         "type": "aetheryte",
         "location": "1399,1499"
       },
@@ -6376,38 +5964,23 @@
   },
   "heritage_found": {
     "id": "heritage_found",
-    "name": "Heritage Found",
+    "territoryId": 1191,
     "pois": [
       {
         "id": 1236,
-        "name": {
-          "en": "The Outskirts",
-          "ja": "アウトスカーツ",
-          "fr": "Les Faubourgs",
-          "de": "Außenbezirke"
-        },
+        "nameId": 4685,
         "type": "aetheryte",
         "location": "799,440"
       },
       {
         "id": 1237,
-        "name": {
-          "en": "Electrope Strike",
-          "ja": "エレクトロープ採石場",
-          "fr": "Mines d'Électrope",
-          "de": "Elektrob-Bruch"
-        },
+        "nameId": 4694,
         "type": "aetheryte",
         "location": "799,1144"
       },
       {
         "id": 1238,
-        "name": {
-          "en": "Yyasulani Station",
-          "ja": "ヤースラニ駅",
-          "fr": "Gare de Yyasulani",
-          "de": "Bahnhof Yyasulani"
-        },
+        "nameId": 4678,
         "type": "aetheryte",
         "location": "1534,1224"
       },
@@ -6490,38 +6063,23 @@
   },
   "living_memory": {
     "id": "living_memory",
-    "name": "Living Memory",
+    "territoryId": 1192,
     "pois": [
       {
         "id": 1254,
-        "name": {
-          "en": "Leynode Aero",
-          "ja": "レイノード・ウィンド",
-          "fr": "Nœud tellurique aéro",
-          "de": "Leyknoten Aero"
-        },
+        "nameId": 4713,
         "type": "aetheryte",
         "location": "764,634"
       },
       {
         "id": 1255,
-        "name": {
-          "en": "Leynode Pyro",
-          "ja": "レイノード・ファイア",
-          "fr": "Nœud tellurique pyro",
-          "de": "Leyknoten Pyro"
-        },
+        "nameId": 4721,
         "type": "aetheryte",
         "location": "1683,749"
       },
       {
         "id": 1256,
-        "name": {
-          "en": "Leynode Mnemo",
-          "ja": "レイノード・メモリス",
-          "fr": "Nœud tellurique mnémo",
-          "de": "Leyknoten Mnemo"
-        },
+        "nameId": 4700,
         "type": "aetheryte",
         "location": "1034,1823"
       },
