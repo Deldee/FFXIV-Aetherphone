@@ -234,7 +234,7 @@ internal sealed partial class HuntsApp
                 Gap(12f);
             }
 
-            var rawDescText = HuntMobLore.DescriptionFor(view.MobId);
+            var rawDescText = HuntMobLore.DescriptionFor(view.MobId, def);
             var descText = rawDescText ?? Loc.T(L.Hunts.NoLoreAvailable);
 
             DrawLoreSection(Loc.T(L.Hunts.DescriptionSection), descText, null, ref detailDescExpanded, scale);

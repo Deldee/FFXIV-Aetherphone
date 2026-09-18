@@ -131,8 +131,8 @@ internal sealed class HuntMobTimingWindow
 
 internal sealed class HuntMobPhase
 {
-    [JsonPropertyName("name")]
-    public Dictionary<string, string>? Name { get; set; }
+    [JsonPropertyName("nameId")]
+    public uint NameId { get; set; }
 
     [JsonPropertyName("zonePoiIds")]
     public int[] ZonePoiIds { get; set; } = Array.Empty<int>();

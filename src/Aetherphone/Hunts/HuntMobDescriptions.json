@@ -47,10 +47,6 @@
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
     "row": 43
   },
-  "archaeotania": {
-    "sheet": "Fate",
-    "row": 1431
-  },
   "armstrong": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
     "row": 48
@@ -70,10 +66,6 @@
   "barbastelle": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF2_00184",
     "row": 11
-  },
-  "behemoth": {
-    "sheet": "Fate",
-    "row": 505
   },
   "bird_of_paradise": {
     "sheet": "custom/002/RegAbr2NotoriousMonsterHintF1_00268",
@@ -119,17 +111,9 @@
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF6_00188",
     "row": 15
   },
-  "chi": {
-    "sheet": "Fate",
-    "row": 1855
-  },
   "chupacabra": {
     "sheet": "custom/008/CtsHnt70RiskyMobUrqopacha_00898",
     "row": 12
-  },
-  "coeurlregina": {
-    "sheet": "Fate",
-    "row": 902
   },
   "coquecigrue": {
     "sheet": "custom/006/CtsHnt50RiskyMobKholusia_00615",
@@ -146,10 +130,6 @@
   "croque_mitaine": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF1_00183",
     "row": 15
-  },
-  "daivadipa": {
-    "sheet": "Fate",
-    "row": 1763
   },
   "dalvags_final_flame": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF5_00193",
@@ -206,10 +186,6 @@
   "forgiven_rebellion": {
     "sheet": "custom/006/CtsHnt50RiskyMobIlMheg_00617",
     "row": 32
-  },
-  "formidable": {
-    "sheet": "Fate",
-    "row": 1464
   },
   "forneus": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF1_00194",
@@ -334,10 +310,6 @@
   "itzpapalotl": {
     "sheet": "custom/006/CtsHnt50RiskyMobLakeland_00614",
     "row": 13
-  },
-  "ixion": {
-    "sheet": "Fate",
-    "row": 1103
   },
   "ixtab": {
     "sheet": "custom/006/CtsHnt50RiskyMobRaktika_00618",
@@ -467,10 +439,6 @@
     "sheet": "custom/001/RegFstNotoriousMonsterHintF2_00195",
     "row": 13
   },
-  "mica_the_magical_mu": {
-    "sheet": "Fate",
-    "row": 1922
-  },
   "mindflayer": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF3_00196",
     "row": 15
@@ -531,10 +499,6 @@
     "sheet": "custom/009/CtsHnt70RiskyMobYakTel_00900",
     "row": 23
   },
-  "noctilucale": {
-    "sheet": "Fate",
-    "row": 877
-  },
   "nopalitender_fabuloso": {
     "sheet": "custom/009/CtsHnt70RiskyMobShaaloani_00901",
     "row": 9
@@ -550,10 +514,6 @@
   "o_poorest_pauldia": {
     "sheet": "custom/006/CtsHnt50RiskyMobIlMheg_00617",
     "row": 20
-  },
-  "odin": {
-    "sheet": "Fate",
-    "row": 196
   },
   "okina": {
     "sheet": "custom/004/CtsHnt40Kugane1_00426",
@@ -731,10 +691,6 @@
     "sheet": "custom/006/CtsHnt50RiskyMobRaktika_00618",
     "row": 18
   },
-  "tamamo_gozen": {
-    "sheet": "Fate",
-    "row": 1106
-  },
   "tarchia": {
     "sheet": "custom/006/CtsHnt50RiskyMobAmhAraeng_00616",
     "row": 24
@@ -774,10 +730,6 @@
   "thousand_cast_theda": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF4_00197",
     "row": 15
-  },
-  "ttokrrone": {
-    "sheet": "Fate",
-    "row": 1871
   },
   "tyger": {
     "sheet": "custom/006/CtsHnt50RiskyMobLakeland_00614",

@@ -13,10 +13,18 @@ public sealed class HuntMobDescriptionCatalogTests
     {
         var catalog = new HuntMobDescriptionCatalog(Source());
 
-        var reference = catalog.ById["behemoth"];
+        var reference = catalog.ById["aegeiros"];
 
-        Assert.Equal("Fate", reference.Sheet);
-        Assert.Equal(505u, reference.Row);
+        Assert.Equal("custom/007/CtsHnt60RiskyMobThavnair_00762", reference.Sheet);
+        Assert.Equal(42u, reference.Row);
+    }
+
+    [Fact]
+    public void FateLinkedMobsAreNotInTheCatalogAnymore()
+    {
+        var catalog = new HuntMobDescriptionCatalog(Source());
+
+        Assert.False(catalog.ById.ContainsKey("behemoth"));
     }
 
     [Fact]
@@ -35,6 +43,6 @@ public sealed class HuntMobDescriptionCatalogTests
         var catalog = new HuntMobDescriptionCatalog(missing);
 
         Assert.Empty(catalog.ById);
-        Assert.Null(catalog.DescriptionFor("behemoth"));
+        Assert.Null(catalog.DescriptionFor("behemoth", def: null));
     }
 }

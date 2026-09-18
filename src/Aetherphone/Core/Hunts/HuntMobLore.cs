@@ -13,7 +13,7 @@ internal static class HuntMobLore
         tips = tipCatalog;
     }
 
-    public static string? DescriptionFor(string mobId) => descriptions?.DescriptionFor(mobId);
+    public static string? DescriptionFor(string mobId, HuntMobDefinition? def) => descriptions?.DescriptionFor(mobId, def);
 
     public static string? TipFor(string mobId) => tips?.TextFor(mobId, Loc.Current.Code);
 
