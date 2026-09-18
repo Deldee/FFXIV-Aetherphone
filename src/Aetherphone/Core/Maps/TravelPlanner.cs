@@ -134,9 +134,14 @@ internal static class TravelPlanner
         return lookup.TryGetValue(territoryId, out var destination) ? destination : default;
     }
 
-    private readonly record struct AetheryteCandidate(uint RowId, string Name, Vector2 MapCoordinate);
+    internal readonly record struct AetheryteCandidate(
+        uint RowId, string Name, Vector2 MapCoordinate, float RawX, float RawY, uint PlaceNameId);
 
     private static Dictionary<uint, List<AetheryteCandidate>>? aetherytesByTerritory;
+
+    public static IReadOnlyList<AetheryteCandidate> AetherytesInTerritory(uint territoryId) =>
+        (aetherytesByTerritory ??= BuildAetheryteCandidates()).GetValueOrDefault(territoryId) ??
+        (IReadOnlyList<AetheryteCandidate>)Array.Empty<AetheryteCandidate>();
 
     private static TravelDestination? ResolveNearestAetheryte(uint territoryId, (float X, float Y) targetCoordinate)
     {
@@ -207,7 +212,8 @@ internal static class TravelPlanner
                     byTerritory[territoryId] = candidates;
                 }
 
-                candidates.Add(new AetheryteCandidate(aetheryte.RowId, name, new Vector2(mapX, mapY)));
+                candidates.Add(new AetheryteCandidate(aetheryte.RowId, name, new Vector2(mapX, mapY), marker.X,
+                    marker.Y, aetheryte.PlaceName.RowId));
             }
         }
 

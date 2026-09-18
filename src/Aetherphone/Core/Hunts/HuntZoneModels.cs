@@ -28,12 +28,6 @@ internal sealed class HuntPoiEntry
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
-    [JsonPropertyName("nameId")]
-    public uint NameId { get; set; }
-
-    [JsonPropertyName("type")]
-    public string Type { get; set; } = string.Empty;
-
     [JsonPropertyName("location")]
     public string Location { get; set; } = string.Empty;
 

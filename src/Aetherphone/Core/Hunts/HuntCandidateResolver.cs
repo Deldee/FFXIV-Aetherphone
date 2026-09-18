@@ -4,8 +4,6 @@ internal readonly record struct HuntPoiState(HuntPoiEntry Poi, HuntsMapMarkerSta
 
 internal static class HuntCandidateResolver
 {
-    private const string MobPoiType = "mob";
-
     public static HashSet<int> ResolveCandidatePoiIds(HuntMobDefinition mob,
         (int WindowNum, int PhaseNum)? activePhase, out bool finalPhase)
     {
@@ -261,8 +259,7 @@ internal static class HuntCandidateResolver
         for (var index = 0; index < zonePois.Length; index++)
         {
             var poi = zonePois[index];
-            if (!string.Equals(poi.Type, MobPoiType, StringComparison.Ordinal) ||
-                !mobCatalog.IsLandminePoi(poi.Id) || !results.TrueForAll(existing => existing.Poi.Id != poi.Id))
+            if (!mobCatalog.IsLandminePoi(poi.Id) || !results.TrueForAll(existing => existing.Poi.Id != poi.Id))
             {
                 continue;
             }

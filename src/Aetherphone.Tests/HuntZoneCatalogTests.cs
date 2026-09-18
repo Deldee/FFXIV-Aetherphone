@@ -38,13 +38,23 @@ public sealed class HuntZoneCatalogTests
     }
 
     [Fact]
-    public void ResolvesTheNameIdStoredForAnAetherytePoi()
+    public void ResolvesAKnownMobSpawnPoi()
+    {
+        var catalog = new HuntZoneCatalog(Source());
+
+        var found = catalog.FindPoi(6);
+
+        Assert.NotNull(found);
+        Assert.Equal("middle_la_noscea", found!.Value.ZoneId);
+    }
+
+    [Fact]
+    public void AetherytesAreNoLongerStoredAsPois()
     {
         var catalog = new HuntZoneCatalog(Source());
 
         var found = catalog.FindPoi(3);
 
-        Assert.NotNull(found);
-        Assert.Equal(184u, found!.Value.Poi.NameId);
+        Assert.Null(found);
     }
 }

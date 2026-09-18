@@ -27,7 +27,6 @@ internal sealed partial class HuntsApp
     private const float LoreHeaderHoverMix = 0.08f;
     private const float LoreBodyAlpha = 0.35f;
     private const float LoreBodyPadding = 6f;
-    private const string AetherytePoiType = "aetheryte";
     private const uint AetheryteMapIconId = 60453;
 
     private const float MapAetheryteIconSize = 20f;
@@ -44,7 +43,7 @@ internal sealed partial class HuntsApp
     private bool detailTimingExpanded = true;
     private string detailMobId = string.Empty;
     private string detailMapZoneId = string.Empty;
-    private readonly List<HuntPoiEntry> detailMapAetherytePoints = new();
+    private readonly List<TravelPlanner.AetheryteCandidate> detailMapAetherytePoints = new();
     private readonly Dictionary<(uint TerritoryId, string ZoneId), string> zoneLabelCache = new();
     private SheetLanguageGate zoneLabelCacheGate;
     private readonly PhotoZoomView detailMapZoom = new();
@@ -114,20 +113,13 @@ internal sealed partial class HuntsApp
             return;
         }
 
-        var zone = zoneCatalog.FindZone(zoneId);
-        if (zone is null)
+        var territoryId = zoneCatalog.ResolveTerritoryId(zoneId);
+        if (territoryId == 0)
         {
             return;
         }
 
-        var pois = zone.Pois;
-        for (var poiIndex = 0; poiIndex < pois.Length; poiIndex++)
-        {
-            if (string.Equals(pois[poiIndex].Type, AetherytePoiType, StringComparison.Ordinal))
-            {
-                detailMapAetherytePoints.Add(pois[poiIndex]);
-            }
-        }
+        detailMapAetherytePoints.AddRange(TravelPlanner.AetherytesInTerritory(territoryId));
     }
 
     private void CloseDetail()
@@ -480,12 +472,11 @@ internal sealed partial class HuntsApp
         var mapId = ResolveMapId(territoryId);
         for (var index = 0; index < detailMapAetherytePoints.Count; index++)
         {
-            var poi = detailMapAetherytePoints[index];
-            var (rawX, rawY) = poi.ParsedLocation();
-            var (normalizedX, normalizedY) = MapPixelMath.NormalizeToFullCanvas(rawX, rawY);
+            var candidate = detailMapAetherytePoints[index];
+            var (normalizedX, normalizedY) = MapPixelMath.NormalizeToFullCanvas(candidate.RawX, candidate.RawY);
             var dotPosition = new Vector2(min.X + normalizedX * (max.X - min.X),
                 min.Y + normalizedY * (max.Y - min.Y));
-            DrawAetheryteDot(drawList, dotPosition, scale, poi, territoryId, worldId, mapId, view.ZoneInstance);
+            DrawAetheryteDot(drawList, dotPosition, scale, candidate, territoryId, worldId, mapId, view.ZoneInstance);
         }
 
         drawList.PopClipRect();
@@ -545,8 +536,8 @@ internal sealed partial class HuntsApp
             HoverLabelSide.Above);
     }
 
-    private void DrawAetheryteDot(ImDrawListPtr drawList, Vector2 center, float scale, HuntPoiEntry poi,
-        uint territoryId, uint worldId, uint mapId, int zoneInstance)
+    private void DrawAetheryteDot(ImDrawListPtr drawList, Vector2 center, float scale,
+        TravelPlanner.AetheryteCandidate candidate, uint territoryId, uint worldId, uint mapId, int zoneInstance)
     {
         var iconRadius = MapAetheryteIconSize * 0.5f * scale;
         var iconMin = new Vector2(center.X - iconRadius, center.Y - iconRadius);
@@ -560,17 +551,16 @@ internal sealed partial class HuntsApp
         if (hovered)
         {
             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            HoverTooltip.Show(new Rect(hitMin, hitMax), ResolvePoiLabel(poi), HoverLabelSide.Above);
+            var label = HuntPoiNames.NameFor(candidate.PlaceNameId) ?? string.Empty;
+            HoverTooltip.Show(new Rect(hitMin, hitMax), label, HoverLabelSide.Above);
         }
 
         if (UiInteract.Click(hitMin, hitMax, hovered) && territoryId != 0 && worldId != 0)
         {
-            var poiCoordinate = zoneCatalog.ResolveCoordinate(poi.Id);
+            var poiCoordinate = ((float X, float Y)?)(candidate.MapCoordinate.X, candidate.MapCoordinate.Y);
             NavigateToAetheryte(territoryId, worldId, mapId, poiCoordinate, zoneInstance);
         }
     }
-
-    private static string ResolvePoiLabel(HuntPoiEntry poi) => HuntPoiNames.NameFor(poi.NameId) ?? string.Empty;
 
     private bool DrawNavigateButton(HuntsView view, float scale, int? confirmedPoiId)
     {
