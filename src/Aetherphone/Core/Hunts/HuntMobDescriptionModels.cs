@@ -9,6 +9,9 @@ internal sealed class HuntMobDescriptionReference
 
     [JsonPropertyName("row")]
     public uint Row { get; set; }
+
+    [JsonPropertyName("count")]
+    public int Count { get; set; } = 1;
 }
 
 [JsonSerializable(typeof(Dictionary<string, HuntMobDescriptionReference>))]

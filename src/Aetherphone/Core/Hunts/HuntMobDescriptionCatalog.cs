@@ -105,6 +105,38 @@ internal sealed class HuntMobDescriptionCatalog
     private static string? ResolveText(HuntMobDescriptionReference reference)
     {
         var sheet = Plugin.DataManager.GetLocalizedSheet<RawRow>(sheetName: reference.Sheet);
-        return sheet.TryGetRow(reference.Row, out var row) ? row.ReadStringColumn(DescriptionColumn).ExtractText() : null;
+        List<string>? parts = null;
+        for (var index = 0; index < reference.Count; index++)
+        {
+            if (!sheet.TryGetRow(reference.Row + (uint)index, out var row))
+            {
+                break;
+            }
+
+            var text = StripDecorativeQuotes(row.ReadStringColumn(DescriptionColumn).ExtractText());
+            if (text.Length == 0)
+            {
+                break;
+            }
+
+            (parts ??= new List<string>()).Add(text);
+        }
+
+        return parts is null ? null : string.Join(" ", parts);
+    }
+
+    private static string StripDecorativeQuotes(string text)
+    {
+        if (text.Length > 0 && text[0] is '"' or '“' or '”')
+        {
+            text = text[1..];
+        }
+
+        if (text.Length > 0 && text[^1] is '"' or '“' or '”')
+        {
+            text = text[..^1];
+        }
+
+        return text;
     }
 }

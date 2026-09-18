@@ -1,818 +1,1022 @@
 {
   "13th_child": {
     "sheet": "custom/009/CtsHnt70RiskyMobLivingMemory_00903",
-    "row": 14
+    "row": 14,
+    "count": 3
   },
   "aegeiros": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
-    "row": 42
+    "row": 42,
+    "count": 3
   },
   "agathos": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintT1B_00269",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "aglaope": {
     "sheet": "custom/006/CtsHnt50RiskyMobIlMheg_00617",
-    "row": 28
+    "row": 28,
+    "count": 4
   },
   "agrippa_the_mighty": {
     "sheet": "custom/001/RegLakNotoriousMonsterHintF1_00199",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "albin_the_ashen": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF4_00192",
-    "row": 12
+    "row": 11,
+    "count": 2
   },
   "alectryon": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF1_00189",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "alteci": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintF1_00265",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "angada": {
     "sheet": "custom/004/CtsHnt40Kugane2_00428",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "aqrabuamelu": {
     "sheet": "custom/004/CtsHnt40AlaGhiri_00429",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "arch_aethereater": {
     "sheet": "custom/009/CtsHnt70RiskyMobLivingMemory_00903",
-    "row": 28
+    "row": 24,
+    "count": 9
   },
   "arch_eta": {
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
-    "row": 43
+    "row": 43,
+    "count": 3
   },
   "armstrong": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
-    "row": 48
+    "row": 48,
+    "count": 4
   },
   "aswang": {
     "sheet": "custom/004/CtsHnt40Reunion_00427",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "atticus_the_primogenitor": {
     "sheet": "custom/009/CtsHnt70RiskyMobHeritageFound_00902",
-    "row": 21
+    "row": 21,
+    "count": 4
   },
   "baal": {
     "sheet": "custom/006/CtsHnt50RiskyMobTempest_00619",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "barbastelle": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF2_00184",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "bird_of_paradise": {
     "sheet": "custom/002/RegAbr2NotoriousMonsterHintF1_00268",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "bloody_mary": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF3_00185",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "bone_crawler": {
     "sheet": "custom/004/CtsHnt40AlaGhiri_00429",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "bonnacon": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF4_00186",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "brontes": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF2_00190",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "buccaboo": {
     "sheet": "custom/004/CtsHnt40AlaGhiri_00429",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "bune": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintT1B_00269",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "burfurlur_the_canny": {
     "sheet": "custom/007/CtsHnt60RiskyMobLabyrinthos_00761",
-    "row": 21
+    "row": 21,
+    "count": 4
   },
   "campacti": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintT1C_00270",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "cats_eye": {
     "sheet": "custom/009/CtsHnt70RiskyMobLivingMemory_00903",
-    "row": 20
+    "row": 20,
+    "count": 4
   },
   "chernobog": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF6_00188",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "chupacabra": {
     "sheet": "custom/008/CtsHnt70RiskyMobUrqopacha_00898",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "coquecigrue": {
     "sheet": "custom/006/CtsHnt50RiskyMobKholusia_00615",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "cornu": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF6_00188",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "croakadile": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF2_00184",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "croque_mitaine": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF1_00183",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "dalvags_final_flame": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF5_00193",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "daphnia_magna": {
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
-    "row": 17
+    "row": 17,
+    "count": 3
   },
   "dark_helmet": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF4_00186",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "deacon": {
     "sheet": "custom/006/CtsHnt50RiskyMobTempest_00619",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "deidar": {
     "sheet": "custom/004/CtsHnt40Kugane2_00428",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "domovoi": {
     "sheet": "custom/006/CtsHnt50RiskyMobIlMheg_00617",
-    "row": 16
+    "row": 16,
+    "count": 4
   },
   "emperors_rose": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
-    "row": 36
+    "row": 36,
+    "count": 3
   },
   "enkelados": {
     "sheet": "custom/002/RegAbr2NotoriousMonsterHintF1_00268",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "erle": {
     "sheet": "custom/004/CtsHnt40CastrumOriens_00425",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "false_gigantopithecus": {
     "sheet": "custom/002/RegDra2NotoriousMonsterHintT1_00267",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "fan_ail": {
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
-    "row": 46
+    "row": 46,
+    "count": 3
   },
   "flame_sergeant_dalvag": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF5_00193",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "forgiven_pedantry": {
     "sheet": "custom/006/CtsHnt50RiskyMobKholusia_00615",
-    "row": 23
+    "row": 21,
+    "count": 4
   },
   "forgiven_rebellion": {
     "sheet": "custom/006/CtsHnt50RiskyMobIlMheg_00617",
-    "row": 32
+    "row": 32,
+    "count": 4
   },
   "forneus": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF1_00194",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "funa_yurei": {
     "sheet": "custom/004/CtsHnt40Kugane1_00426",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "gajasura": {
     "sheet": "custom/004/CtsHnt40Kugane2_00428",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "gallowsbeak": {
     "sheet": "custom/009/CtsHnt70RiskyMobHeritageFound_00902",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "gamma": {
     "sheet": "custom/004/CtsHnt40Kugane2_00428",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "gandarewa": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintT1B_00269",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "gargant": {
     "sheet": "custom/009/CtsHnt70RiskyMobHeritageFound_00902",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "gatling": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF3_00191",
-    "row": 12
+    "row": 11,
+    "count": 2
   },
   "gauki_strongblade": {
     "sheet": "custom/004/CtsHnt40Kugane1_00426",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "genesis_rock": {
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
-    "row": 14
+    "row": 14,
+    "count": 3
   },
   "ghede_ti_malice": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF3_00196",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "gilshs_aath_swiftclaw": {
     "sheet": "custom/006/CtsHnt50RiskyMobTempest_00619",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "girimekhala": {
     "sheet": "custom/004/CtsHnt40Reunion_00427",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "girtab": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF4_00197",
-    "row": 14
+    "row": 13,
+    "count": 2
   },
   "gnath_cometdrone": {
     "sheet": "custom/002/RegDra2NotoriousMonsterHintF1_00266",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "goozoabekbe": {
     "sheet": "custom/008/CtsHnt70RiskyMobKozamauka_00899",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "grassman": {
     "sheet": "custom/006/CtsHnt50RiskyMobRaktika_00618",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "green_archon": {
     "sheet": "custom/007/CtsHnt60RiskyMobLabyrinthos_00761",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "guhuo_niao": {
     "sheet": "custom/004/CtsHnt40Kugane1_00426",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "gunitt": {
     "sheet": "custom/006/CtsHnt50RiskyMobTempest_00619",
-    "row": 21
+    "row": 21,
+    "count": 4
   },
   "gurangatch": {
     "sheet": "custom/007/CtsHnt60RiskyMobElpis_00765",
-    "row": 20
+    "row": 20,
+    "count": 3
   },
   "gwas_y_neidr": {
     "sheet": "custom/004/CtsHnt40AlaGhiri_00429",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "gyorai_quickstrike": {
     "sheet": "custom/004/CtsHnt40Kugane2_00428",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "hellsclaw": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF3_00185",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "heshuala": {
     "sheet": "custom/009/CtsHnt70RiskyMobHeritageFound_00902",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "hulder": {
     "sheet": "custom/007/CtsHnt60RiskyMobLabyrinthos_00761",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "huracan": {
     "sheet": "custom/006/CtsHnt50RiskyMobKholusia_00615",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "ihnuxokiy": {
     "sheet": "custom/008/CtsHnt70RiskyMobKozamauka_00899",
-    "row": 22
+    "row": 22,
+    "count": 4
   },
   "indomitable": {
     "sheet": "custom/006/CtsHnt50RiskyMobKholusia_00615",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "iravati": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
-    "row": 13
+    "row": 13,
+    "count": 3
   },
   "itzpapalotl": {
     "sheet": "custom/006/CtsHnt50RiskyMobLakeland_00614",
-    "row": 13
+    "row": 13,
+    "count": 4
   },
   "ixtab": {
     "sheet": "custom/006/CtsHnt50RiskyMobRaktika_00618",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "jewel_bearer": {
     "sheet": "custom/009/CtsHnt70RiskyMobLivingMemory_00903",
-    "row": 11
+    "row": 11,
+    "count": 3
   },
   "juggler_hecatomb": {
     "sheet": "custom/006/CtsHnt50RiskyMobAmhAraeng_00616",
-    "row": 12
+    "row": 12,
+    "count": 4
   },
   "kaiser_behemoth": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintF1_00265",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "keheniheyamewi": {
     "sheet": "custom/009/CtsHnt70RiskyMobShaaloani_00901",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "ker": {
     "sheet": "custom/007/CtsHnt60RiskyMobElpis_00765",
-    "row": 27
+    "row": 27,
+    "count": 4
   },
   "kirlirger_the_abhorrent": {
     "sheet": "custom/008/CtsHnt70RiskyMobUrqopacha_00898",
-    "row": 21
+    "row": 21,
+    "count": 5
   },
   "kiwa": {
     "sheet": "custom/004/CtsHnt40RhalgrsReach_00430",
-    "row": 13
+    "row": 12,
+    "count": 3
   },
   "kreutzet": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintF1_00265",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "kurma": {
     "sheet": "custom/004/CtsHnt40Reunion_00427",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "kurrea": {
     "sheet": "custom/001/RegLakNotoriousMonsterHintF1_00199",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "la_velue": {
     "sheet": "custom/006/CtsHnt50RiskyMobLakeland_00614",
-    "row": 9
+    "row": 9,
+    "count": 4
   },
   "laideronnette": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF1_00194",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "lampalagua": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF3_00191",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "leafscourge_hadoll_ja": {
     "sheet": "custom/009/CtsHnt70RiskyMobYakTel_00900",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "leech_king": {
     "sheet": "custom/001/RegLakNotoriousMonsterHintF1_00199",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "leucrotta": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintT1C_00270",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "level_cheater": {
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
-    "row": 40
+    "row": 40,
+    "count": 3
   },
   "lil_murderer": {
     "sheet": "custom/006/CtsHnt50RiskyMobKholusia_00615",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "lord_of_the_wyverns": {
     "sheet": "custom/002/RegDra2NotoriousMonsterHintF1_00266",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "luminare": {
     "sheet": "custom/004/CtsHnt40RhalgrsReach_00430",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "lunatender_queen": {
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
-    "row": 23
+    "row": 23,
+    "count": 3
   },
   "lycidas": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintT1C_00270",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "lyuba": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintF1_00265",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "maahas": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF3_00191",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "mad_maguey": {
     "sheet": "custom/008/CtsHnt70RiskyMobUrqopacha_00898",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "mahisha": {
     "sheet": "custom/004/CtsHnt40RhalgrsReach_00430",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "maliktender": {
     "sheet": "custom/006/CtsHnt50RiskyMobAmhAraeng_00616",
-    "row": 16
+    "row": 16,
+    "count": 4
   },
   "manes": {
     "sheet": "custom/004/CtsHnt40RhalgrsReach_00430",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "marberry": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF5_00187",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "marraco": {
     "sheet": "custom/001/RegRocNotoriousMonsterHintF1_00198",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "melt": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF2_00195",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "mindflayer": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF3_00196",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "mindmaker": {
     "sheet": "custom/006/CtsHnt50RiskyMobRaktika_00618",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "minerva": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
-    "row": 45
+    "row": 45,
+    "count": 3
   },
   "minhocao": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF5_00193",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "mirka": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintF1_00265",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "monarch_ogrefly": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF3_00196",
-    "row": 12
+    "row": 11,
+    "count": 2
   },
   "mousse_princess": {
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
-    "row": 20
+    "row": 20,
+    "count": 3
   },
   "myradrosh": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF5_00187",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "nahn": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF4_00186",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "nandi": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF5_00187",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "nariphon": {
     "sheet": "custom/006/CtsHnt50RiskyMobLakeland_00614",
-    "row": 20
+    "row": 20,
+    "count": 4
   },
   "narrow_rift": {
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
-    "row": 49
+    "row": 49,
+    "count": 4
   },
   "naul": {
     "sheet": "custom/001/RegRocNotoriousMonsterHintF1_00198",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "nechuciho": {
     "sheet": "custom/008/CtsHnt70RiskyMobUrqopacha_00898",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "neyoozoteel": {
     "sheet": "custom/009/CtsHnt70RiskyMobYakTel_00900",
-    "row": 23
+    "row": 21,
+    "count": 4
   },
   "nopalitender_fabuloso": {
     "sheet": "custom/009/CtsHnt70RiskyMobShaaloani_00901",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "nuckelavee": {
     "sheet": "custom/006/CtsHnt50RiskyMobLakeland_00614",
-    "row": 17
+    "row": 17,
+    "count": 3
   },
   "nunyunuwi": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF4_00192",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "o_poorest_pauldia": {
     "sheet": "custom/006/CtsHnt50RiskyMobIlMheg_00617",
-    "row": 20
+    "row": 20,
+    "count": 4
   },
   "okina": {
     "sheet": "custom/004/CtsHnt40Kugane1_00426",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "omni": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintT1C_00270",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "oni_yumemi": {
     "sheet": "custom/004/CtsHnt40Kugane1_00426",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "ophioneus": {
     "sheet": "custom/007/CtsHnt60RiskyMobElpis_00765",
-    "row": 23
+    "row": 23,
+    "count": 4
   },
   "orcus": {
     "sheet": "custom/004/CtsHnt40CastrumOriens_00425",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "orghana": {
     "sheet": "custom/004/CtsHnt40Reunion_00427",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "oskh_rhei": {
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
-    "row": 37
+    "row": 37,
+    "count": 3
   },
   "ouzelum": {
     "sheet": "custom/004/CtsHnt40CastrumOriens_00425",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "ovjang": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF2_00190",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "pachamama": {
     "sheet": "custom/006/CtsHnt50RiskyMobRaktika_00618",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "petalodus": {
     "sheet": "custom/007/CtsHnt60RiskyMobElpis_00765",
-    "row": 17
+    "row": 17,
+    "count": 3
   },
   "phecda": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF4_00197",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "pkuucha": {
     "sheet": "custom/008/CtsHnt70RiskyMobKozamauka_00899",
-    "row": 18
+    "row": 18,
+    "count": 4
   },
   "pterygotus": {
     "sheet": "custom/002/RegDra2NotoriousMonsterHintT1_00267",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "pylraster": {
     "sheet": "custom/002/RegDra2NotoriousMonsterHintF1_00266",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "queen_hawk": {
     "sheet": "custom/008/CtsHnt70RiskyMobUrqopacha_00898",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "rrax_yitya": {
     "sheet": "custom/009/CtsHnt70RiskyMobYakTel_00900",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "ruminator": {
     "sheet": "custom/007/CtsHnt60RiskyMobMareLamentorum_00764",
-    "row": 26
+    "row": 26,
+    "count": 4
   },
   "rusalka": {
     "sheet": "custom/006/CtsHnt50RiskyMobTempest_00619",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "sabotender_bailarina": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF2_00190",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "safat": {
     "sheet": "custom/001/RegRocNotoriousMonsterHintF1_00198",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "sally_the_sweeper": {
     "sheet": "custom/009/CtsHnt70RiskyMobLivingMemory_00903",
-    "row": 18
+    "row": 17,
+    "count": 3
   },
   "salt_and_light": {
     "sheet": "custom/004/CtsHnt40RhalgrsReach_00430",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "sansheya": {
     "sheet": "custom/009/CtsHnt70RiskyMobShaaloani_00901",
-    "row": 21
+    "row": 21,
+    "count": 5
   },
   "sanu_vali_of_dancing_wings": {
     "sheet": "custom/002/RegAbr2NotoriousMonsterHintF1_00268",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "scitalis": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintT1B_00269",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "senmurv": {
     "sheet": "custom/002/RegDra2NotoriousMonsterHintF1_00266",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "sewer_syrup": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF1_00189",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "shadow_dweller_yamini": {
     "sheet": "custom/004/CtsHnt40CastrumOriens_00425",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "shockmaw": {
     "sheet": "custom/007/CtsHnt60RiskyMobElpis_00765",
-    "row": 11
+    "row": 11,
+    "count": 3
   },
   "sisiutl": {
     "sheet": "custom/002/RegAbr2NotoriousMonsterHintF1_00268",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "skogs_fru": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF1_00183",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "slipkinx_steeljoints": {
     "sheet": "custom/002/RegDra2NotoriousMonsterHintT1_00267",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "sphatika": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
-    "row": 25
+    "row": 25,
+    "count": 4
   },
   "squonk": {
     "sheet": "custom/002/RegAbr2NotoriousMonsterHintF1_00268",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "starcrier": {
     "sheet": "custom/009/CtsHnt70RiskyMobYakTel_00900",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "stench_blossom": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintT1C_00270",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "stinging_sophie": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF2_00195",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "stolas": {
     "sheet": "custom/002/RegDra2NotoriousMonsterHintT1_00267",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "storsie": {
     "sheet": "custom/007/CtsHnt60RiskyMobLabyrinthos_00761",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "sugaar": {
     "sheet": "custom/006/CtsHnt50RiskyMobAmhAraeng_00616",
-    "row": 20
+    "row": 20,
+    "count": 4
   },
   "sugriva": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
-    "row": 19
+    "row": 19,
+    "count": 3
   },
   "sum": {
     "sheet": "custom/004/CtsHnt40Reunion_00427",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "supay": {
     "sheet": "custom/006/CtsHnt50RiskyMobRaktika_00618",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "tarchia": {
     "sheet": "custom/006/CtsHnt50RiskyMobAmhAraeng_00616",
-    "row": 24
+    "row": 24,
+    "count": 5
   },
   "the_forecaster": {
     "sheet": "custom/009/CtsHnt70RiskyMobLivingMemory_00903",
-    "row": 24
+    "row": 24,
+    "count": 9
   },
   "the_garlok": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF3_00185",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "the_mudman": {
     "sheet": "custom/006/CtsHnt50RiskyMobIlMheg_00617",
-    "row": 24
+    "row": 24,
+    "count": 4
   },
   "the_pale_rider": {
     "sheet": "custom/002/RegDra2NotoriousMonsterHintT1_00267",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "the_raintriller": {
     "sheet": "custom/008/CtsHnt70RiskyMobKozamauka_00899",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "the_scarecrow": {
     "sheet": "custom/002/RegRoc2NotoriousMonsterHintT1B_00269",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "the_slammer": {
     "sheet": "custom/008/CtsHnt70RiskyMobKozamauka_00899",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "thextera": {
     "sheet": "custom/002/RegDra2NotoriousMonsterHintF1_00266",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "thousand_cast_theda": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF4_00197",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "tyger": {
     "sheet": "custom/006/CtsHnt50RiskyMobLakeland_00614",
-    "row": 24
+    "row": 24,
+    "count": 4
   },
   "u_u_u_u": {
     "sheet": "custom/007/CtsHnt60RiskyMobLabyrinthos_00761",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "udumbara": {
     "sheet": "custom/004/CtsHnt40CastrumOriens_00425",
-    "row": 21
+    "row": 21,
+    "count": 3
   },
   "uktena": {
     "sheet": "custom/009/CtsHnt70RiskyMobShaaloani_00901",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "unktehi": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF2_00184",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "urna_variabilis": {
     "sheet": "custom/009/CtsHnt70RiskyMobHeritageFound_00902",
-    "row": 18
+    "row": 18,
+    "count": 3
   },
   "vajrakumara": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
-    "row": 16
+    "row": 16,
+    "count": 3
   },
   "vochstein": {
     "sheet": "custom/004/CtsHnt40AlaGhiri_00429",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "vogaal_ja": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF1_00183",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "vulpangue": {
     "sheet": "custom/006/CtsHnt50RiskyMobIlMheg_00617",
-    "row": 13
+    "row": 13,
+    "count": 3
   },
   "vuokho": {
     "sheet": "custom/001/RegSeaNotoriousMonsterHintF6_00188",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "warmonger": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
-    "row": 39
+    "row": 39,
+    "count": 3
   },
   "white_joker": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF1_00194",
-    "row": 11
+    "row": 11,
+    "count": 2
   },
   "worm_of_the_well": {
     "sheet": "custom/006/CtsHnt50RiskyMobAmhAraeng_00616",
-    "row": 9
+    "row": 9,
+    "count": 3
   },
   "wulgaru": {
     "sheet": "custom/001/RegFstNotoriousMonsterHintF2_00195",
-    "row": 15
+    "row": 15,
+    "count": 3
   },
   "xtyiinbek": {
     "sheet": "custom/009/CtsHnt70RiskyMobYakTel_00900",
-    "row": 12
+    "row": 12,
+    "count": 3
   },
   "yehehetoauapyo": {
     "sheet": "custom/009/CtsHnt70RiskyMobShaaloani_00901",
-    "row": 16
+    "row": 15,
+    "count": 3
   },
   "yilan": {
     "sheet": "custom/007/CtsHnt60RiskyMobThavnair_00762",
-    "row": 22
+    "row": 22,
+    "count": 3
   },
   "yumcax": {
     "sheet": "custom/007/CtsHnt60RiskyMobElpis_00765",
-    "row": 14
+    "row": 14,
+    "count": 3
   },
   "zanigoh": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF4_00192",
-    "row": 13
+    "row": 13,
+    "count": 2
   },
   "zona_seeker": {
     "sheet": "custom/001/RegWilNotoriousMonsterHintF1_00189",
-    "row": 16
+    "row": 15,
+    "count": 3
   }
 }

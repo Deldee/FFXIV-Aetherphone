@@ -17,6 +17,7 @@ public sealed class HuntMobDescriptionCatalogTests
 
         Assert.Equal("custom/007/CtsHnt60RiskyMobThavnair_00762", reference.Sheet);
         Assert.Equal(42u, reference.Row);
+        Assert.Equal(3, reference.Count);
     }
 
     [Fact]
