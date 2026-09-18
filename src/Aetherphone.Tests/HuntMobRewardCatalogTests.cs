@@ -41,24 +41,23 @@ public sealed class HuntMobRewardCatalogTests
     }
 
     [Fact]
-    public void ResolvesItemNameForALocaleTheFileCarries()
+    public void ResolvesItemRowIdForAKnownItem()
     {
         var catalog = new HuntMobRewardCatalog(Source());
 
-        var name = catalog.ItemNameFor("allied_seal", "de");
+        var rowId = catalog.ItemRowIdFor("allied_seal");
 
-        Assert.False(string.IsNullOrWhiteSpace(name));
+        Assert.Equal(27u, rowId);
     }
 
     [Fact]
-    public void FallsBackToEnglishItemNameForALocaleTheFileDoesNotCarry()
+    public void ReturnsNullRowIdForAnUnknownItem()
     {
         var catalog = new HuntMobRewardCatalog(Source());
 
-        var english = catalog.ItemNameFor("allied_seal", "en");
-        var spanish = catalog.ItemNameFor("allied_seal", "es");
+        var rowId = catalog.ItemRowIdFor("not_a_real_item_id");
 
-        Assert.Equal(english, spanish);
+        Assert.Null(rowId);
     }
 
     [Fact]
@@ -68,6 +67,6 @@ public sealed class HuntMobRewardCatalogTests
         var catalog = new HuntMobRewardCatalog(missing);
 
         Assert.Empty(catalog.RewardsFor("behemoth"));
-        Assert.Null(catalog.ItemNameFor("allied_seal", "en"));
+        Assert.Null(catalog.ItemRowIdFor("allied_seal"));
     }
 }

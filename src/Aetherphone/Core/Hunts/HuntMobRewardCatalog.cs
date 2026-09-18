@@ -6,7 +6,7 @@ internal sealed class HuntMobRewardCatalog
 {
     private readonly HuntJsonCatalogLoader<HuntMobRewardData> loader;
     private Dictionary<string, HuntMobRewardEntry[]> mobRewards = new();
-    private Dictionary<string, Dictionary<string, string>> itemNames = new();
+    private Dictionary<string, uint> itemRowIds = new();
 
     public HuntMobRewardCatalog(FileInfo source)
     {
@@ -21,25 +21,15 @@ internal sealed class HuntMobRewardCatalog
         return mobRewards.TryGetValue(mobId, out var entries) ? entries : Array.Empty<HuntMobRewardEntry>();
     }
 
-    public string? ItemNameFor(string itemId, string localeCode)
+    public uint? ItemRowIdFor(string itemId)
     {
         loader.EnsureLoaded();
-        if (!itemNames.TryGetValue(itemId, out var byLocale))
-        {
-            return null;
-        }
-
-        if (byLocale.TryGetValue(localeCode, out var name))
-        {
-            return name;
-        }
-
-        return byLocale.TryGetValue("en", out var fallback) ? fallback : null;
+        return itemRowIds.TryGetValue(itemId, out var rowId) ? rowId : null;
     }
 
     private void OnLoaded(HuntMobRewardData parsed)
     {
-        itemNames = parsed.Items;
+        itemRowIds = parsed.Items;
         var expanded = new Dictionary<string, HuntMobRewardEntry[]>();
         foreach (var set in parsed.RewardSets)
         {
@@ -56,7 +46,7 @@ internal sealed class HuntMobRewardCatalog
 internal sealed class HuntMobRewardData
 {
     [JsonPropertyName("items")]
-    public Dictionary<string, Dictionary<string, string>> Items { get; set; } = new();
+    public Dictionary<string, uint> Items { get; set; } = new();
 
     [JsonPropertyName("rewardSets")]
     public HuntMobRewardSet[] RewardSets { get; set; } = Array.Empty<HuntMobRewardSet>();
