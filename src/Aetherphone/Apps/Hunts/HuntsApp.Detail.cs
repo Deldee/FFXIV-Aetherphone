@@ -237,11 +237,7 @@ internal sealed partial class HuntsApp
             var rawDescText = HuntMobLore.DescriptionFor(view.MobId);
             var descText = rawDescText ?? Loc.T(L.Hunts.NoLoreAvailable);
 
-            var descNote = rawDescText is not null && HuntMobLore.DescriptionIsFallback(view.MobId)
-                ? Loc.T(L.Hunts.LoreNotAvailableInLanguage)
-                : null;
-
-            DrawLoreSection(Loc.T(L.Hunts.DescriptionSection), descText, descNote, ref detailDescExpanded, scale);
+            DrawLoreSection(Loc.T(L.Hunts.DescriptionSection), descText, null, ref detailDescExpanded, scale);
             Gap(24f);
         }
     }

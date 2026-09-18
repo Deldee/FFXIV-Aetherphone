@@ -37,33 +37,34 @@ internal static class GameSheetLanguage
         };
     }
 
-    public static ExcelSheet<T> GetLocalizedSheet<T>(this IDataManager data, ClientLanguage? overrideLanguage = null)
+    public static ExcelSheet<T> GetLocalizedSheet<T>(this IDataManager data, ClientLanguage? overrideLanguage = null,
+        string? sheetName = null)
         where T : struct, IExcelRow<T> =>
-        GetSheetForLanguage<T>(data, Resolve(overrideLanguage));
+        GetSheetForLanguage<T>(data, Resolve(overrideLanguage), sheetName);
 
     public static ExcelSheet<T> GetLocalizedSheet<T>(this IDataManager data, SheetLanguageGate gate)
         where T : struct, IExcelRow<T> =>
-        GetSheetForLanguage<T>(data, gate.Language);
+        GetSheetForLanguage<T>(data, gate.Language, null);
 
-    private static ExcelSheet<T> GetSheetForLanguage<T>(IDataManager data, ClientLanguage? language)
+    private static ExcelSheet<T> GetSheetForLanguage<T>(IDataManager data, ClientLanguage? language, string? sheetName)
         where T : struct, IExcelRow<T>
     {
         if (language is not { } resolved)
         {
-            return data.GetExcelSheet<T>();
+            return data.GetExcelSheet<T>(name: sheetName);
         }
 
         lock (UnsupportedLanguagesLock)
         {
             if (UnsupportedLanguages.Contains(resolved))
             {
-                return data.GetExcelSheet<T>();
+                return data.GetExcelSheet<T>(name: sheetName);
             }
         }
 
         try
         {
-            return data.GetExcelSheet<T>(resolved);
+            return data.GetExcelSheet<T>(resolved, sheetName);
         }
         catch (UnsupportedLanguageException)
         {
@@ -72,7 +73,7 @@ internal static class GameSheetLanguage
                 UnsupportedLanguages.Add(resolved);
             }
 
-            return data.GetExcelSheet<T>();
+            return data.GetExcelSheet<T>(name: sheetName);
         }
     }
 }

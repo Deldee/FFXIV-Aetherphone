@@ -363,7 +363,7 @@ internal sealed class PhoneServices : IDisposable
             Plugin.PluginInterface.AssemblyLocation.DirectoryName ?? string.Empty, "Hunts", "HuntMobDescriptions.json"));
         var huntMobTipsFile = new FileInfo(Path.Combine(
             Plugin.PluginInterface.AssemblyLocation.DirectoryName ?? string.Empty, "Hunts", "HuntMobTips.json"));
-        HuntMobLore.Initialize(new HuntMobTextCatalog(huntMobDescriptionsFile), new HuntMobTextCatalog(huntMobTipsFile));
+        HuntMobLore.Initialize(new HuntMobDescriptionCatalog(huntMobDescriptionsFile), new HuntMobTextCatalog(huntMobTipsFile));
         var huntMobRewardsFile = new FileInfo(Path.Combine(
             Plugin.PluginInterface.AssemblyLocation.DirectoryName ?? string.Empty, "Hunts", "HuntMobRewards.json"));
         var huntMobRewardCatalog = new HuntMobRewardCatalog(huntMobRewardsFile);
