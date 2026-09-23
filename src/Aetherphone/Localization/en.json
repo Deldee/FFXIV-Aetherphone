@@ -2940,6 +2940,7 @@
   "skywatcher.fieldOpsRegion": "Field Ops",
   "skywatcher.miscellaneousRegion": "Miscellaneous",
   "skywatcher.favorites": "Favorites",
+  "skywatcher.noZoneMatches": "No zones match that search",
   "news.topics": "Topics",
   "news.notices": "Notices",
   "news.maintenance": "Maintenance",

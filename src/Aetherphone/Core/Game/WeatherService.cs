@@ -12,7 +12,8 @@ internal readonly record struct WeatherWindow(WeatherEntry Weather, int MinutesF
 
 internal readonly record struct WeatherZoneEntry(uint TerritoryId, string ZoneName);
 
-internal readonly record struct WeatherRegionGroup(string Region, string RegionUpper, IReadOnlyList<WeatherZoneEntry> Zones);
+internal readonly record struct WeatherRegionGroup(string Region, string RegionUpper, IReadOnlyList<WeatherZoneEntry> Zones,
+    bool IsFieldOps = false);
 
 internal interface IWeatherChance
 {
@@ -25,6 +26,8 @@ internal sealed class WeatherService
     private const long RealSecondsPerEorzeaHour = 175;
     private const long RealSecondsPerEorzeaDay = 4200;
     private const string UnknownRegionPlaceholder = "???";
+    private const string FieldOpsRegionKey = "fieldops";
+    private const string MiscRegionKey = "misc";
     private readonly IDataManager data;
     private readonly IClientState clientState;
     private readonly Dictionary<byte, WeatherEntry> entries = new();
@@ -133,8 +136,8 @@ internal sealed class WeatherService
             if (region.Length == 0)
             {
                 region = FieldOperations.IsFieldOperationZone(territory.TerritoryIntendedUse.RowId)
-                    ? Loc.T(L.Skywatcher.FieldOpsRegion)
-                    : Loc.T(L.Skywatcher.MiscellaneousRegion);
+                    ? FieldOpsRegionKey
+                    : MiscRegionKey;
             }
 
             if (!groups.TryGetValue(region, out var zones))
@@ -156,8 +159,19 @@ internal sealed class WeatherService
         {
             var zones = new List<WeatherZoneEntry>(groups[regionKeys[index]].Values);
             zones.Sort(CompareByTerritoryId);
-            var regionName = regionKeys[index];
-            built.Add(new WeatherRegionGroup(regionName, Loc.Culture.TextInfo.ToUpper(regionName), zones));
+            var regionKey = regionKeys[index];
+            switch (regionKey)
+            {
+                case FieldOpsRegionKey:
+                    built.Add(new WeatherRegionGroup(string.Empty, string.Empty, zones, true));
+                    break;
+                case MiscRegionKey:
+                    built.Add(new WeatherRegionGroup(string.Empty, string.Empty, zones));
+                    break;
+                default:
+                    built.Add(new WeatherRegionGroup(regionKey, Loc.Culture.TextInfo.ToUpper(regionKey), zones));
+                    break;
+            }
         }
 
         regionGroups = built;
@@ -220,6 +234,15 @@ internal sealed class WeatherService
             var minutes = (int)((timestamp - nowUnix) / 60);
             var windowBell = (int)(timestamp / RealSecondsPerEorzeaHour % 24);
             into.Add(new WeatherWindow(entry, minutes, index == 0, windowBell));
+        }
+    }
+
+    public static void RefreshMinutesFromNow(List<WeatherWindow> windows, long windowStart, long nowUnix)
+    {
+        for (var index = 0; index < windows.Count; index++)
+        {
+            var timestamp = windowStart + index * RealSecondsPerWindow;
+            windows[index] = windows[index] with { MinutesFromNow = (int)((timestamp - nowUnix) / 60) };
         }
     }
 

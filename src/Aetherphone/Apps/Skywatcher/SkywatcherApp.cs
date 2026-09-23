@@ -32,6 +32,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     private readonly Configuration configuration;
     private readonly ViewRouter<SkywatcherRoute> router;
     private readonly RouterDraw<SkywatcherRoute> drawView;
+    private readonly Action closeDetail;
     private readonly List<WeatherWindow> previewForecast = new();
     private readonly List<string> previewForecastWhenLabels = new();
     private readonly List<WeatherWindow> detailForecast = new();
@@ -40,9 +41,11 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     private string detailZone = string.Empty;
     private uint lastPreviewTerritoryId;
     private long lastWindowStartUnix = -1;
+    private long lastMinuteUnix = -1;
     private SkywatcherTab activeTab;
     private bool scrubbing;
     private bool pendingScrollReset;
+    private DragScrollHost.Surface scrollSurface;
     private string search = string.Empty;
 
     public SkywatcherApp(WeatherService weather, WeatherControl control, Configuration configuration)
@@ -52,6 +55,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         this.configuration = configuration;
         router = new ViewRouter<SkywatcherRoute>(SkywatcherRoute.Browse);
         drawView = DrawView;
+        closeDetail = CloseDetail;
     }
 
     public void OnOpened()
@@ -60,7 +64,6 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         scrubbing = false;
         router.Reset();
         search = string.Empty;
-        SyncFavorites();
         Refresh();
     }
 
@@ -108,6 +111,15 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         pendingScrollReset = true;
     }
 
+    private void RefreshMinuteLabels(long windowStart, long nowUnix)
+    {
+        WeatherService.RefreshMinutesFromNow(previewForecast, windowStart, nowUnix);
+        BuildShortWhenLabels(previewForecastWhenLabels, previewForecast);
+        WeatherService.RefreshMinutesFromNow(detailForecast, windowStart, nowUnix);
+        BuildShortWhenLabels(detailForecastWhenLabels, detailForecast);
+        RefreshFavoriteMinuteLabels(windowStart, nowUnix);
+    }
+
     public void Draw(in PhoneContext context)
     {
         var windowStart = WeatherService.CurrentWindowStartUnix();
@@ -123,6 +135,14 @@ internal sealed partial class SkywatcherApp : IPhoneApp
             Refresh(windowStart);
         }
 
+        var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var currentMinute = nowUnix / 60;
+        if (currentMinute != lastMinuteUnix)
+        {
+            RefreshMinuteLabels(windowStart, nowUnix);
+            lastMinuteUnix = currentMinute;
+        }
+
         var scale = UiScale.Current;
         var theme = context.Theme;
         var content = context.Content;
@@ -133,7 +153,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
             scale, 1f, false);
         if (activeTab == SkywatcherTab.Forecast && !onBrowse)
         {
-            SceneChrome.BackChevron(content, CloseDetail, palette.Ink, scale);
+            SceneChrome.BackChevron(content, closeDetail, palette.Ink, scale);
         }
         else
         {
@@ -143,36 +163,17 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         var navRect = new Rect(new Vector2(content.Min.X, content.Max.Y - NavHeight * scale), content.Max);
         var body = new Rect(new Vector2(screen.Min.X, content.Min.Y + 40f * scale),
             new Vector2(screen.Max.X, navRect.Min.Y));
-        var skyKey = ImGui.GetID("##sky");
-        ImGui.SetCursorScreenPos(body.Min);
-        using (ImRaii.PushStyle(ImGuiStyleVar.WindowPadding, new Vector2(14f * scale, 4f * scale)))
-        using (var child = ImRaii.Child("##sky", body.Size, false,
-                   DragScrollHost.ScrollFlags(ImGuiWindowFlags.NoBackground)))
+        if (activeTab == SkywatcherTab.Control)
         {
-            if (child)
+            using var scroll = SkyScroll.Begin(this, body, scale);
+            if (scroll.Active)
             {
-                AppSurface.ResetScrollOnNewVisit();
-                var surface = DragScrollHost.Begin(skyKey);
-                if (pendingScrollReset)
-                {
-                    surface.JumpToTop();
-                    pendingScrollReset = false;
-                }
-
-                if (activeTab == SkywatcherTab.Control)
-                {
-                    DrawControl(palette, scale);
-                }
-                else
-                {
-                    router.Draw(body, AppSkin.Transparent, ImGui.GetIO().DeltaTime, drawView);
-                }
-
-                if (scrubbing)
-                {
-                    surface.CancelDrag();
-                }
+                DrawControl(palette, scale);
             }
+        }
+        else
+        {
+            router.Draw(body, AppSkin.Transparent, ImGui.GetIO().DeltaTime, drawView);
         }
 
         DrawBottomNav(navRect, palette, scale);
@@ -185,12 +186,23 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         {
             var (browseKind, browseIsDay, browsePalette, _) = SkyDataFor(previewForecast);
             PaintSky(area, browseKind, browseIsDay, browsePalette, scale);
-            DrawBrowse(browsePalette, scale);
+            using var scroll = SkyScroll.Begin(this, area, scale);
+            if (scroll.Active)
+            {
+                DrawBrowse(browsePalette, scale);
+            }
+
             return;
         }
 
         var (kind, isDay, palette, hasData) = SkyDataFor(detailForecast);
         PaintSky(area, kind, isDay, palette, scale);
+        using var detailScroll = SkyScroll.Begin(this, area, scale);
+        if (!detailScroll.Active)
+        {
+            return;
+        }
+
         if (!hasData)
         {
             DrawEmpty(area, palette, scale);
@@ -516,5 +528,55 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 
     public void Dispose()
     {
+    }
+
+    private readonly ref struct SkyScroll
+    {
+        private readonly SkywatcherApp owner;
+        private readonly ImRaii.ChildDisposable child;
+        private readonly IDisposable? padding;
+        public readonly bool Active;
+
+        private SkyScroll(SkywatcherApp owner, ImRaii.ChildDisposable child, IDisposable? padding, bool active)
+        {
+            this.owner = owner;
+            this.child = child;
+            this.padding = padding;
+            Active = active;
+        }
+
+        public static SkyScroll Begin(SkywatcherApp owner, Rect area, float scale)
+        {
+            ImGui.SetCursorScreenPos(area.Min);
+            var padding = ImRaii.PushStyle(ImGuiStyleVar.WindowPadding, new Vector2(14f * scale, 4f * scale));
+            var child = ImRaii.Child("##sky", area.Size, false,
+                DragScrollHost.ScrollFlags(ImGuiWindowFlags.NoBackground));
+            if (!child)
+            {
+                return new SkyScroll(owner, child, padding, false);
+            }
+
+            AppSurface.ResetScrollOnNewVisit();
+            var surface = DragScrollHost.Begin(ImGui.GetID("##sky"));
+            owner.scrollSurface = surface;
+            if (owner.pendingScrollReset)
+            {
+                surface.JumpToTop();
+                owner.pendingScrollReset = false;
+            }
+
+            return new SkyScroll(owner, child, padding, true);
+        }
+
+        public void Dispose()
+        {
+            if (Active && owner.scrubbing)
+            {
+                owner.scrollSurface.CancelDrag();
+            }
+
+            padding?.Dispose();
+            child.Dispose();
+        }
     }
 }

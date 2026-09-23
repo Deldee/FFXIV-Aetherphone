@@ -27,6 +27,7 @@ internal sealed class SkywatcherWidget : IHomeWidget
     private readonly List<WeatherWindow> forecast = new();
     private string zone = string.Empty;
     private long lastWindowStartUnix = -1;
+    private long lastMinuteUnix = -1;
     private uint viewedTerritoryId;
 
     public SkywatcherWidget(WeatherService weather)
@@ -78,15 +79,21 @@ internal sealed class SkywatcherWidget : IHomeWidget
         var liveDiverged = territoryId == viewedTerritoryId && forecast.Count > 0 &&
             weather.LiveRenderedWeather() is { } live && live.Id != forecast[0].Weather.Id;
 
-        if (!liveDiverged && territoryId == viewedTerritoryId && windowStart == lastWindowStartUnix)
+        if (liveDiverged || territoryId != viewedTerritoryId || windowStart != lastWindowStartUnix)
         {
-            return;
+            viewedTerritoryId = territoryId;
+            lastWindowStartUnix = windowStart;
+            zone = weather.CurrentZone();
+            weather.Forecast(forecast, ForecastWindows);
         }
 
-        viewedTerritoryId = territoryId;
-        lastWindowStartUnix = windowStart;
-        zone = weather.CurrentZone();
-        weather.Forecast(forecast, ForecastWindows);
+        var nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var currentMinute = nowUnix / 60;
+        if (currentMinute != lastMinuteUnix)
+        {
+            WeatherService.RefreshMinutesFromNow(forecast, lastWindowStartUnix, nowUnix);
+            lastMinuteUnix = currentMinute;
+        }
     }
 
     private void DrawSmall(in WidgetContext context, in SkyPalette palette, WeatherKind kind, bool isDay,

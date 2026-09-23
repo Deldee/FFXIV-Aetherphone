@@ -2940,6 +2940,7 @@
   "skywatcher.fieldOpsRegion": "Полевые операции",
   "skywatcher.miscellaneousRegion": "Прочее",
   "skywatcher.favorites": "Избранное",
+  "skywatcher.noZoneMatches": "Нет зон по этому запросу",
   "news.topics": "Темы",
   "news.notices": "Объявления",
   "news.maintenance": "Обслуживание",

@@ -1,4 +1,3 @@
-using Aetherphone.Apps.Maps;
 using Aetherphone.Core;
 using Aetherphone.Core.Game;
 using Aetherphone.Core.Localization;
@@ -19,52 +18,32 @@ internal sealed partial class SkywatcherApp
     private const float SearchBarHeight = 40f;
     private const float FavoriteCardHeight = 116f;
     private const float FavoriteCurrentGlyphRadius = 16f;
-    private readonly HashSet<uint> favorites = new();
     private readonly List<WeatherZoneEntry> favoriteZones = new();
     private readonly Dictionary<uint, WeatherEntry> rowWeather = new();
     private readonly Dictionary<uint, List<WeatherWindow>> favoriteForecasts = new();
     private readonly Dictionary<uint, List<string>> favoriteWhenLabels = new();
     private readonly List<WeatherRegionGroup> filteredRegions = new();
     private readonly List<List<WeatherZoneEntry>> filteredMatchesPool = new();
+    private List<WeatherRegionGroup>? resolvedRegions;
+    private IReadOnlyList<WeatherRegionGroup>? resolvedRegionsSource;
     private IReadOnlyList<WeatherRegionGroup>? filteredSourceRegions;
     private string? filteredSearch;
-    private bool favoritesSynced;
-
-    private void SyncFavorites()
-    {
-        favorites.Clear();
-        var stored = configuration.SkywatcherFavorites;
-        for (var index = 0; index < stored.Count; index++)
-        {
-            favorites.Add(stored[index]);
-        }
-
-        favoritesSynced = true;
-    }
-
-    private void EnsureFavoritesSynced()
-    {
-        if (!favoritesSynced)
-        {
-            SyncFavorites();
-        }
-    }
+    private float favoritesLabelHeight;
+    private string favoritesLabelUpper = string.Empty;
+    private string favoritesLabelUpperLocale = string.Empty;
 
     private void ToggleFavorite(uint territoryId)
     {
-        EnsureFavoritesSynced();
         var scale = UiScale.Current;
         var visibleBefore = VisibleFavoriteCount();
 
-        if (favorites.Remove(territoryId))
+        if (configuration.SkywatcherFavorites.Remove(territoryId))
         {
-            configuration.SkywatcherFavorites.Remove(territoryId);
             favoriteForecasts.Remove(territoryId);
             favoriteWhenLabels.Remove(territoryId);
         }
         else
         {
-            favorites.Add(territoryId);
             configuration.SkywatcherFavorites.Add(territoryId);
             FavoriteForecast(territoryId);
         }
@@ -75,7 +54,7 @@ internal sealed partial class SkywatcherApp
         var delta = FavoritesSectionHeightFor(visibleAfter, scale) - FavoritesSectionHeightFor(visibleBefore, scale);
         if (delta != 0f)
         {
-            ImGui.SetScrollY(ImGui.GetScrollY() + delta);
+            scrollSurface.JumpTo(ImGui.GetScrollY() + delta);
         }
     }
 
@@ -106,18 +85,16 @@ internal sealed partial class SkywatcherApp
         return zoneName.Length > 0;
     }
 
-    private static float FavoritesSectionHeightFor(int visibleCount, float scale)
+    private float FavoritesSectionHeightFor(int visibleCount, float scale)
     {
         if (visibleCount == 0)
         {
             return 0f;
         }
 
-        var labelText = Loc.Culture.TextInfo.ToUpper(Loc.T(L.Skywatcher.Favorites));
-        var labelHeight = 12f * scale + Typography.Measure(labelText, TextStyles.FootnoteEmphasized).Y + 6f * scale;
         var cardsHeight = visibleCount * (FavoriteCardHeight * scale + 6f * scale);
         var itemGaps = ImGui.GetStyle().ItemSpacing.Y * (2 * visibleCount + 2);
-        return labelHeight + cardsHeight + itemGaps;
+        return favoritesLabelHeight + cardsHeight + itemGaps;
     }
 
     private void RefreshRowWeather()
@@ -152,13 +129,30 @@ internal sealed partial class SkywatcherApp
 
     private void RefreshFavoriteForecasts()
     {
-        favoriteForecasts.Clear();
-        favoriteWhenLabels.Clear();
         var stored = configuration.SkywatcherFavorites;
         for (var index = 0; index < stored.Count; index++)
         {
-            FavoriteForecast(stored[index]);
+            RefreshFavoriteForecast(stored[index]);
         }
+    }
+
+    private void RefreshFavoriteForecast(uint territoryId)
+    {
+        if (!favoriteForecasts.TryGetValue(territoryId, out var windows))
+        {
+            windows = new List<WeatherWindow>();
+            favoriteForecasts[territoryId] = windows;
+        }
+
+        weather.Forecast(territoryId, windows, PreviewStripCount);
+
+        if (!favoriteWhenLabels.TryGetValue(territoryId, out var labels))
+        {
+            labels = new List<string>();
+            favoriteWhenLabels[territoryId] = labels;
+        }
+
+        BuildShortWhenLabels(labels, windows);
     }
 
     private List<WeatherWindow> FavoriteForecast(uint territoryId)
@@ -168,23 +162,27 @@ internal sealed partial class SkywatcherApp
             return cached;
         }
 
-        var windows = new List<WeatherWindow>();
-        weather.Forecast(territoryId, windows, PreviewStripCount);
-        favoriteForecasts[territoryId] = windows;
-        var labels = new List<string>();
-        BuildShortWhenLabels(labels, windows);
-        favoriteWhenLabels[territoryId] = labels;
-        return windows;
+        RefreshFavoriteForecast(territoryId);
+        return favoriteForecasts[territoryId];
+    }
+
+    private void RefreshFavoriteMinuteLabels(long windowStart, long nowUnix)
+    {
+        foreach (var (territoryId, windows) in favoriteForecasts)
+        {
+            WeatherService.RefreshMinutesFromNow(windows, windowStart, nowUnix);
+            BuildShortWhenLabels(favoriteWhenLabels[territoryId], windows);
+        }
     }
 
     private void DrawBrowse(in SkyPalette palette, float scale)
     {
-        EnsureFavoritesSynced();
         DrawCurrentAreaPreview(palette, scale);
         DrawFavoritesSection(palette, scale);
         DrawSearchField(palette, scale);
 
         var regions = RefreshedFilteredRegions();
+        var anyZonesVisible = false;
         for (var regionIndex = 0; regionIndex < regions.Count; regionIndex++)
         {
             var region = regions[regionIndex];
@@ -194,8 +192,17 @@ internal sealed partial class SkywatcherApp
                 continue;
             }
 
+            anyZonesVisible = true;
             SectionLabelUpper(region.RegionUpper, palette, scale);
             DrawZoneList(palette, scale, region.Zones, visibleZones);
+        }
+
+        if (!anyZonesVisible && search.Length > 0)
+        {
+            var width = ImGui.GetContentRegionAvail().X;
+            var center = ImGui.GetCursorScreenPos() + new Vector2(width * 0.5f, 28f * scale);
+            Typography.DrawCentered(center, Loc.T(L.Skywatcher.NoZoneMatches), palette.InkSoft, TextStyles.Subheadline);
+            ImGui.Dummy(new Vector2(width, 56f * scale));
         }
 
         ImGui.Dummy(new Vector2(0f, 8f * scale));
@@ -214,9 +221,35 @@ internal sealed partial class SkywatcherApp
         ImGui.Dummy(new Vector2(0f, 6f * scale));
     }
 
-    private IReadOnlyList<WeatherRegionGroup> RefreshedFilteredRegions()
+    private IReadOnlyList<WeatherRegionGroup> ResolvedRegions()
     {
         var regions = weather.ZonesByRegion();
+        if (ReferenceEquals(resolvedRegionsSource, regions))
+        {
+            return resolvedRegions!;
+        }
+
+        var resolved = new List<WeatherRegionGroup>(regions.Count);
+        for (var index = 0; index < regions.Count; index++)
+        {
+            var region = regions[index];
+            if (region.Region.Length == 0)
+            {
+                var label = Loc.T(region.IsFieldOps ? L.Skywatcher.FieldOpsRegion : L.Skywatcher.MiscellaneousRegion);
+                region = new WeatherRegionGroup(label, Loc.Culture.TextInfo.ToUpper(label), region.Zones);
+            }
+
+            resolved.Add(region);
+        }
+
+        resolvedRegionsSource = regions;
+        resolvedRegions = resolved;
+        return resolved;
+    }
+
+    private IReadOnlyList<WeatherRegionGroup> RefreshedFilteredRegions()
+    {
+        var regions = ResolvedRegions();
         if (ReferenceEquals(filteredSourceRegions, regions) && filteredSearch == search)
         {
             return filteredRegions;
@@ -272,6 +305,17 @@ internal sealed partial class SkywatcherApp
         return list;
     }
 
+    private string FavoritesLabelUpper()
+    {
+        if (favoritesLabelUpperLocale != Loc.Current.Code)
+        {
+            favoritesLabelUpper = Loc.Culture.TextInfo.ToUpper(Loc.T(L.Skywatcher.Favorites));
+            favoritesLabelUpperLocale = Loc.Current.Code;
+        }
+
+        return favoritesLabelUpper;
+    }
+
     private void DrawFavoritesSection(in SkyPalette palette, float scale)
     {
         favoriteZones.Clear();
@@ -290,7 +334,9 @@ internal sealed partial class SkywatcherApp
             return;
         }
 
-        SectionLabel(Loc.T(L.Skywatcher.Favorites), palette, scale);
+        var labelTop = ImGui.GetCursorScreenPos().Y;
+        SectionLabelUpper(FavoritesLabelUpper(), palette, scale);
+        favoritesLabelHeight = ImGui.GetCursorScreenPos().Y - labelTop;
         for (var index = 0; index < favoriteZones.Count; index++)
         {
             DrawFavoriteCard(palette, scale, favoriteZones[index]);
@@ -312,7 +358,7 @@ internal sealed partial class SkywatcherApp
         var name = Typography.FitText(entry.ZoneName, nameMaxWidth, TextStyles.Headline);
         Typography.Draw(new Vector2(inner.Min.X, inner.Min.Y), name, palette.Ink, TextStyles.Headline);
         DrawFavoriteStar(ImGui.GetWindowDrawList(), starCenter, starRadius, palette,
-            favorites.Contains(entry.TerritoryId));
+            configuration.SkywatcherFavorites.Contains(entry.TerritoryId));
 
         var windows = FavoriteForecast(entry.TerritoryId);
         if (windows.Count > 0)
@@ -419,6 +465,13 @@ internal sealed partial class SkywatcherApp
             }
 
             var rowTop = inner.Min.Y + rowIndex * rowHeight;
+            var rowBottom = rowTop + rowHeight;
+            if (!ImGui.IsRectVisible(new Vector2(inner.Min.X, rowTop), new Vector2(inner.Max.X, rowBottom)))
+            {
+                rowIndex++;
+                continue;
+            }
+
             var rowCenterY = rowTop + rowHeight * 0.5f;
             if (rowIndex > 0)
             {
@@ -441,10 +494,10 @@ internal sealed partial class SkywatcherApp
             var nowWindow = new WeatherWindow(entryWeather, 0, true, 0);
             DrawMini(nowWindow, glyphCenter, ZoneMiniGlyphRadius * scale);
             DrawFavoriteStar(drawList, starCenter, ZoneStarRadius * scale, palette,
-                favorites.Contains(entry.TerritoryId));
+                configuration.SkywatcherFavorites.Contains(entry.TerritoryId));
 
             var starMin = new Vector2(starCenter.X - ZoneStarRadius * scale - 8f * scale, rowTop);
-            var starMax = new Vector2(inner.Max.X, rowTop + rowHeight);
+            var starMax = new Vector2(inner.Max.X, rowBottom);
             var starHovered = UiInteract.Hover(starMin, starMax);
             if (starHovered)
             {
@@ -453,7 +506,7 @@ internal sealed partial class SkywatcherApp
 
             var starClicked = UiInteract.Click(starMin, starMax, starHovered);
             var rowClicked = !starHovered &&
-                UiInteract.HoverClick(new Vector2(inner.Min.X, rowTop), new Vector2(inner.Max.X, rowTop + rowHeight));
+                UiInteract.HoverClick(new Vector2(inner.Min.X, rowTop), new Vector2(inner.Max.X, rowBottom));
             if (starClicked)
             {
                 ToggleFavorite(entry.TerritoryId);
@@ -487,6 +540,6 @@ internal sealed partial class SkywatcherApp
     private static void DrawFavoriteStar(ImDrawListPtr drawList, Vector2 center, float radius, in SkyPalette palette,
         bool filled)
     {
-        MapGlyphs.Star(drawList, center, radius, filled, MapGlyphs.FavoriteFill, palette.InkFaint, UiScale.Current);
+        FavoriteGlyph.Star(drawList, center, radius, filled, FavoriteGlyph.Fill, palette.InkFaint, UiScale.Current);
     }
 }
