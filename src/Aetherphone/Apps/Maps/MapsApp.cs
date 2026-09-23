@@ -305,7 +305,7 @@ internal sealed class MapsApp : IPhoneApp
         }
 
         var isFavorite = favorites.Contains(aetheryte.RowId);
-        MapGlyphs.Star(drawList, starCenter, starRadius, isFavorite, MapGlyphs.FavoriteFill,
+        FavoriteGlyph.Star(drawList, starCenter, starRadius, isFavorite, FavoriteGlyph.Fill,
             Palette.WithAlpha(frameTheme.TextMuted, 0.6f), scale);
         var textLeft = starCenter.X + starRadius + 12f * scale;
         var textRight = row.Max.X - 14f * scale;
