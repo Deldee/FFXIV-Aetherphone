@@ -94,4 +94,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ManagedDoom\ManagedDoom.csproj" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties hunts_4huntmobdescriptions_1json__JsonSchema="https://acp-protocol.dev/schemas/v1/attempts.schema.json" /></VisualStudio></ProjectExtensions>
 </Project>
