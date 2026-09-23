@@ -23,6 +23,7 @@ internal sealed partial class SkywatcherApp
     private readonly List<WeatherZoneEntry> favoriteZones = new();
     private readonly Dictionary<uint, WeatherEntry> rowWeather = new();
     private readonly Dictionary<uint, List<WeatherWindow>> favoriteForecasts = new();
+    private readonly Dictionary<uint, List<string>> favoriteWhenLabels = new();
     private readonly List<WeatherRegionGroup> filteredRegions = new();
     private readonly List<List<WeatherZoneEntry>> filteredMatchesPool = new();
     private IReadOnlyList<WeatherRegionGroup>? filteredSourceRegions;
@@ -59,6 +60,7 @@ internal sealed partial class SkywatcherApp
         {
             configuration.SkywatcherFavorites.Remove(territoryId);
             favoriteForecasts.Remove(territoryId);
+            favoriteWhenLabels.Remove(territoryId);
         }
         else
         {
@@ -94,7 +96,7 @@ internal sealed partial class SkywatcherApp
 
     private bool TryResolveVisibleFavorite(uint territoryId, out string zoneName)
     {
-        if (territoryId == viewedTerritoryId)
+        if (territoryId == weather.CurrentTerritoryId)
         {
             zoneName = string.Empty;
             return false;
@@ -151,6 +153,7 @@ internal sealed partial class SkywatcherApp
     private void RefreshFavoriteForecasts()
     {
         favoriteForecasts.Clear();
+        favoriteWhenLabels.Clear();
         var stored = configuration.SkywatcherFavorites;
         for (var index = 0; index < stored.Count; index++)
         {
@@ -168,6 +171,9 @@ internal sealed partial class SkywatcherApp
         var windows = new List<WeatherWindow>();
         weather.Forecast(territoryId, windows, PreviewStripCount);
         favoriteForecasts[territoryId] = windows;
+        var labels = new List<string>();
+        BuildShortWhenLabels(labels, windows);
+        favoriteWhenLabels[territoryId] = labels;
         return windows;
     }
 
@@ -188,7 +194,7 @@ internal sealed partial class SkywatcherApp
                 continue;
             }
 
-            SectionLabel(region.Region, palette, scale);
+            SectionLabelUpper(region.RegionUpper, palette, scale);
             DrawZoneList(palette, scale, region.Zones, visibleZones);
         }
 
@@ -245,7 +251,7 @@ internal sealed partial class SkywatcherApp
 
             if (matches != null)
             {
-                filteredRegions.Add(new WeatherRegionGroup(region.Region, matches));
+                filteredRegions.Add(new WeatherRegionGroup(region.Region, region.RegionUpper, matches));
             }
         }
 
@@ -314,8 +320,8 @@ internal sealed partial class SkywatcherApp
             var weatherLine = Typography.FitText(windows[0].Weather.Name, nameMaxWidth, TextStyles.Subheadline);
             Typography.Draw(new Vector2(inner.Min.X, inner.Min.Y + Typography.LineHeight(TextStyles.Headline)),
                 weatherLine, palette.InkSoft, TextStyles.Subheadline);
-            DrawWeatherStrip(inner, palette, scale, windows, FavoriteCurrentGlyphRadius,
-                "skywatcher.favoriteStrip.", (long)entry.TerritoryId * 10);
+            DrawWeatherStrip(inner, palette, scale, windows, favoriteWhenLabels[entry.TerritoryId],
+                FavoriteCurrentGlyphRadius, "skywatcher.favoriteStrip.", (long)entry.TerritoryId * 10);
         }
 
         ImGui.SetCursorScreenPos(origin);
@@ -350,16 +356,17 @@ internal sealed partial class SkywatcherApp
         var card = new Rect(origin, origin + new Vector2(width, height));
         DrawGlass(card, palette, scale);
         var inner = card.Inset(14f * scale);
-        var hasWeather = forecast.Count > 0;
+        var hasWeather = previewForecast.Count > 0;
 
-        var name = Typography.FitText(zone, inner.Width, TextStyles.Headline);
+        var name = Typography.FitText(previewZone, inner.Width, TextStyles.Headline);
         Typography.Draw(new Vector2(inner.Min.X, inner.Min.Y), name, palette.Ink, TextStyles.Headline);
         if (hasWeather)
         {
-            var weatherLine = Typography.FitText(forecast[0].Weather.Name, inner.Width, TextStyles.Subheadline);
+            var weatherLine = Typography.FitText(previewForecast[0].Weather.Name, inner.Width, TextStyles.Subheadline);
             Typography.Draw(new Vector2(inner.Min.X, inner.Min.Y + Typography.LineHeight(TextStyles.Headline)),
                 weatherLine, palette.InkSoft, TextStyles.Subheadline);
-            DrawWeatherStrip(inner, palette, scale, forecast, PreviewCurrentGlyphRadius, "skywatcher.preview.", 0);
+            DrawWeatherStrip(inner, palette, scale, previewForecast, previewForecastWhenLabels,
+                PreviewCurrentGlyphRadius, "skywatcher.preview.", 0);
         }
 
         ImGui.SetCursorScreenPos(origin);
@@ -367,12 +374,12 @@ internal sealed partial class SkywatcherApp
         ImGui.Dummy(new Vector2(0f, 6f * scale));
         if (UiInteract.HoverClick(card.Min, card.Max))
         {
-            OpenDetail(viewedTerritoryId);
+            OpenDetail(weather.CurrentTerritoryId);
         }
     }
 
     private void DrawWeatherStrip(Rect inner, in SkyPalette palette, float scale, IReadOnlyList<WeatherWindow> windows,
-        float currentGlyphRadius, string marqueePrefix, long marqueeBase)
+        IReadOnlyList<string> whenLabels, float currentGlyphRadius, string marqueePrefix, long marqueeBase)
     {
         var count = Math.Min(windows.Count, PreviewStripCount);
         var columnWidth = inner.Width / count;
@@ -387,7 +394,7 @@ internal sealed partial class SkywatcherApp
             var glyphCenter = new Vector2(columnCenterX, glyphBottom - radius);
             DrawMini(window, glyphCenter, radius);
             var columnMaxWidth = MathF.Max(1f, columnWidth - 4f * scale);
-            Marquee.DrawCentered(new MarqueeId(marqueePrefix, marqueeBase + index), ShortWhen(window), columnCenterX,
+            Marquee.DrawCentered(new MarqueeId(marqueePrefix, marqueeBase + index), whenLabels[index], columnCenterX,
                 labelTop, columnMaxWidth, TextStyles.Caption2, palette.InkFaint, false);
         }
     }
@@ -406,7 +413,7 @@ internal sealed partial class SkywatcherApp
         for (var index = 0; index < zones.Count; index++)
         {
             var entry = zones[index];
-            if (entry.TerritoryId == viewedTerritoryId)
+            if (entry.TerritoryId == weather.CurrentTerritoryId)
             {
                 continue;
             }
@@ -468,7 +475,7 @@ internal sealed partial class SkywatcherApp
         var count = 0;
         for (var index = 0; index < zones.Count; index++)
         {
-            if (zones[index].TerritoryId != viewedTerritoryId)
+            if (zones[index].TerritoryId != weather.CurrentTerritoryId)
             {
                 count++;
             }

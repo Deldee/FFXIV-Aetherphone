@@ -12,7 +12,7 @@ internal readonly record struct WeatherWindow(WeatherEntry Weather, int MinutesF
 
 internal readonly record struct WeatherZoneEntry(uint TerritoryId, string ZoneName);
 
-internal readonly record struct WeatherRegionGroup(string Region, IReadOnlyList<WeatherZoneEntry> Zones);
+internal readonly record struct WeatherRegionGroup(string Region, string RegionUpper, IReadOnlyList<WeatherZoneEntry> Zones);
 
 internal interface IWeatherChance
 {
@@ -156,7 +156,8 @@ internal sealed class WeatherService
         {
             var zones = new List<WeatherZoneEntry>(groups[regionKeys[index]].Values);
             zones.Sort(CompareByTerritoryId);
-            built.Add(new WeatherRegionGroup(regionKeys[index], zones));
+            var regionName = regionKeys[index];
+            built.Add(new WeatherRegionGroup(regionName, Loc.Culture.TextInfo.ToUpper(regionName), zones));
         }
 
         regionGroups = built;

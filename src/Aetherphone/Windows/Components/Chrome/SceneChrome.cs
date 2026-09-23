@@ -22,7 +22,10 @@ internal static class SceneChrome
         return new Rect(new Vector2(screen.Min.X, content.Min.Y), new Vector2(screen.Max.X, content.Max.Y));
     }
 
-    public static void BackChevron(Rect content, INavigator navigation, Vector4 ink, float scale)
+    public static void BackChevron(Rect content, INavigator navigation, Vector4 ink, float scale) =>
+        BackChevron(content, navigation.Back, ink, scale);
+
+    public static void BackChevron(Rect content, Action back, Vector4 ink, float scale)
     {
         var rowCenterY = content.Min.Y + 20f * scale;
         var hitMin = new Vector2(content.Min.X, content.Min.Y);
@@ -32,7 +35,7 @@ internal static class SceneChrome
         var center = new Vector2(content.Min.X + 15f * scale, rowCenterY);
         if (BackButton.Draw("chrome.back", center, 15f * scale, ink, hovered, scale, shadow: true))
         {
-            navigation.Back();
+            back();
         }
     }
 }

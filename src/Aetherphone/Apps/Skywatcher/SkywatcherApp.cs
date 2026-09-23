@@ -30,13 +30,18 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     private readonly WeatherService weather;
     private readonly WeatherControl control;
     private readonly Configuration configuration;
-    private readonly List<WeatherWindow> forecast = new();
-    private string zone = string.Empty;
+    private readonly ViewRouter<SkywatcherRoute> router;
+    private readonly RouterDraw<SkywatcherRoute> drawView;
+    private readonly List<WeatherWindow> previewForecast = new();
+    private readonly List<string> previewForecastWhenLabels = new();
+    private readonly List<WeatherWindow> detailForecast = new();
+    private readonly List<string> detailForecastWhenLabels = new();
+    private string previewZone = string.Empty;
+    private string detailZone = string.Empty;
+    private uint lastPreviewTerritoryId;
     private long lastWindowStartUnix = -1;
     private SkywatcherTab activeTab;
     private bool scrubbing;
-    private bool showingBrowse = true;
-    private uint viewedTerritoryId;
     private bool pendingScrollReset;
     private string search = string.Empty;
 
@@ -45,14 +50,15 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         this.weather = weather;
         this.control = control;
         this.configuration = configuration;
+        router = new ViewRouter<SkywatcherRoute>(SkywatcherRoute.Browse);
+        drawView = DrawView;
     }
 
     public void OnOpened()
     {
         activeTab = SkywatcherTab.Forecast;
         scrubbing = false;
-        showingBrowse = true;
-        viewedTerritoryId = weather.CurrentTerritoryId;
+        router.Reset();
         search = string.Empty;
         SyncFavorites();
         Refresh();
@@ -66,30 +72,38 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 
     private void Refresh(long windowStart)
     {
-        if (showingBrowse)
+        var route = router.Current;
+        if (route.Screen == SkywatcherScreen.Browse)
         {
-            viewedTerritoryId = weather.CurrentTerritoryId;
+            lastPreviewTerritoryId = weather.CurrentTerritoryId;
             RefreshRowWeather();
             RefreshFavoriteForecasts();
+            previewZone = weather.CurrentZone();
+            weather.Forecast(weather.CurrentTerritoryId, previewForecast, WindowCount);
+            BuildShortWhenLabels(previewForecastWhenLabels, previewForecast);
+        }
+        else
+        {
+            detailZone = weather.ZoneName(route.TerritoryId);
+            weather.Forecast(route.TerritoryId, detailForecast, WindowCount);
+            BuildShortWhenLabels(detailForecastWhenLabels, detailForecast);
         }
 
-        zone = weather.ZoneName(viewedTerritoryId);
-        weather.Forecast(viewedTerritoryId, forecast, WindowCount);
         lastWindowStartUnix = windowStart;
     }
 
     private void OpenDetail(uint territoryId)
     {
-        showingBrowse = false;
-        viewedTerritoryId = territoryId;
-        zone = weather.ZoneName(territoryId);
-        weather.Forecast(territoryId, forecast, WindowCount);
+        detailZone = weather.ZoneName(territoryId);
+        weather.Forecast(territoryId, detailForecast, WindowCount);
+        BuildShortWhenLabels(detailForecastWhenLabels, detailForecast);
+        router.Push(SkywatcherRoute.Detail(territoryId));
         pendingScrollReset = true;
     }
 
     private void CloseDetail()
     {
-        showingBrowse = true;
+        router.Pop();
         Refresh();
         pendingScrollReset = true;
     }
@@ -97,9 +111,13 @@ internal sealed partial class SkywatcherApp : IPhoneApp
     public void Draw(in PhoneContext context)
     {
         var windowStart = WeatherService.CurrentWindowStartUnix();
-        var zoneChanged = showingBrowse && weather.CurrentTerritoryId != viewedTerritoryId;
-        var liveDiverged = viewedTerritoryId == weather.CurrentTerritoryId && forecast.Count > 0 &&
-            weather.LiveRenderedWeather() is { } live && live.Id != forecast[0].Weather.Id;
+        var route = router.Current;
+        var onBrowse = route.Screen == SkywatcherScreen.Browse;
+        var activeForecast = onBrowse ? previewForecast : detailForecast;
+        var activeTerritoryId = onBrowse ? weather.CurrentTerritoryId : route.TerritoryId;
+        var zoneChanged = onBrowse && weather.CurrentTerritoryId != lastPreviewTerritoryId;
+        var liveDiverged = activeTerritoryId == weather.CurrentTerritoryId && activeForecast.Count > 0 &&
+            weather.LiveRenderedWeather() is { } live && live.Id != activeForecast[0].Weather.Id;
         if (zoneChanged || liveDiverged || windowStart != lastWindowStartUnix)
         {
             Refresh(windowStart);
@@ -109,18 +127,13 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         var theme = context.Theme;
         var content = context.Content;
         var screen = SceneChrome.ScreenFrom(content, theme, scale);
-        var bell = EorzeaTime.Now();
-        var daylight = WeatherSky.Daylight(bell.Hour + bell.Minute / 60f);
-        var isDay = daylight >= 0.5f;
-        var hasData = forecast.Count > 0;
-        var kind = hasData ? WeatherSky.Classify(forecast[0].Weather.EnglishKey) : WeatherKind.Clouds;
-        var palette = WeatherSky.Blend(kind, hasData ? daylight : 0f);
+        var (kind, isDay, palette, _) = SkyDataFor(activeForecast);
         WeatherSky.Paint(screen, theme.ScreenRounding * scale, palette, kind, isDay);
         WeatherAmbience.Draw(ImGui.GetWindowDrawList(), screen, theme.ScreenRounding * scale, kind, isDay, palette,
             scale, 1f, false);
-        if (activeTab == SkywatcherTab.Forecast && !showingBrowse)
+        if (activeTab == SkywatcherTab.Forecast && !onBrowse)
         {
-            DrawDetailBackChevron(content, palette.Ink, scale);
+            SceneChrome.BackChevron(content, CloseDetail, palette.Ink, scale);
         }
         else
         {
@@ -128,8 +141,8 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         }
 
         var navRect = new Rect(new Vector2(content.Min.X, content.Max.Y - NavHeight * scale), content.Max);
-        var body = new Rect(new Vector2(content.Min.X, content.Min.Y + 40f * scale),
-            new Vector2(content.Max.X, navRect.Min.Y));
+        var body = new Rect(new Vector2(screen.Min.X, content.Min.Y + 40f * scale),
+            new Vector2(screen.Max.X, navRect.Min.Y));
         var skyKey = ImGui.GetID("##sky");
         ImGui.SetCursorScreenPos(body.Min);
         using (ImRaii.PushStyle(ImGuiStyleVar.WindowPadding, new Vector2(14f * scale, 4f * scale)))
@@ -146,7 +159,15 @@ internal sealed partial class SkywatcherApp : IPhoneApp
                     pendingScrollReset = false;
                 }
 
-                DrawTab(screen, palette, kind, isDay, hasData, scale);
+                if (activeTab == SkywatcherTab.Control)
+                {
+                    DrawControl(palette, scale);
+                }
+                else
+                {
+                    router.Draw(body, AppSkin.Transparent, ImGui.GetIO().DeltaTime, drawView);
+                }
+
                 if (scrubbing)
                 {
                     surface.CancelDrag();
@@ -157,47 +178,50 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         DrawBottomNav(navRect, palette, scale);
     }
 
-    private void DrawDetailBackChevron(Rect content, Vector4 ink, float scale)
+    private void DrawView(SkywatcherRoute route, Rect area, int depth)
     {
-        var rowCenterY = content.Min.Y + 20f * scale;
-        var hitMin = new Vector2(content.Min.X, content.Min.Y);
-        var hitMax = new Vector2(content.Min.X + 46f * scale, content.Min.Y + 40f * scale);
-        UiAnchors.Report("chrome.back", new Rect(hitMin, hitMax));
-        var hovered = UiInteract.Hover(hitMin, hitMax);
-        var center = new Vector2(content.Min.X + 15f * scale, rowCenterY);
-        if (BackButton.Draw("chrome.back", center, 15f * scale, ink, hovered, scale, shadow: true))
+        var scale = UiScale.Current;
+        if (route.Screen == SkywatcherScreen.Browse)
         {
-            CloseDetail();
-        }
-    }
-
-    private void DrawTab(Rect screen, in SkyPalette palette, WeatherKind kind, bool isDay, bool hasData, float scale)
-    {
-        if (activeTab == SkywatcherTab.Control)
-        {
-            DrawControl(palette, scale);
+            var (browseKind, browseIsDay, browsePalette, _) = SkyDataFor(previewForecast);
+            PaintSky(area, browseKind, browseIsDay, browsePalette, scale);
+            DrawBrowse(browsePalette, scale);
             return;
         }
 
-        if (showingBrowse)
-        {
-            DrawBrowse(palette, scale);
-            return;
-        }
-
+        var (kind, isDay, palette, hasData) = SkyDataFor(detailForecast);
+        PaintSky(area, kind, isDay, palette, scale);
         if (!hasData)
         {
-            DrawEmpty(screen, palette, scale);
+            DrawEmpty(area, palette, scale);
             return;
         }
 
         var width = ImGui.GetContentRegionAvail().X;
-        DrawHero(width, screen, palette, kind, isDay, scale);
+        DrawHero(width, area, palette, kind, isDay, scale);
         SectionLabel(Loc.T(L.Skywatcher.NextFewHours), palette, scale);
-        DrawHourly(screen, palette, scale);
+        DrawHourly(palette, scale);
         SectionLabel(Loc.T(L.Skywatcher.Forecast), palette, scale);
-        DrawForecastList(screen, palette, scale);
+        DrawForecastList(palette, scale);
         ImGui.Dummy(new Vector2(0f, 8f * scale));
+    }
+
+    private static (WeatherKind Kind, bool IsDay, SkyPalette Palette, bool HasData) SkyDataFor(
+        IReadOnlyList<WeatherWindow> windows)
+    {
+        var bell = EorzeaTime.Now();
+        var daylight = WeatherSky.Daylight(bell.Hour + bell.Minute / 60f);
+        var isDay = daylight >= 0.5f;
+        var hasData = windows.Count > 0;
+        var kind = hasData ? WeatherSky.Classify(windows[0].Weather.EnglishKey) : WeatherKind.Clouds;
+        var palette = WeatherSky.Blend(kind, hasData ? daylight : 0f);
+        return (kind, isDay, palette, hasData);
+    }
+
+    private static void PaintSky(Rect area, WeatherKind kind, bool isDay, in SkyPalette palette, float scale)
+    {
+        WeatherSky.Paint(area, 0f, palette, kind, isDay);
+        WeatherAmbience.Draw(ImGui.GetWindowDrawList(), area, 0f, kind, isDay, palette, scale, 1f, false);
     }
 
     private void DrawBottomNav(Rect nav, in SkyPalette palette, float scale)
@@ -234,14 +258,14 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         }
     }
 
-    private void DrawHero(float width, Rect screen, in SkyPalette palette, WeatherKind kind, bool isDay, float scale)
+    private void DrawHero(float width, Rect area, in SkyPalette palette, WeatherKind kind, bool isDay, float scale)
     {
         var origin = ImGui.GetCursorScreenPos();
         var centerX = origin.X + width * 0.5f;
         var titleHeight = 0f;
-        if (zone.Length > 0)
+        if (detailZone.Length > 0)
         {
-            titleHeight = ShadowWrappedCentered(new Vector2(centerX, origin.Y + 16f * scale), zone, palette.Ink,
+            titleHeight = ShadowWrappedCentered(new Vector2(centerX, origin.Y + 16f * scale), detailZone, palette.Ink,
                 TextStyles.Title2, width - 32f * scale, palette, scale);
         }
 
@@ -249,11 +273,11 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         var glyphCenter = new Vector2(centerX, MathF.Max(glyphBaseline, origin.Y + 16f * scale + titleHeight + 44f * scale));
         var glyphOverflow = MathF.Max(0f, glyphCenter.Y - glyphBaseline);
         var radius = 50f * scale;
-        WeatherGlyph.Draw(kind, glyphCenter, radius, palette, isDay, SampleSky(palette, screen, glyphCenter.Y));
+        WeatherGlyph.Draw(kind, glyphCenter, radius, palette, isDay, SampleSky(palette, area, glyphCenter.Y));
         WeatherAmbience.Halo(ImGui.GetWindowDrawList(), glyphCenter, radius * 1.05f, palette.Glow,
             0.65f + 0.40f * Pulse.Wave(Pulse.Breath));
-        ShadowCentered(new Vector2(centerX, origin.Y + 176f * scale + glyphOverflow), forecast[0].Weather.Name, palette.Ink,
-            TextStyles.LargeTitle.Scale, FontWeight.Regular, palette, scale);
+        ShadowCentered(new Vector2(centerX, origin.Y + 176f * scale + glyphOverflow), detailForecast[0].Weather.Name,
+            palette.Ink, TextStyles.LargeTitle.Scale, FontWeight.Regular, palette, scale);
         ShadowCentered(new Vector2(centerX, origin.Y + 210f * scale + glyphOverflow), Summary(), palette.InkSoft,
             TextStyles.Subheadline.Scale, TextStyles.Subheadline.Weight, palette, scale);
         var heroHeight = 234f * scale + glyphOverflow;
@@ -266,7 +290,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         ImGui.Dummy(new Vector2(width, heroHeight));
     }
 
-    private void DrawHourly(Rect screen, in SkyPalette palette, float scale)
+    private void DrawHourly(in SkyPalette palette, float scale)
     {
         var origin = ImGui.GetCursorScreenPos();
         var width = ImGui.GetContentRegionAvail().X;
@@ -279,12 +303,12 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 
         DrawGlass(card, palette, scale);
         var inner = card.Inset(12f * scale);
-        var count = Math.Min(forecast.Count, HourlyStripCount);
+        var count = Math.Min(detailForecast.Count, HourlyStripCount);
         var columnWidth = inner.Width / count;
         var drawList = ImGui.GetWindowDrawList();
         for (var index = 0; index < count; index++)
         {
-            var window = forecast[index];
+            var window = detailForecast[index];
             var columnCenterX = inner.Min.X + columnWidth * (index + 0.5f);
             if (window.IsCurrent)
             {
@@ -306,12 +330,12 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         ImGui.Dummy(new Vector2(width, height));
     }
 
-    private void DrawForecastList(Rect screen, in SkyPalette palette, float scale)
+    private void DrawForecastList(in SkyPalette palette, float scale)
     {
         var origin = ImGui.GetCursorScreenPos();
         var width = ImGui.GetContentRegionAvail().X;
         var rowHeight = 42f * scale;
-        var count = forecast.Count;
+        var count = detailForecast.Count;
         var card = new Rect(origin, origin + new Vector2(width, count * rowHeight + 10f * scale));
         DrawGlass(card, palette, scale);
         var inner = card.Inset(5f * scale);
@@ -319,7 +343,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         var glyphX = inner.Min.X + 98f * scale;
         for (var index = 0; index < count; index++)
         {
-            var window = forecast[index];
+            var window = detailForecast[index];
             var rowTop = inner.Min.Y + index * rowHeight;
             var rowCenterY = rowTop + rowHeight * 0.5f;
             if (index > 0)
@@ -375,21 +399,25 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         return Typography.DrawWrappedCentered(topCenter, text, color, style, maxWidth);
     }
 
-    private static void DrawEmpty(Rect screen, in SkyPalette palette, float scale)
+    private static void DrawEmpty(Rect area, in SkyPalette palette, float scale)
     {
         var width = ImGui.GetContentRegionAvail().X;
         var origin = ImGui.GetCursorScreenPos();
         var center = new Vector2(origin.X + width * 0.5f, origin.Y + ImGui.GetContentRegionAvail().Y * 0.4f);
         WeatherGlyph.Draw(WeatherKind.Clouds, center - new Vector2(0f, 28f * scale), 46f * scale, palette, false,
-            SampleSky(palette, screen, center.Y - 28f * scale));
+            SampleSky(palette, area, center.Y - 28f * scale));
         Typography.DrawCentered(new Vector2(center.X, center.Y + 48f * scale), Loc.T(L.Skywatcher.NoData),
             palette.InkSoft, 1.0f);
     }
 
     private static void SectionLabel(string title, in SkyPalette palette, float scale)
     {
+        SectionLabelUpper(Loc.Culture.TextInfo.ToUpper(title), palette, scale);
+    }
+
+    private static void SectionLabelUpper(string text, in SkyPalette palette, float scale)
+    {
         ImGui.Dummy(new Vector2(0f, 12f * scale));
-        var text = Loc.Culture.TextInfo.ToUpper(title);
         var style = TextStyles.FootnoteEmphasized;
         var origin = ImGui.GetCursorScreenPos() + new Vector2(4f * scale, 0f);
         var drawList = ImGui.GetWindowDrawList();
@@ -407,21 +435,23 @@ internal sealed partial class SkywatcherApp : IPhoneApp
 
     private string Summary()
     {
-        if (forecast.Count < 2)
+        if (detailForecast.Count < 2)
         {
-            return forecast.Count == 1 ? Loc.T(L.Skywatcher.Continuing, forecast[0].Weather.Name) : string.Empty;
+            return detailForecast.Count == 1
+                ? Loc.T(L.Skywatcher.Continuing, detailForecast[0].Weather.Name)
+                : string.Empty;
         }
 
-        var current = forecast[0].Weather.Id;
-        for (var index = 1; index < forecast.Count; index++)
+        var current = detailForecast[0].Weather.Id;
+        for (var index = 1; index < detailForecast.Count; index++)
         {
-            if (forecast[index].Weather.Id != current)
+            if (detailForecast[index].Weather.Id != current)
             {
-                return $"{forecast[index].Weather.Name} {LongWhen(forecast[index])}";
+                return $"{detailForecast[index].Weather.Name} {LongWhen(detailForecast[index])}";
             }
         }
 
-        return Loc.T(L.Skywatcher.ForNextHours, forecast[0].Weather.Name);
+        return Loc.T(L.Skywatcher.ForNextHours, detailForecast[0].Weather.Name);
     }
 
     private static Vector4 SampleSky(in SkyPalette palette, Rect screen, float y)
@@ -456,6 +486,15 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         }
 
         return Loc.T(L.Time.MinutesShort, window.MinutesFromNow);
+    }
+
+    private static void BuildShortWhenLabels(List<string> into, IReadOnlyList<WeatherWindow> windows)
+    {
+        into.Clear();
+        for (var index = 0; index < windows.Count; index++)
+        {
+            into.Add(ShortWhen(windows[index]));
+        }
     }
 
     private static string LongWhen(WeatherWindow window)
