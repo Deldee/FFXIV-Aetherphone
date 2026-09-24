@@ -6,34 +6,20 @@ using Lumina.Excel.Exceptions;
 
 namespace Aetherphone.Core.Game;
 
-internal enum SheetLanguageOverride
-{
-    None,
-    English,
-    German,
-    French,
-    Japanese,
-}
-
-internal readonly record struct SheetLanguageGate(bool PreferPhoneLocale, string LocaleCode);
+internal readonly record struct SheetLanguageGate(ClientLanguage? Language);
 
 internal static class GameSheetLanguage
 {
-    public static SheetLanguageGate CurrentGate() =>
-        new(Plugin.Cfg.PreferPhoneLocaleForGameData, Loc.Current.Code);
+    private static readonly HashSet<ClientLanguage> UnsupportedLanguages = new();
+    private static readonly object UnsupportedLanguagesLock = new();
 
-    public static ClientLanguage? Resolve(SheetLanguageOverride overrideLanguage = SheetLanguageOverride.None)
+    public static SheetLanguageGate CurrentGate() => new(Resolve());
+
+    public static ClientLanguage? Resolve(ClientLanguage? overrideLanguage = null)
     {
-        if (overrideLanguage != SheetLanguageOverride.None)
+        if (overrideLanguage is { } forced)
         {
-            return overrideLanguage switch
-            {
-                SheetLanguageOverride.English => ClientLanguage.English,
-                SheetLanguageOverride.German => ClientLanguage.German,
-                SheetLanguageOverride.French => ClientLanguage.French,
-                SheetLanguageOverride.Japanese => ClientLanguage.Japanese,
-                _ => null,
-            };
+            return forced;
         }
 
         if (!Plugin.Cfg.PreferPhoneLocaleForGameData)
@@ -41,33 +27,52 @@ internal static class GameSheetLanguage
             return null;
         }
 
-        var phoneLanguage = Loc.Current.Code switch
+        return Loc.Current.Code switch
         {
             "de" => ClientLanguage.German,
             "en" => ClientLanguage.English,
             "fr" => ClientLanguage.French,
             "ja" => ClientLanguage.Japanese,
-            _ => (ClientLanguage?)null,
+            _ => null,
         };
-
-        return phoneLanguage ?? Plugin.DataManager.Language;
     }
 
-    public static ExcelSheet<T> GetLocalizedSheet<T>(this IDataManager data,
-        SheetLanguageOverride overrideLanguage = SheetLanguageOverride.None) where T : struct, IExcelRow<T>
+    public static ExcelSheet<T> GetLocalizedSheet<T>(this IDataManager data, ClientLanguage? overrideLanguage = null)
+        where T : struct, IExcelRow<T> =>
+        GetSheetForLanguage<T>(data, Resolve(overrideLanguage));
+
+    public static ExcelSheet<T> GetLocalizedSheet<T>(this IDataManager data, SheetLanguageGate gate)
+        where T : struct, IExcelRow<T> =>
+        GetSheetForLanguage<T>(data, gate.Language);
+
+    private static ExcelSheet<T> GetSheetForLanguage<T>(IDataManager data, ClientLanguage? language)
+        where T : struct, IExcelRow<T>
     {
-        if (Resolve(overrideLanguage) is not { } language)
+        if (language is not { } resolved)
         {
             return data.GetExcelSheet<T>();
         }
 
+        lock (UnsupportedLanguagesLock)
+        {
+            if (UnsupportedLanguages.Contains(resolved))
+            {
+                return data.GetExcelSheet<T>();
+            }
+        }
+
         try
         {
-            return data.GetExcelSheet<T>(language);
+            return data.GetExcelSheet<T>(resolved);
         }
         catch (UnsupportedLanguageException)
         {
-            return language == ClientLanguage.English ? data.GetExcelSheet<T>() : data.GetExcelSheet<T>(ClientLanguage.English);
+            lock (UnsupportedLanguagesLock)
+            {
+                UnsupportedLanguages.Add(resolved);
+            }
+
+            return data.GetExcelSheet<T>();
         }
     }
 }

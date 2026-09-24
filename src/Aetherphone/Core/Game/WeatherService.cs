@@ -1,3 +1,4 @@
+using Dalamud.Game;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Environment;
 using Lumina.Excel.Sheets;
@@ -113,7 +114,7 @@ internal sealed class WeatherService
         }
 
         var key = name;
-        if (data.GetLocalizedSheet<Weather>(SheetLanguageOverride.English).TryGetRow(id, out var englishRow))
+        if (data.GetLocalizedSheet<Weather>(ClientLanguage.English).TryGetRow(id, out var englishRow))
         {
             key = englishRow.Name.ExtractText();
         }

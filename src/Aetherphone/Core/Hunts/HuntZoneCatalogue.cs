@@ -1,4 +1,3 @@
-using Aetherphone.Core.Game;
 using Aetherphone.Core.Maps;
 using Dalamud.Game;
 using Lumina.Excel.Exceptions;
@@ -102,11 +101,12 @@ internal sealed class HuntZoneCatalog
     private static Dictionary<string, uint> BuildTerritoryIdLookup()
     {
         var lookup = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
-        var englishLanguage = GameSheetLanguage.Resolve(SheetLanguageOverride.English) ?? ClientLanguage.English;
         Lumina.Excel.ExcelSheet<TerritoryType> sheet;
+        Lumina.Excel.ExcelSheet<PlaceName> placeNames;
         try
         {
-            sheet = Plugin.DataManager.GetExcelSheet<TerritoryType>(englishLanguage);
+            sheet = Plugin.DataManager.GetExcelSheet<TerritoryType>(ClientLanguage.English);
+            placeNames = Plugin.DataManager.GetExcelSheet<PlaceName>(ClientLanguage.English);
         }
         catch (UnsupportedLanguageException exception)
         {
@@ -116,12 +116,12 @@ internal sealed class HuntZoneCatalog
 
         foreach (var territory in sheet)
         {
-            if (territory.PlaceName.RowId == 0)
+            if (territory.PlaceName.RowId == 0 || !placeNames.TryGetRow(territory.PlaceName.RowId, out var placeName))
             {
                 continue;
             }
 
-            var name = territory.PlaceName.Value.Name.ExtractText();
+            var name = placeName.Name.ExtractText();
             if (name.Length > 0 && !lookup.ContainsKey(name))
             {
                 lookup[name] = territory.RowId;
