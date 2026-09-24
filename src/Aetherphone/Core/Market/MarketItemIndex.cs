@@ -61,7 +61,7 @@ internal sealed class MarketItemIndex
             building = true;
         }
 
-        _ = Task.Run(Build);
+        _ = Task.Run(() => Build(gate));
     }
 
     public void Search(string query, List<MarketItemRef> results, int max)
@@ -111,12 +111,12 @@ internal sealed class MarketItemIndex
 
     private MarketItemRef At(int index) => new(ids[index], names[index], icons[index], vendorPrices[index]);
 
-    private void Build()
+    private void Build(SheetLanguageGate gate)
     {
         try
         {
             var vendorItems = BuildVendorSet();
-            var sheet = data.GetLocalizedSheet<Item>();
+            var sheet = data.GetLocalizedSheet<Item>(gate);
             var bufferIds = new List<uint>(8192);
             var bufferNames = new List<string>(8192);
             var bufferIcons = new List<uint>(8192);
@@ -159,7 +159,7 @@ internal sealed class MarketItemIndex
             vendorPrices = localVendor;
             lowerNames = localLower;
             indexById = localIndex;
-            builtGate = GameSheetLanguage.CurrentGate();
+            builtGate = gate;
             ready = true;
         }
         catch (Exception exception)
