@@ -47,6 +47,7 @@ internal sealed class LanguagePage : ISettingsPage
 
             card.End();
 
+            SettingsSection.Header(Loc.T(L.Settings.GameDataSection), theme);
             var gameDataCard = GroupCard.Begin(theme, 1);
             var preferPhoneLocale = SettingsRow.Bool(gameDataCard.NextRow(),
                 Loc.T(L.Settings.PreferPhoneLocaleForGameData), configuration.PreferPhoneLocaleForGameData, theme,
