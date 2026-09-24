@@ -157,12 +157,15 @@ internal sealed class GameData
 
     public string TerritoryName(uint rowId)
     {
-        if (rowId != 0 && data.GetExcelSheet<TerritoryType>().TryGetRow(rowId, out var territory))
+        if (rowId == 0 || !data.GetExcelSheet<TerritoryType>().TryGetRow(rowId, out var territory) ||
+            territory.PlaceName.RowId == 0)
         {
-            return territory.PlaceName.Value.Name.ExtractText();
+            return string.Empty;
         }
 
-        return string.Empty;
+        return data.GetLocalizedSheet<PlaceName>().TryGetRow(territory.PlaceName.RowId, out var placeName)
+            ? placeName.Name.ExtractText()
+            : string.Empty;
     }
 
     public string DataCenterName(uint worldId)
