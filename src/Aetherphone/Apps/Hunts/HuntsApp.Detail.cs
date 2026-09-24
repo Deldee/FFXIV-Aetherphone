@@ -46,7 +46,7 @@ internal sealed partial class HuntsApp
     private string detailMapZoneId = string.Empty;
     private readonly List<HuntPoiEntry> detailMapAetherytePoints = new();
     private readonly Dictionary<(uint TerritoryId, string ZoneId), string> zoneLabelCache = new();
-    private SheetLanguageGate zoneLabelCacheGate;
+    private string zoneLabelCacheLocale = string.Empty;
     private readonly PhotoZoomView detailMapZoom = new();
     private bool detailMapHovered;
     private bool detailMapPendingFocus;
@@ -419,11 +419,11 @@ internal sealed partial class HuntsApp
 
     private string ResolveZoneLabel(string zoneId, uint territoryId)
     {
-        var gate = GameSheetLanguage.CurrentGate();
-        if (zoneLabelCacheGate != gate)
+        var locale = HuntUiLanguage.Key();
+        if (zoneLabelCacheLocale != locale)
         {
             zoneLabelCache.Clear();
-            zoneLabelCacheGate = gate;
+            zoneLabelCacheLocale = locale;
         }
 
         var key = (territoryId, zoneId);
@@ -440,13 +440,14 @@ internal sealed partial class HuntsApp
     private static string? ResolveLiveZoneName(uint territoryId)
     {
         if (territoryId == 0 ||
-            !Plugin.DataManager.GetLocalizedSheet<TerritoryType>().TryGetRow(territoryId, out var territory) ||
-            territory.PlaceName.RowId == 0)
+            !Plugin.DataManager.GetExcelSheet<TerritoryType>(HuntUiLanguage.SheetLanguage())
+                .TryGetRow(territoryId, out var territory) || territory.PlaceName.RowId == 0)
         {
             return null;
         }
 
-        return Plugin.DataManager.GetLocalizedSheet<PlaceName>().TryGetRow(territory.PlaceName.RowId, out var placeName)
+        return Plugin.DataManager.GetExcelSheet<PlaceName>(HuntUiLanguage.SheetLanguage())
+            .TryGetRow(territory.PlaceName.RowId, out var placeName)
             ? placeName.Name.ExtractText()
             : null;
     }
