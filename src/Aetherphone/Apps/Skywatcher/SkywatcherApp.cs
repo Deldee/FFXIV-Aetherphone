@@ -284,7 +284,7 @@ internal sealed partial class SkywatcherApp : IPhoneApp
         var half = radius + 3f * scale;
         var chip = new Rect(new Vector2(center.X - half, center.Y - half),
             new Vector2(center.X + half, center.Y + half));
-        WeatherCard.Chip(ImGui.GetWindowDrawList(), chip, kind, isDay, scale);
+        WeatherCard.Chip(ImGui.GetWindowDrawList(), chip, kind, isDay, scale, emphasizeBorder: true);
     }
 
     private static void ShadowCentered(Vector2 center, string text, Vector4 color, float fontScale, FontWeight weight,

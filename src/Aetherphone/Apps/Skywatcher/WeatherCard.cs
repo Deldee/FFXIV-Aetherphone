@@ -7,6 +7,8 @@ namespace Aetherphone.Apps.Skywatcher;
 internal static class WeatherCard
 {
     private const int ShadowLayers = 3;
+    private static readonly Vector4 ChipBorder = new(1f, 1f, 1f, 0.14f);
+    private static readonly Vector4 ForecastChipBorder = new(1f, 1f, 1f, 0.45f);
 
     public static void Panel(ImDrawListPtr drawList, Rect card, in SkyPalette palette, float scale, float radius = -1f)
     {
@@ -46,7 +48,8 @@ internal static class WeatherCard
         Material.Sheen(drawList, card.Min, card.Max, radius, ImGui.GetColorU32(color), 1.2f * scale, 1.2f * scale);
     }
 
-    public static void Chip(ImDrawListPtr drawList, Rect chip, WeatherKind kind, bool isDay, float scale)
+    public static void Chip(ImDrawListPtr drawList, Rect chip, WeatherKind kind, bool isDay, float scale,
+        bool emphasizeBorder = false)
     {
         var palette = WeatherSky.Resolve(kind, isDay);
         var radius = Metrics.Radius.Md * scale;
@@ -54,7 +57,7 @@ internal static class WeatherCard
             ImGui.GetColorU32(palette.Top), ImGui.GetColorU32(palette.Bottom));
         var glyphRadius = MathF.Min(chip.Width, chip.Height) * 0.36f;
         WeatherGlyph.Draw(kind, chip.Center, glyphRadius, palette, isDay, palette.Bottom);
-        Squircle.Stroke(drawList, chip.Min, chip.Max, radius,
-            ImGui.GetColorU32(new Vector4(1f, 1f, 1f, 0.14f)), 1f * scale);
+        var border = emphasizeBorder ? ForecastChipBorder : ChipBorder;
+        Squircle.Stroke(drawList, chip.Min, chip.Max, radius, ImGui.GetColorU32(border), 1f * scale);
     }
 }
